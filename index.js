@@ -8,7 +8,20 @@ class WebAuthn4JS extends EventEmitter {
     constructor(methods) {
         super();
         this.methods = methods;
+
+        // define _ methods below which call this.methods, with cb
+        // then make async ones here
     }
+
+    begin_registration
+    finish_registration ? takes http request and calls create_credential
+    create_credential
+
+    begin_login
+    finish_login ? takes http request and called validate_login
+    validate_login
+
+
 }
 
 exports.make = promisify((config, cb) => {
