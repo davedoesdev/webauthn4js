@@ -10,12 +10,33 @@ import (
 	"github.com/duo-labs/webauthn/protocol"
 )
 
-/*type User struct {
+type User struct {
 	ID          []byte                `json:"id"`
 	Name        string                `json:"name"`
 	DisplayName string                `json:"displayName"`
+	IconURL     string                `json:"iconURL"`
 	Credentials []webauthn.Credential `json:"credentials"`
-}*/
+}
+
+func (user User) WebAuthnID() []byte {
+	return user.ID
+}
+
+func (user User) WebAuthnName() string {
+	return user.Name
+}
+
+func (user User) WebAuthnDisplayName() string {
+	return user.DisplayName
+}
+
+func (user User) WebAuthnIcon() string {
+	return user.IconURL
+}
+
+func (user User) WebAuthnCredentials() []webauthn.Credential {
+	return user.Credentials
+}
 
 var webAuthn *webauthn.WebAuthn
 var c chan bool
@@ -45,7 +66,7 @@ func cberr(cb js.Value, err error) interface{} {
 }
 
 func cbok(cb js.Value, args ...interface{}) interface{} {
-	cb.Invoke(append([]interface{}{js.Null()}, args)...)
+	cb.Invoke(append([]interface{}{js.Null()}, args...)...)
 	return js.Null()
 }
 
@@ -70,7 +91,7 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 		return cberr(cb, errors.New("WebAuthn not initialiazed"))
 	}
 
-	var user webauthn.User
+	var user User
 	err := json.Unmarshal([]byte(arguments[0].String()), &user)
 	if err != nil {
 		return cberr(cb, err)
@@ -117,5 +138,5 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 		return cberr(cb, err)
 	}
 
-	return cbok(cb, optionsJSON, sessionDataJSON)
+	return cbok(cb, string(optionsJSON), string(sessionDataJSON))
 }

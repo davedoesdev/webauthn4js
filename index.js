@@ -8,18 +8,36 @@ class WebAuthn4JS extends EventEmitter {
     constructor(methods) {
         super();
         this.methods = methods;
+        this.beginRegistration = promisify(this._beginRegistration.bind(this));
 
-        // define _ methods below which call this.methods, with cb
-        // then make async ones here
     }
 
-    begin_registration
+    _beginRegistration(user, ...args) {
+        user = Object.assign({}, user);
+        if (!Buffer.isBuffer(user.id)) {
+            user.id = Buffer.from(user.id);
+        }
+        user.id = user.id.toString('base64');
+
+        const regOpts = args.slice(0, args.length - 1);
+
+        // TODO we need to json regOpts
+
+        this.methods.beginRegistration(
+            JSON.stringify(user),
+            ...regOpts,
+            (err, options, sessionData) => {
+                args[args.length - 1](err, { options, sessionData });
+            });
+    }
+
+    /*begin_registration
     finish_registration ? takes http request and calls create_credential
     create_credential
 
     begin_login
     finish_login ? takes http request and called validate_login
-    validate_login
+    validate_login*/
 
 
 }
