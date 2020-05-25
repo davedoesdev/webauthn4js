@@ -5,6 +5,7 @@ import (
 	"os"
 	"encoding/json"
 	"errors"
+	"bytes"
 
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/duo-labs/webauthn/protocol"
@@ -50,6 +51,7 @@ func main() {
 		"exit": js.FuncOf(exit),
 		"init": js.FuncOf(initialize),
 		"beginRegistration": js.FuncOf(beginRegistration),
+		"finishRegistration": js.FuncOf(finishRegistration),
 	})
 
 	<-c
@@ -109,7 +111,7 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 			}
 
 			var newCCO protocol.PublicKeyCredentialCreationOptions
-			err = json.Unmarshal([]byte(f.Invoke(ccoJSON).String()), &newCCO)
+			err = json.Unmarshal([]byte(f.Invoke(string(ccoJSON)).String()), &newCCO)
 			if err != nil {
 				ccoErr = err
 				return
@@ -139,4 +141,42 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 	}
 
 	return cbok(cb, string(optionsJSON), string(sessionDataJSON))
+}
+
+func finishRegistration(this js.Value, arguments []js.Value) interface{} {
+	cb := arguments[3]
+
+	if webAuthn == nil {
+		return cberr(cb, errors.New("WebAuthn not initialiazed"))
+	}
+
+	var user User
+	err := json.Unmarshal([]byte(arguments[0].String()), &user)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	var sessionData webauthn.SessionData
+	err = json.Unmarshal([]byte(arguments[1].String()), &sessionData)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	response, err := protocol.ParseCredentialCreationResponseBody(
+		bytes.NewReader([]byte(arguments[2].String())))
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	credential, err := webAuthn.CreateCredential(user, sessionData, response)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	credentialJSON, err := json.Marshal(credential)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	return cbok(cb, string(credentialJSON))
 }

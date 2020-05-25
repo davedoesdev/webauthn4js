@@ -13,22 +13,25 @@ class WebAuthn4JS extends EventEmitter {
     }
 
     _beginRegistration(user, ...args) {
-        user = Object.assign({}, user);
-        if (!Buffer.isBuffer(user.id)) {
-            user.id = Buffer.from(user.id);
+        const cb = args[args.length - 1];
+        try {
+            user = Object.assign({}, user);
+            if (!Buffer.isBuffer(user.id)) {
+                user.id = Buffer.from(user.id);
+            }
+            user.id = user.id.toString('base64');
+
+            const regOpts = args.slice(0, args.length - 1).map(f =>
+                cco => JSON.stringify(f(JSON.parse(cco))));
+
+            this.methods.beginRegistration(
+                JSON.stringify(user),
+                ...regOpts,
+                (err, options, sessionData) => process.nextTick(
+                    cb, err, { options, sessionData }));
+        } catch (ex) {
+            cb(ex);
         }
-        user.id = user.id.toString('base64');
-
-        const regOpts = args.slice(0, args.length - 1);
-
-        // TODO we need to json regOpts
-
-        this.methods.beginRegistration(
-            JSON.stringify(user),
-            ...regOpts,
-            (err, options, sessionData) => {
-                args[args.length - 1](err, { options, sessionData });
-            });
     }
 
     /*begin_registration
