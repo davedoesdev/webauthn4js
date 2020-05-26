@@ -52,6 +52,8 @@ func main() {
 		"init": js.FuncOf(initialize),
 		"beginRegistration": js.FuncOf(beginRegistration),
 		"finishRegistration": js.FuncOf(finishRegistration),
+		"beginLogin": js.FuncOf(beginLogin),
+		"finishLogin": js.FuncOf(finishLogin),
 	})
 
 	<-c
@@ -180,3 +182,100 @@ func finishRegistration(this js.Value, arguments []js.Value) interface{} {
 
 	return cbok(cb, string(credentialJSON))
 }
+
+func beginLogin(this js.Value, arguments []js.Value) interface{} {
+	cb := arguments[len(arguments) - 1]
+
+	if webAuthn == nil {
+		return cberr(cb, errors.New("WebAuthn not initialiazed"))
+	}
+
+	var user User
+	err := json.Unmarshal([]byte(arguments[0].String()), &user)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	var loginOpts []webauthn.LoginOption
+	var croErr error
+
+	for _, f := range arguments[1:len(arguments) - 1] {
+		loginOpts = append(loginOpts, func(cro *protocol.PublicKeyCredentialRequestOptions) {
+			croJSON, err :=  json.Marshal(cro)
+			if err != nil {
+				croErr = err
+				return
+			}
+
+			var newCRO protocol.PublicKeyCredentialRequestOptions
+			err = json.Unmarshal([]byte(f.Invoke(string(croJSON)).String()), &newCRO)
+			if err != nil {
+				croErr = err
+				return
+			}
+
+			*cro = newCRO
+		})
+	}
+
+	if croErr != nil {
+		return cberr(cb, croErr)
+	}
+
+	options, sessionData, err := webAuthn.BeginLogin(user, loginOpts...)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	optionsJSON, err := json.Marshal(options)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	sessionDataJSON, err := json.Marshal(sessionData)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	return cbok(cb, string(optionsJSON), string(sessionDataJSON))
+}
+
+func finishLogin(this js.Value, arguments []js.Value) interface{} {
+	cb := arguments[3]
+
+	if webAuthn == nil {
+		return cberr(cb, errors.New("WebAuthn not initialiazed"))
+	}
+
+	var user User
+	err := json.Unmarshal([]byte(arguments[0].String()), &user)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	var sessionData webauthn.SessionData
+	err = json.Unmarshal([]byte(arguments[1].String()), &sessionData)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	response, err := protocol.ParseCredentialRequestResponseBody(
+		bytes.NewReader([]byte(arguments[2].String())))
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	credential, err := webAuthn.ValidateLogin(user, sessionData, response)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	credentialJSON, err := json.Marshal(credential)
+	if err != nil {
+		return cberr(cb, err)
+	}
+
+	return cbok(cb, string(credentialJSON))
+}
+
+

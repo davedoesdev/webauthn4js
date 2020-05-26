@@ -9,40 +9,98 @@ class WebAuthn4JS extends EventEmitter {
         super();
         this.methods = methods;
         this.beginRegistration = promisify(this._beginRegistration.bind(this));
+        this.finishRegistration = promisify(this._finishRegistration.bind(this));
+        this.beginLogin = promisify(this._beginLogin.bind(this));
+        this.finishLogin = promisify(this._finishLogin.bind(this));
+        // TODO: dedup the implementations below
+    }
 
+    _user(user) {
+        user = Object.assign({}, user);
+        if (!Buffer.isBuffer(user.id)) {
+            user.id = Buffer.from(user.id);
+        }
+        user.id = user.id.toString('base64');
+        return user;
     }
 
     _beginRegistration(user, ...args) {
         const cb = args[args.length - 1];
         try {
-            user = Object.assign({}, user);
-            if (!Buffer.isBuffer(user.id)) {
-                user.id = Buffer.from(user.id);
-            }
-            user.id = user.id.toString('base64');
-
             const regOpts = args.slice(0, args.length - 1).map(f =>
                 cco => JSON.stringify(f(JSON.parse(cco))));
-
             this.methods.beginRegistration(
-                JSON.stringify(user),
+                JSON.stringify(_user(user)),
                 ...regOpts,
-                (err, options, sessionData) => process.nextTick(
-                    cb, err, { options, sessionData }));
+                (err, options, sessionData) => {
+                    if (err) {
+                        return process.nextTick(cb, err);
+                    }
+                    process.nextTick(cb, null, {
+                        options: JSON.parse(options),
+                        sessionData: JSON.parse(sessionData)
+                    });
+                });
         } catch (ex) {
             cb(ex);
         }
     }
 
-    /*begin_registration
-    finish_registration ? takes http request and calls create_credential
-    create_credential
+    _finishRegistration(user, sessionData, response, cb) {
+        try {
+            this.methods.finishRegistration(
+                JSON.stringify(_user(user)),
+                JSON.stringify(sessionData),
+                JSON.stringify(response),
+                (err, credential) => {
+                    if (err) {
+                        return process.nextTick(cb, err);
+                    }
+                    process.nextTick(cb, null, JSON.parse(credential));
+                });
+        } catch (ex) {
+            cb(ex);
+        }
+    }
 
-    begin_login
-    finish_login ? takes http request and called validate_login
-    validate_login*/
+    _beginLogin(user, ...args) {
+        const cb = args[args.length - 1];
+        try {
+            const loginOpts = args.slice(0, args.length - 1).map(f =>
+                cro => JSON.stringify(f(JSON.parse(cro))));
+            this.methods.beginLogin(
+                JSON.stringify(_user(user)),
+                ...loginOpts,
+                (err, options, sessionData) => {
+                    if (err) {
+                        return process.nextTick(cb, err);
+                    }
+                    process.nextTick(cb, null, {
+                        options: JSON.parse(options),
+                        sessionData: JSON.parse(sessionData)
+                    });
+                });
+        } catch (ex) {
+            cb(ex);
+        }
+    }
 
-
+    _finishLogin(user, sessionData, response, cb) {
+        try {
+            this.methods.finishLogin(
+                JSON.stringify(_user(user)),
+                JSON.stringify(sessionData),
+                JSON.stringify(response),
+                (err, credential) => {
+                    if (err) {
+                        return process.nextTick(cb, err);
+                    }
+                    process.nextTick(cb, null, JSON.parse(credential));
+                });
+        } catch (ex) {
+            cb(ex);
+        }
+    }
 }
 
 exports.make = promisify((config, cb) => {
