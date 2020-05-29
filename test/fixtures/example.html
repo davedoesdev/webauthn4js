@@ -31,6 +31,9 @@
       const username = document.getElementById('email').value;
       try {
         const get_response = await fetch(`/register/${username}`);
+        if (!get_response.ok) {
+          throw new Error(`Registration GET failed with ${get_response.status}`);
+        }
         const { options, session_data } = await get_response.json();
         const { publicKey } = options;
         publicKey.challenge = bufferDecode(publicKey.challenge);
@@ -59,77 +62,59 @@
             session_data
           })
         });
-        if (put_response.ok) {
-          return alert(`Successfully registered ${username}`);
+        if (!put_response.ok) {
+          throw new Error(`Registration PUT failed with ${put_response.status}`);
         }
       } catch (ex) {
         console.error(ex);
+        return alert(`Failed to register ${username}`);
       }
-      alert(`Failed to register ${username}`);
+      alert(`Successfully registered ${username}`);
     }
 
-    function loginUser() {
-
-      username = $("#email").val()
-      if (username === "") {
-        alert("Please enter a username");
-        return;
-      }
-
-      $.get(
-        '/login/begin/' + username,
-        null,
-        function (data) {
-          return data
-        },
-        'json')
-        .then((credentialRequestOptions) => {
-          console.log(credentialRequestOptions)
-          credentialRequestOptions.publicKey.challenge = bufferDecode(credentialRequestOptions.publicKey.challenge);
-          credentialRequestOptions.publicKey.allowCredentials.forEach(function (listItem) {
-            listItem.id = bufferDecode(listItem.id)
-          });
-
-          return navigator.credentials.get({
-            publicKey: credentialRequestOptions.publicKey
-          })
-        })
-        .then((assertion) => {
-          console.log(assertion)
-          let authData = assertion.response.authenticatorData;
-          let clientDataJSON = assertion.response.clientDataJSON;
-          let rawId = assertion.rawId;
-          let sig = assertion.response.signature;
-          let userHandle = assertion.response.userHandle;
-
-          $.post(
-            '/login/finish/' + username,
-            JSON.stringify({
-              id: assertion.id,
-              rawId: bufferEncode(rawId),
-              type: assertion.type,
-              response: {
-                authenticatorData: bufferEncode(authData),
-                clientDataJSON: bufferEncode(clientDataJSON),
-                signature: bufferEncode(sig),
-                userHandle: bufferEncode(userHandle),
-              },
-            }),
-            function (data) {
-              return data
+    async function loginUser() {
+      const username = document.getElementById('email').value;
+      try {
+        const get_response = await fetch(`/login/${username}`);
+        if (!get_response.ok) {
+          throw new Error(`Login GET failed with ${get_response.status}`);
+        }
+        const { options, session_data } = await get_response.json();
+        const { publicKey } = options;
+        publicKey.challenge = bufferDecode(publicKey.challenge);
+        for (const c of publicKey.allowCredentials) {
+          c.id = bufferDecode(c.id);
+        }
+        const assertion = await navigator.credentials.get(options);
+        const { id, rawId, type, response: assertion_response } = assertion;
+        const { authenticatorData, clientDataJSON, signature, userHandle } = assertion_response;
+        const post_response = await fetch(`/login/${username}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id,
+            rawId: bufferEncode(rawId),
+            type,
+            response: {
+              authenticatorData: bufferEncode(authenticatorData),
+              clientDataJSON: bufferEncode(clientDataJSON),
+              signature: bufferEncode(signature),
+              userHandle: bufferEncode(userHandle)
             },
-            'json')
-        })
-        .then((success) => {
-          alert("successfully logged in " + username + "!")
-          return
-        })
-        .catch((error) => {
-          console.log(error)
-          alert("failed to register " + username)
-        })
+            session_data
+          })
+        });
+        if (!post_response.ok) {
+          throw new Error(`Login POST failed with ${post_response.status}`);
+        }
+      } catch (ex) {
+        console.error(ex);
+        return alert(`Failed to log in ${username}`);
+      }
+      alert(`Successfully logged in ${username}`);
     }
-
     </script>
   </body>
 </html>
