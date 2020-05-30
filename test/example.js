@@ -83,15 +83,7 @@ async function login(fastify, options) {
             err.statusCode = 404;
             throw err;
         }
-        const { options, sessionData } = await webAuthn.beginLogin(
-            user,
-            /*TODO allowCreds cco => {
-                cco.excludeCredentials = user.credentials.map(c => ({
-                    type: 'public-key',
-                    id: c.ID
-                }));
-                return cco;
-            }*/);
+        const { options, sessionData } = await webAuthn.beginLogin(user);
         return {
             options,
             session_data: await make_secret_session_data(
@@ -139,7 +131,10 @@ async function login(fastify, options) {
         RPDisplayName: 'WebAuthnJS',
         RPID: 'localhost',
         RPOrigin: `https://localhost:${port}`,
-        RPIcon: 'https://webauthnjs.example.com/logo.png'
+        RPIcon: 'https://webauthnjs.example.com/logo.png',
+        AuthenticatorSelection: {
+            userVerification: 'preferred'
+        }
     });
 
     const sodium = await SodiumPlus.auto();
