@@ -108,7 +108,13 @@ async function login(fastify, options) {
             ex.statusCode = 400;
             throw ex;
         }
-        // TODO: check clonewarning, inc credentials counter
+        if (credential.Authenticator.CloneWarning) {
+            const err = new Error('credential appears to be cloned');
+            err.statusCode = 403;
+            throw err;
+        }
+        const user_cred = user.credentials.find(c => c.ID === credential.ID);
+        user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
         reply.code(204);
     });
 }
