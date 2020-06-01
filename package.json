@@ -28,8 +28,6 @@
     "webauthn"
   ],
   "dependencies": {
-    "grunt": "^1.1.0",
-    "load-grunt-tasks": "^5.1.0",
     "sodium-plus": "^0.7.1"
   },
   "devDependencies": {
@@ -43,6 +41,7 @@
     "eslint": "^7.1.0",
     "fastify": "^2.14.1",
     "fastify-static": "^2.7.0",
+    "grunt": "^1.1.0",
     "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
     "grunt-force-task": "^2.0.0",
