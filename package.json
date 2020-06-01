@@ -17,7 +17,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "build": "GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go",
+    "build": "GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go user.go && go build genschema.go user.go",
     "test": "grunt test",
     "ci": "grunt lint coverage"
   },
