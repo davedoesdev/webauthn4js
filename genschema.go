@@ -10,20 +10,32 @@ import (
 	"github.com/alecthomas/jsonschema"
 )
 
-type WebAuthn4JS struct  {
+type WebAuthn4JS struct {
 	Config webauthn.Config
 	User User
-	CCO protocol.PublicKeyCredentialCreationOptions
-	CC protocol.CredentialCreation
+	CredentialCreation protocol.CredentialCreation
+	CredentialCreationResponse protocol.CredentialCreationResponse
+	CredentialAssertion protocol.CredentialAssertion
+	CredentialAssertionResponse protocol.CredentialAssertionResponse
 	SessionData webauthn.SessionData
-	Credential webauthn.Credential
-	CRO protocol.PublicKeyCredentialRequestOptions
-	CA protocol.CredentialAssertion
 }
 
 func main() {
+	jsonschema.Version = "" // json-schema-to-typescript doesn't like $schema and $ref together
 	typ := reflect.TypeOf((*WebAuthn4JS)(nil)).Elem()
-	schema := jsonschema.ReflectFromType(typ)
+	reflector := jsonschema.Reflector{
+		DoNotReference: false,
+		ExpandedStruct: true,
+		/*TypeMapper: func(typ reflect.Type) *jsonschema.Type {
+			if typ == reflect.TypeOf((*protocol.Challenge)(nil)).Elem() {
+				return &jsonschema.Type{
+					Type: "string",
+				}
+			}
+			return nil
+		},*/
+	}
+	schema := reflector.ReflectFromType(typ)
 	json, err := schema.MarshalJSON()
 	if  err != nil {
 		fmt.Fprintln(os.Stderr, err)
