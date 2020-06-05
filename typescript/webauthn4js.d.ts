@@ -1,4 +1,4 @@
-import * from './webauthn'
+//import * from './webauthn'
 
 export interface WebAuthn4JS extends EventEmitter {
     async beginRegistration(
@@ -28,7 +28,7 @@ export interface WebAuthn4JS extends EventEmitter {
         sessionData : SessionData,
         response : CredentialAssertionResponse
     ) : Credential;
-};
+}
 
 declare function make(config : Config) : WebAuthnJS;
 

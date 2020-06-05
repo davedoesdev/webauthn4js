@@ -1,3 +1,4 @@
+/*eslint-env node */
 'use strict';
 const path = require('path');
 const { EventEmitter } = require('events');
