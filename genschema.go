@@ -11,7 +11,7 @@ import (
 )
 
 type WebAuthn4JS struct {
-	Config webauthn.Config
+	Config Config
 	User User
 	CredentialCreation protocol.CredentialCreation
 	CredentialCreationResponse protocol.CredentialCreationResponse

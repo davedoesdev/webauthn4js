@@ -13,8 +13,8 @@ module.exports = function (grunt) {
 
         exec: {
             build_go: [
-                'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go user.go',
-                'go build genschema.go user.go',
+                'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go config.go user.go',
+                'go build genschema.go config.go user.go',
                 './genschema | json2ts > typescript/webauthn.d.ts'
             ].join('&&'),
             build_ts: [

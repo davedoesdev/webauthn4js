@@ -68,12 +68,13 @@ func cbok(cb js.Value, args ...interface{}) interface{} {
 
 func initialize(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[1]
-	var config webauthn.Config
+	var config Config
 	err := json.Unmarshal([]byte(arguments[0].String()), &config)
 	if err != nil {
 		return cberr(cb, err)
 	}
-	webAuthn, err = webauthn.New(&config)
+	wconfig := webauthn.Config(config)
+	webAuthn, err = webauthn.New(&wconfig)
 	if err != nil {
 		return cberr(cb, err)
 	}

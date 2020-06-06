@@ -8,12 +8,12 @@
 export interface Config {
   RPDisplayName: string;
   RPID: string;
-  RPOrigin: string;
-  RPIcon: string;
-  AttestationPreference: string;
-  AuthenticatorSelection: AuthenticatorSelection;
-  Timeout: number;
-  Debug: boolean;
+  RPOrigin?: string;
+  RPIcon?: string;
+  AttestationPreference?: string;
+  AuthenticatorSelection?: AuthenticatorSelection;
+  Timeout?: number;
+  Debug?: boolean;
 }
 export interface AuthenticatorSelection {
   authenticatorAttachment?: string;
