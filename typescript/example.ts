@@ -7,6 +7,7 @@ import mod_fastify, { FastifyError } from 'fastify';
 import fastify_static from 'fastify-static';
 import sodium_plus from 'sodium-plus';
 import makeWebAuthn from '../index.js';
+import { User } from './webauthn';
 const readFile = fs.promises.readFile;
 
 const challenge_timeout = 60000;
@@ -14,7 +15,7 @@ const port = 3000;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const users = new Map();
+const users = new Map<string, User>();
 let num_users = 0;
 
 class ErrorWithStatus extends Error {
