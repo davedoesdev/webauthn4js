@@ -1,7 +1,7 @@
 /*eslint-env node */
 
-const path = require('path');
 const fs = require('fs');
+const { join } = require('path');
 const mod_fastify = require('fastify');
 const fastify_static = require('fastify-static');
 const { SodiumPlus } = require('sodium-plus');
@@ -14,124 +14,19 @@ const port = 3000;
 const users = new Map();
 let num_users = 0;
 
-async function register(fastify, options) {
-    const {
-        webAuthn,
-        make_secret_session_data,
-        verify_secret_session_data
-    } = options;
-
-    fastify.get('/:username',  async request => {
-        let user = users.get(request.params.username);
-        if (!user) {
-            user = {
-                id: `user${num_users++}`,
-                name: request.params.username,
-                displayName: request.params.username.split('@')[0],
-                iconURL: '',
-                credentials: []
-            };
-            users.set(request.params.username, user);
-        }
-        const { options, sessionData } = await webAuthn.beginRegistration(
-            user,
-            cco => {
-                cco.excludeCredentials = user.credentials.map(c => ({
-                    type: 'public-key',
-                    id: c.ID
-                }));
-                return cco;
-            });
-        return {
-            options,
-            session_data: await make_secret_session_data(
-                request.params.username, 'registration', sessionData)
-        };
-    });
-
-    fastify.put('/:username', async (request, reply) => {
-        const user = users.get(request.params.username);
-        if (!user) {
-            const err = new Error('no user');
-            err.statusCode = 404;
-            throw err;
-        }
-        const session_data = await verify_secret_session_data(
-            request.params.username, 'registration', request.body);
-        let credential;
-        try {
-            credential = await webAuthn.finishRegistration(
-                user, session_data, request.body);
-        } catch (ex) {
-            ex.statusCode = 400;
-            throw ex;
-        }
-        user.credentials.push(credential);
-        reply.code(204);
-    });
-}
-
-async function login(fastify, options) {
-    const {
-        webAuthn,
-        make_secret_session_data,
-        verify_secret_session_data
-    } = options;
-
-    fastify.get('/:username',  async request => {
-        const user = users.get(request.params.username);
-        if (!user) {
-            const err = new Error('no user');
-            err.statusCode = 404;
-            throw err;
-        }
-        const { options, sessionData } = await webAuthn.beginLogin(user);
-        return {
-            options,
-            session_data: await make_secret_session_data(
-                request.params.username, 'login', sessionData)
-        };
-    });
-
-    fastify.post('/:username', async (request, reply) => {
-        const user = users.get(request.params.username);
-        if (!user) {
-            const err = new Error('no user');
-            err.statusCode = 404;
-            throw err;
-        }
-        const session_data = await verify_secret_session_data(
-            request.params.username, 'login', request.body);
-        let credential;
-        try {
-            credential = await webAuthn.finishLogin(
-                user, session_data, request.body);
-        } catch (ex) {
-            ex.statusCode = 400;
-            throw ex;
-        }
-        if (credential.Authenticator.CloneWarning) {
-            const err = new Error('credential appears to be cloned');
-            err.statusCode = 403;
-            throw err;
-        }
-        const user_cred = user.credentials.find(c => c.ID === credential.ID);
-        user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
-        reply.code(204);
-    });
-}
-
 (async function () {
+    const keys_dir = join(__dirname, 'keys');
+
     const fastify = mod_fastify({
         logger: true,
         https: {
-            key: await readFile(path.join(__dirname, 'keys', 'server.key')),
-            cert: await readFile(path.join(__dirname, 'keys', 'server.crt'))
+            key: await readFile(join(keys_dir, 'server.key')),
+            cert: await readFile(join(keys_dir, 'server.crt'))
         }
     });
 
     fastify.register(fastify_static, {
-        root: path.join(__dirname, 'fixtures'),
+        root: join(__dirname, 'fixtures'),
         index: 'example.html'
     });
 
@@ -185,19 +80,108 @@ async function login(fastify, options) {
         }
     }
 
-    const options = {
-        webAuthn,
-        make_secret_session_data,
-        verify_secret_session_data
-    };
+    async function register(fastify) {
+        fastify.get('/:username',  async request => {
+            let user = users.get(request.params.username);
+            if (!user) {
+                user = {
+                    id: `user${num_users++}`,
+                    name: request.params.username,
+                    displayName: request.params.username.split('@')[0],
+                    iconURL: '',
+                    credentials: []
+                };
+                users.set(request.params.username, user);
+            }
+            const { options, sessionData } = await webAuthn.beginRegistration(
+                user,
+                cco => {
+                    cco.excludeCredentials = user.credentials.map(c => ({
+                        type: 'public-key',
+                        id: c.ID
+                    }));
+                    return cco;
+                });
+            return {
+                options,
+                session_data: await make_secret_session_data(
+                    request.params.username, 'registration', sessionData)
+            };
+        });
 
-    fastify.register(register, Object.assign({
+        fastify.put('/:username', async (request, reply) => {
+            const user = users.get(request.params.username);
+            if (!user) {
+                const err = new Error('no user');
+                err.statusCode = 404;
+                throw err;
+            }
+            const session_data = await verify_secret_session_data(
+                request.params.username, 'registration', request.body);
+            let credential;
+            try {
+                credential = await webAuthn.finishRegistration(
+                    user, session_data, request.body);
+            } catch (ex) {
+                ex.statusCode = 400;
+                throw ex;
+            }
+            user.credentials.push(credential);
+            reply.code(204);
+        });
+    }
+
+    async function login(fastify) {
+        fastify.get('/:username',  async request => {
+            const user = users.get(request.params.username);
+            if (!user) {
+                const err = new Error('no user');
+                err.statusCode = 404;
+                throw err;
+            }
+            const { options, sessionData } = await webAuthn.beginLogin(user);
+            return {
+                options,
+                session_data: await make_secret_session_data(
+                    request.params.username, 'login', sessionData)
+            };
+        });
+
+        fastify.post('/:username', async (request, reply) => {
+            const user = users.get(request.params.username);
+            if (!user) {
+                const err = new Error('no user');
+                err.statusCode = 404;
+                throw err;
+            }
+            const session_data = await verify_secret_session_data(
+                request.params.username, 'login', request.body);
+            let credential;
+            try {
+                credential = await webAuthn.finishLogin(
+                    user, session_data, request.body);
+            } catch (ex) {
+                ex.statusCode = 400;
+                throw ex;
+            }
+            if (credential.Authenticator.CloneWarning) {
+                const err = new Error('credential appears to be cloned');
+                err.statusCode = 403;
+                throw err;
+            }
+            const user_cred = user.credentials.find(c => c.ID === credential.ID);
+            user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
+            reply.code(204);
+        });
+    }
+
+    fastify.register(register, {
         prefix: '/register/'
-    }, options));
+    });
 
-    fastify.register(login, Object.assign({
+    fastify.register(login, {
         prefix: '/login/'
-    }, options));
+    });
 
     await fastify.listen(port);
 

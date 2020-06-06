@@ -1,16 +1,18 @@
 /*eslint-env node */
 
-import * as path from 'path';
 import * as fs from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import mod_fastify, { FastifyError } from 'fastify';
 import fastify_static from 'fastify-static';
 import sodium_plus from 'sodium-plus';
-import makeWebAuthn from '..';
-
+import makeWebAuthn from '../index.js';
 const readFile = fs.promises.readFile;
 
 const challenge_timeout = 60000;
 const port = 3000;
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const users = new Map();
 let num_users = 0;
@@ -21,13 +23,73 @@ class ErrorWithStatus extends Error {
     }
 }
 
-async function register(fastify, options) {
-    const {
-        webAuthn,
-        make_secret_session_data,
-        verify_secret_session_data
-    } = options;
+const test_dir = join(__dirname, '..', 'test');
+const keys_dir = join(test_dir, 'keys');
 
+const fastify = mod_fastify({
+    logger: true,
+    https: {
+        key: await readFile(join(keys_dir, 'server.key')),
+        cert: await readFile(join(keys_dir, 'server.crt'))
+    }
+});
+
+fastify.register(fastify_static, {
+    root: join(test_dir, 'fixtures'),
+    index: ['example.html']
+});
+
+const webAuthn = await makeWebAuthn({
+    RPDisplayName: 'WebAuthnJS',
+    RPID: 'localhost',
+    RPOrigin: `https://localhost:${port}`,
+    RPIcon: 'https://webauthnjs.example.com/logo.png',
+    AuthenticatorSelection: {
+        userVerification: 'preferred'
+    }
+});
+
+const sodium = await sodium_plus.SodiumPlus.auto();
+const session_data_key = await sodium.crypto_secretbox_keygen();
+
+async function make_secret_session_data(username, type, session_data) {
+    const nonce = await sodium.randombytes_buf(
+        sodium.CRYPTO_SECRETBOX_NONCEBYTES);
+    return {
+        ciphertext: (await sodium.crypto_secretbox(
+            JSON.stringify([ username, type, session_data, Date.now() ]),
+            nonce,
+            session_data_key)).toString('base64'),
+        nonce: nonce.toString('base64')
+    };
+}
+
+async function verify_secret_session_data(expected_username, expected_type, obj) {
+    try {
+        const secret_session_data = obj.session_data;
+        delete obj.session_data;
+        const [ username, type, session_data, timestamp ] = JSON.parse(
+            (await sodium.crypto_secretbox_open(
+                Buffer.from(secret_session_data.ciphertext, 'base64'),
+                Buffer.from(secret_session_data.nonce, 'base64'),
+                session_data_key)).toString());
+        if (username !== expected_username) {
+            throw new Error('wrong username');
+        }
+        if (type !== expected_type) {
+            throw new Error('wrong type');
+        }
+        if ((timestamp + challenge_timeout) <= Date.now()) {
+            throw new Error('session timed out');
+        }
+        return session_data;
+    } catch (ex) {
+        ex.statusCode = 400;
+        throw ex;
+    }
+}
+
+async function register(fastify) {
     fastify.get('/:username',  async request => {
         let user = users.get(request.params.username);
         if (!user) {
@@ -76,13 +138,7 @@ async function register(fastify, options) {
     });
 }
 
-async function login(fastify, options) {
-    const {
-        webAuthn,
-        make_secret_session_data,
-        verify_secret_session_data
-    } = options;
-
+async function login(fastify) {
     fastify.get('/:username',  async request => {
         const user = users.get(request.params.username);
         if (!user) {
@@ -120,83 +176,14 @@ async function login(fastify, options) {
     });
 }
 
-    const fastify = mod_fastify({
-        logger: true,
-        https: {
-            key: await readFile(path.join(__dirname, 'keys', 'server.key')),
-            cert: await readFile(path.join(__dirname, 'keys', 'server.crt'))
-        }
-    });
+fastify.register(register, {
+    prefix: '/register/'
+});
 
-    fastify.register(fastify_static, {
-        root: path.join(__dirname, 'fixtures'),
-        index: ['example.html']
-    });
+fastify.register(login, {
+    prefix: '/login/'
+});
 
-    const webAuthn = await makeWebAuthn({
-        RPDisplayName: 'WebAuthnJS',
-        RPID: 'localhost',
-        RPOrigin: `https://localhost:${port}`,
-        RPIcon: 'https://webauthnjs.example.com/logo.png',
-        AuthenticatorSelection: {
-            userVerification: 'preferred'
-        }
-    });
+await fastify.listen(port);
 
-    const sodium = await sodium_plus.SodiumPlus.auto();
-    const session_data_key = await sodium.crypto_secretbox_keygen();
-
-    async function make_secret_session_data(username, type, session_data) {
-        const nonce = await sodium.randombytes_buf(
-            sodium.CRYPTO_SECRETBOX_NONCEBYTES);
-        return {
-            ciphertext: (await sodium.crypto_secretbox(
-                JSON.stringify([ username, type, session_data, Date.now() ]),
-                nonce,
-                session_data_key)).toString('base64'),
-            nonce: nonce.toString('base64')
-        };
-    }
-
-    async function verify_secret_session_data(expected_username, expected_type, obj) {
-        try {
-            const secret_session_data = obj.session_data;
-            delete obj.session_data;
-            const [ username, type, session_data, timestamp ] = JSON.parse(
-                (await sodium.crypto_secretbox_open(
-                    Buffer.from(secret_session_data.ciphertext, 'base64'),
-                    Buffer.from(secret_session_data.nonce, 'base64'),
-                    session_data_key)).toString());
-            if (username !== expected_username) {
-                throw new Error('wrong username');
-            }
-            if (type !== expected_type) {
-                throw new Error('wrong type');
-            }
-            if ((timestamp + challenge_timeout) <= Date.now()) {
-                throw new Error('session timed out');
-            }
-            return session_data;
-        } catch (ex) {
-            ex.statusCode = 400;
-            throw ex;
-        }
-    }
-
-    const options = {
-        webAuthn,
-        make_secret_session_data,
-        verify_secret_session_data
-    };
-
-    fastify.register(register, Object.assign({
-        prefix: '/register/'
-    }, options));
-
-    fastify.register(login, Object.assign({
-        prefix: '/login/'
-    }, options));
-
-    await fastify.listen(port);
-
-    console.log(`Please visit https://localhost:${port}`);
+console.log(`Please visit https://localhost:${port}`);
