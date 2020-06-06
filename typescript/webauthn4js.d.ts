@@ -1,35 +1,44 @@
-//import * from './webauthn'
+import { EventEmitter } from 'events';
+import {
+    Config,
+    User,
+    CredentialCreation,
+    CredentialCreationResponse,
+    CredentialAssertion,
+    CredentialAssertionResponse,
+    SessionData
+} from './webauthn';
 
 export interface WebAuthn4JS extends EventEmitter {
-    async beginRegistration(
+    beginRegistration(
         user : User,
         ...opts : PublicKeyCredentialCreationOptions[]
-    ) : {
+    ) : Promise<{
         options : CredentialCreation,
         sessionData : SessionData
-    };
+    }>;
 
-    async finishRegistration(
+    finishRegistration(
         user : User,
         sessionData : SessionData,
         response : CredentialCreationResponse
-    ) : Credential;
+    ) : Promise<Credential>;
 
-    async beginLogin(
+    beginLogin(
         user : User,
         ...opts : PublicKeyCredentialRequestOptions[]
-    ) : {
+    ) : Promise<{
         options : CredentialAssertion,
         sessionData : SessionData
-    };
+    }>;
 
-    async finishLogin(
+    finishLogin(
         user : User,
         sessionData : SessionData,
         response : CredentialAssertionResponse
-    ) : Credential;
+    ) : Promise<Credential>;
 }
 
-declare function make(config : Config) : WebAuthnJS;
+declare function make(config : Config) : WebAuthn4JS;
 
 export default make;

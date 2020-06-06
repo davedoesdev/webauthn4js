@@ -68,7 +68,7 @@ class WebAuthn4JS extends EventEmitter {
     }
 }
 
-exports.make = promisify((config, cb) => {
+module.exports = promisify((config, cb) => {
     let called = false;
     let webauthn = null;
 

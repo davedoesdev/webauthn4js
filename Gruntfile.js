@@ -12,6 +12,16 @@ module.exports = function (grunt) {
         },
 
         exec: {
+            build_go: [
+                'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go user.go',
+                'go build genschema.go user.go',
+                './genschema | json2ts > typescript/webauthn.d.ts'
+            ].join('&&'),
+            build_ts: [
+                'tsc -p typescript',
+                // https://github.com/microsoft/TypeScript/issues/18442
+                'mv typescript/example.js typescript/example.mjs'
+            ].join('&&'),
             test: './node_modules/.bin/wdio',
             cover: "./node_modules/.bin/nyc -x Gruntfile.js -x 'test/**' -x wdio.conf.js ./node_modules/.bin/grunt test",
             cover_report: './node_modules/.bin/nyc report -r lcov -r text',
@@ -22,6 +32,11 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-exec');
+
+    grunt.registerTask('build', [
+        'exec:build_go',
+        'exec:build_ts'
+    ]);
 
     grunt.registerTask('lint', [
         'eslint:default',

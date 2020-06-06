@@ -1,11 +1,12 @@
 /*eslint-env node */
 
-const path = require('path');
-const fs = require('fs');
-const mod_fastify = require('fastify');
-const fastify_static = require('fastify-static');
-const { SodiumPlus } = require('sodium-plus');
-const makeWebAuthn = require('..');
+import * as path from 'path';
+import * as fs from 'fs';
+import mod_fastify, { FastifyError } from 'fastify';
+import fastify_static from 'fastify-static';
+import sodium_plus from 'sodium-plus';
+import makeWebAuthn from '..';
+
 const readFile = fs.promises.readFile;
 
 const challenge_timeout = 60000;
@@ -13,6 +14,12 @@ const port = 3000;
 
 const users = new Map();
 let num_users = 0;
+
+class ErrorWithStatus extends Error {
+    constructor(message : string, public statusCode : number) {
+        super(message);
+    }
+}
 
 async function register(fastify, options) {
     const {
@@ -52,9 +59,7 @@ async function register(fastify, options) {
     fastify.put('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
-            const err = new Error('no user');
-            err.statusCode = 404;
-            throw err;
+            throw new ErrorWithStatus('no user', 404);
         }
         const session_data = await verify_secret_session_data(
             request.params.username, 'registration', request.body);
@@ -81,9 +86,7 @@ async function login(fastify, options) {
     fastify.get('/:username',  async request => {
         const user = users.get(request.params.username);
         if (!user) {
-            const err = new Error('no user');
-            err.statusCode = 404;
-            throw err;
+            throw new ErrorWithStatus('no user', 404);
         }
         const { options, sessionData } = await webAuthn.beginLogin(user);
         return {
@@ -96,9 +99,7 @@ async function login(fastify, options) {
     fastify.post('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
-            const err = new Error('no user');
-            err.statusCode = 404;
-            throw err;
+            throw new ErrorWithStatus('no user', 404);
         }
         const session_data = await verify_secret_session_data(
             request.params.username, 'login', request.body);
@@ -111,9 +112,7 @@ async function login(fastify, options) {
             throw ex;
         }
         if (credential.Authenticator.CloneWarning) {
-            const err = new Error('credential appears to be cloned');
-            err.statusCode = 403;
-            throw err;
+            throw new ErrorWithStatus('credential appears to be cloned', 403);
         }
         const user_cred = user.credentials.find(c => c.ID === credential.ID);
         user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
@@ -121,7 +120,6 @@ async function login(fastify, options) {
     });
 }
 
-(async function () {
     const fastify = mod_fastify({
         logger: true,
         https: {
@@ -132,7 +130,7 @@ async function login(fastify, options) {
 
     fastify.register(fastify_static, {
         root: path.join(__dirname, 'fixtures'),
-        index: 'example.html'
+        index: ['example.html']
     });
 
     const webAuthn = await makeWebAuthn({
@@ -145,7 +143,7 @@ async function login(fastify, options) {
         }
     });
 
-    const sodium = await SodiumPlus.auto();
+    const sodium = await sodium_plus.SodiumPlus.auto();
     const session_data_key = await sodium.crypto_secretbox_keygen();
 
     async function make_secret_session_data(username, type, session_data) {
@@ -165,10 +163,10 @@ async function login(fastify, options) {
             const secret_session_data = obj.session_data;
             delete obj.session_data;
             const [ username, type, session_data, timestamp ] = JSON.parse(
-                await sodium.crypto_secretbox_open(
+                (await sodium.crypto_secretbox_open(
                     Buffer.from(secret_session_data.ciphertext, 'base64'),
                     Buffer.from(secret_session_data.nonce, 'base64'),
-                    session_data_key));
+                    session_data_key)).toString());
             if (username !== expected_username) {
                 throw new Error('wrong username');
             }
@@ -202,4 +200,3 @@ async function login(fastify, options) {
     await fastify.listen(port);
 
     console.log(`Please visit https://localhost:${port}`);
-})();

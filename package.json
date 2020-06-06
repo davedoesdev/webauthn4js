@@ -16,8 +16,11 @@
     "url": "https://github.com/davedoesdev/webauthn/issues"
   },
   "main": "index.js",
+  "types": "typescript/webauthn4js.d.ts",
   "scripts": {
-    "build": "GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go user.go && go build genschema.go user.go && ./genschema | json2ts > types/webauthn.d.ts",
+    "build": "grunt build",
+    "build_go": "grunt exec:build_go",
+    "build_ts": "grunt exec:build_ts",
     "test": "grunt test",
     "ci": "grunt lint coverage"
   },
@@ -38,8 +41,8 @@
     "@wdio/spec-reporter": "^6.1.14",
     "chai": "^4.2.0",
     "eslint": "^7.1.0",
-    "fastify": "^2.14.1",
-    "fastify-static": "^2.7.0",
+    "fastify": "^3.0.0-rc.3",
+    "fastify-static": "^3.0.0",
     "grunt": "^1.1.0",
     "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
