@@ -2,9 +2,12 @@ import { EventEmitter } from 'events';
 import {
     Config,
     User,
+    Credential,
     CredentialCreation,
+    PublicKeyCredentialCreationOptions,
     CredentialCreationResponse,
     CredentialAssertion,
+    PublicKeyCredentialRequestOptions,
     CredentialAssertionResponse,
     SessionData
 } from './typescript/webauthn';
@@ -12,7 +15,7 @@ import {
 export interface WebAuthn4JS extends EventEmitter {
     beginRegistration(
         user : User,
-        ...opts : ((PublicKeyCredentialCreationOptions) => PublicKeyCredentialCreationOptions)[]
+        ...opts : ((cco : PublicKeyCredentialCreationOptions) => PublicKeyCredentialCreationOptions)[]
     ) : Promise<{
         options : CredentialCreation,
         sessionData : SessionData
@@ -26,7 +29,7 @@ export interface WebAuthn4JS extends EventEmitter {
 
     beginLogin(
         user : User,
-        ...opts : ((PublicKeyCredentialRequestOptions) => PublicKeyCredentialRequestOptions)[]
+        ...opts : ((cro : PublicKeyCredentialRequestOptions) => PublicKeyCredentialRequestOptions)[]
     ) : Promise<{
         options : CredentialAssertion,
         sessionData : SessionData

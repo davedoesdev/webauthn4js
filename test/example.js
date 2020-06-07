@@ -14,6 +14,13 @@ const port = 3000;
 const users = new Map();
 let num_users = 0;
 
+class ErrorWithStatus extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+    }
+}
+
 (async function () {
     const keys_dir = join(__dirname, 'keys');
 
@@ -55,10 +62,11 @@ let num_users = 0;
         };
     }
 
-    async function verify_secret_session_data(expected_username, expected_type, obj) {
+    async function verify_secret_session_data(
+        expected_username,
+        expected_type,
+        secret_session_data) {
         try {
-            const secret_session_data = obj.session_data;
-            delete obj.session_data;
             const [ username, type, session_data, timestamp ] = JSON.parse(
                 await sodium.crypto_secretbox_open(
                     Buffer.from(secret_session_data.ciphertext, 'base64'),
@@ -93,13 +101,14 @@ let num_users = 0;
                 };
                 users.set(request.params.username, user);
             }
+            const excludeCredentials = user.credentials.map(c => ({
+                type: 'public-key',
+                id: c.ID
+            }));
             const { options, sessionData } = await webAuthn.beginRegistration(
                 user,
                 cco => {
-                    cco.excludeCredentials = user.credentials.map(c => ({
-                        type: 'public-key',
-                        id: c.ID
-                    }));
+                    cco.excludeCredentials = excludeCredentials;
                     return cco;
                 });
             return {
@@ -112,16 +121,14 @@ let num_users = 0;
         fastify.put('/:username', async (request, reply) => {
             const user = users.get(request.params.username);
             if (!user) {
-                const err = new Error('no user');
-                err.statusCode = 404;
-                throw err;
+                throw new ErrorWithStatus('no user', 404);
             }
             const session_data = await verify_secret_session_data(
-                request.params.username, 'registration', request.body);
+                request.params.username, 'registration', request.body.session_data);
             let credential;
             try {
                 credential = await webAuthn.finishRegistration(
-                    user, session_data, request.body);
+                    user, session_data, request.body.ccr);
             } catch (ex) {
                 ex.statusCode = 400;
                 throw ex;
@@ -135,9 +142,7 @@ let num_users = 0;
         fastify.get('/:username',  async request => {
             const user = users.get(request.params.username);
             if (!user) {
-                const err = new Error('no user');
-                err.statusCode = 404;
-                throw err;
+                throw new ErrorWithStatus('no user', 404);
             }
             const { options, sessionData } = await webAuthn.beginLogin(user);
             return {
@@ -150,26 +155,26 @@ let num_users = 0;
         fastify.post('/:username', async (request, reply) => {
             const user = users.get(request.params.username);
             if (!user) {
-                const err = new Error('no user');
-                err.statusCode = 404;
-                throw err;
+                throw new ErrorWithStatus('no user', 404);
             }
             const session_data = await verify_secret_session_data(
-                request.params.username, 'login', request.body);
+                request.params.username, 'login', request.body.session_data);
             let credential;
             try {
                 credential = await webAuthn.finishLogin(
-                    user, session_data, request.body);
+                    user, session_data, request.body.car);
             } catch (ex) {
                 ex.statusCode = 400;
                 throw ex;
             }
             if (credential.Authenticator.CloneWarning) {
-                const err = new Error('credential appears to be cloned');
-                err.statusCode = 403;
-                throw err;
+                throw new Error('credential appears to be cloned', 403);
             }
             const user_cred = user.credentials.find(c => c.ID === credential.ID);
+            if (!user_cred) {
+                // Should have been checked already in Go by webAuthn.finishLogin
+                throw new ErrorWithStatus('no credential', 500);
+            }
             user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
             reply.code(204);
         });

@@ -2,8 +2,10 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "es2017",
+    "lib": ["es2017"],
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "strict": true
   },
   "files": [
     "example.ts"

@@ -38,12 +38,14 @@ async function registerUser() { // eslint-disable-line no-unused-vars
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                id,
-                rawId: bufferEncode(rawId),
-                type,
-                response: {
-                    attestationObject: bufferEncode(attestationObject),
-                    clientDataJSON: bufferEncode(clientDataJSON)
+                ccr: {
+                    id,
+                    rawId: bufferEncode(rawId),
+                    type,
+                    response: {
+                        attestationObject: bufferEncode(attestationObject),
+                        clientDataJSON: bufferEncode(clientDataJSON)
+                    }
                 },
                 session_data
             })
@@ -80,14 +82,16 @@ async function loginUser() { // eslint-disable-line no-unused-vars
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                id,
-                rawId: bufferEncode(rawId),
-                type,
-                response: {
-                    authenticatorData: bufferEncode(authenticatorData),
-                    clientDataJSON: bufferEncode(clientDataJSON),
-                    signature: bufferEncode(signature),
-                    userHandle: bufferEncode(userHandle)
+                car: {
+                    id,
+                    rawId: bufferEncode(rawId),
+                    type,
+                    response: {
+                        authenticatorData: bufferEncode(authenticatorData),
+                        clientDataJSON: bufferEncode(clientDataJSON),
+                        signature: bufferEncode(signature),
+                        userHandle: bufferEncode(userHandle)
+                    }
                 },
                 session_data
             })

@@ -9,8 +9,10 @@ import sodium_plus from 'sodium-plus';
 import makeWebAuthn from '../index.js';
 import {
     User,
+    Credential,
     CredentialCreationResponse,
-    CredentialAssertionResponse
+    CredentialAssertionResponse,
+    SessionData
 } from './webauthn';
 const readFile = fs.promises.readFile;
 
@@ -57,7 +59,15 @@ const webAuthn = await makeWebAuthn({
 const sodium = await sodium_plus.SodiumPlus.auto();
 const session_data_key = await sodium.crypto_secretbox_keygen();
 
-async function make_secret_session_data(username, type, session_data) {
+interface ISecretSessionData {
+    ciphertext : string,
+    nonce : string
+}
+
+async function make_secret_session_data(
+    username : string,
+    type : string,
+    session_data : SessionData) : Promise<ISecretSessionData> {
     const nonce = await sodium.randombytes_buf(
         sodium.CRYPTO_SECRETBOX_NONCEBYTES);
     return {
@@ -69,10 +79,11 @@ async function make_secret_session_data(username, type, session_data) {
     };
 }
 
-async function verify_secret_session_data(expected_username, expected_type, obj) {
+async function verify_secret_session_data(
+    expected_username : string,
+    expected_type : string,
+    secret_session_data : ISecretSessionData) : Promise<SessionData> {
     try {
-        const secret_session_data = obj.session_data;
-        delete obj.session_data;
         const [ username, type, session_data, timestamp ] = JSON.parse(
             (await sodium.crypto_secretbox_open(
                 Buffer.from(secret_session_data.ciphertext, 'base64'),
@@ -111,13 +122,14 @@ const register : FastifyPlugin = async function (fastify) {
             };
             users.set(request.params.username, user);
         }
+        const excludeCredentials = user.credentials.map(c => ({
+            type: 'public-key',
+            id: c.ID
+        }));
         const { options, sessionData } = await webAuthn.beginRegistration(
             user,
             cco => {
-                cco.excludeCredentials = user.credentials.map(c => ({
-                    type: 'public-key',
-                    id: c.ID
-                }));
+                cco.excludeCredentials = excludeCredentials;
                 return cco;
             });
         return {
@@ -128,7 +140,10 @@ const register : FastifyPlugin = async function (fastify) {
     });
 
     interface ICreateRoute extends IUserRoute {
-        Body: CredentialCreationResponse
+        Body: {
+            ccr : CredentialCreationResponse,
+            session_data : ISecretSessionData
+        }
     }
 
     fastify.put<ICreateRoute>('/:username', async (request, reply) => {
@@ -137,11 +152,11 @@ const register : FastifyPlugin = async function (fastify) {
             throw new ErrorWithStatus('no user', 404);
         }
         const session_data = await verify_secret_session_data(
-            request.params.username, 'registration', request.body);
+            request.params.username, 'registration', request.body.session_data);
         let credential;
         try {
             credential = await webAuthn.finishRegistration(
-                user, session_data, request.body);
+                user, session_data, request.body.ccr);
         } catch (ex) {
             ex.statusCode = 400;
             throw ex;
@@ -166,7 +181,10 @@ const login : FastifyPlugin = async function (fastify) {
     });
 
     interface IAssertRoute extends IUserRoute {
-        Body: CredentialAssertionResponse
+        Body: {
+            car : CredentialAssertionResponse,
+            session_data : ISecretSessionData
+        }
     }
 
     fastify.post<IAssertRoute>('/:username', async (request, reply) => {
@@ -175,11 +193,11 @@ const login : FastifyPlugin = async function (fastify) {
             throw new ErrorWithStatus('no user', 404);
         }
         const session_data = await verify_secret_session_data(
-            request.params.username, 'login', request.body);
-        let credential;
+            request.params.username, 'login', request.body.session_data);
+        let credential : Credential;
         try {
             credential = await webAuthn.finishLogin(
-                user, session_data, request.body);
+                user, session_data, request.body.car);
         } catch (ex) {
             ex.statusCode = 400;
             throw ex;
@@ -188,6 +206,10 @@ const login : FastifyPlugin = async function (fastify) {
             throw new ErrorWithStatus('credential appears to be cloned', 403);
         }
         const user_cred = user.credentials.find(c => c.ID === credential.ID);
+        if (!user_cred) {
+            // Should have been checked already in Go by webAuthn.finishLogin
+            throw new ErrorWithStatus('no credential', 500);
+        }
         user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
         reply.code(204);
     });
