@@ -3,11 +3,15 @@
 import * as fs from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import mod_fastify, { FastifyError } from 'fastify';
+import mod_fastify, { FastifyError, FastifyPlugin } from 'fastify';
 import fastify_static from 'fastify-static';
 import sodium_plus from 'sodium-plus';
 import makeWebAuthn from '../index.js';
-import { User } from './webauthn';
+import {
+    User,
+    CredentialCreationResponse,
+    CredentialAssertionResponse
+} from './webauthn';
 const readFile = fs.promises.readFile;
 
 const challenge_timeout = 60000;
@@ -90,8 +94,12 @@ async function verify_secret_session_data(expected_username, expected_type, obj)
     }
 }
 
-async function register(fastify) {
-    fastify.get('/:username',  async request => {
+interface IUserRoute {
+    Params: { username : string }
+}
+
+const register : FastifyPlugin = async function (fastify) {
+    fastify.get<IUserRoute>('/:username',  async request => {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
@@ -119,7 +127,11 @@ async function register(fastify) {
         };
     });
 
-    fastify.put('/:username', async (request, reply) => {
+    interface ICreateRoute extends IUserRoute {
+        Body: CredentialCreationResponse
+    }
+
+    fastify.put<ICreateRoute>('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -139,8 +151,8 @@ async function register(fastify) {
     });
 }
 
-async function login(fastify) {
-    fastify.get('/:username',  async request => {
+const login : FastifyPlugin = async function (fastify) {
+    fastify.get<IUserRoute>('/:username',  async request => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -153,7 +165,11 @@ async function login(fastify) {
         };
     });
 
-    fastify.post('/:username', async (request, reply) => {
+    interface IAssertRoute extends IUserRoute {
+        Body: CredentialAssertionResponse
+    }
+
+    fastify.post<IAssertRoute>('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
