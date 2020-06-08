@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { TypedEmitter } from 'tiny-typed-emitter';
 import {
     Config,
     User,
@@ -12,7 +12,12 @@ import {
     SessionData
 } from './typescript/webauthn';
 
-export interface WebAuthn4JS extends EventEmitter {
+interface WebAuthn4JSEvents {
+    error: (err : Error) => void;
+    exit: () => void;
+}
+
+export interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
     beginRegistration(
         user : User,
         ...opts : ((cco : PublicKeyCredentialCreationOptions) => PublicKeyCredentialCreationOptions)[]
