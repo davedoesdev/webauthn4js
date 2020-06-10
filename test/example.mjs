@@ -44,7 +44,7 @@ const webAuthn = await makeWebAuthn({
     RPDisplayName: 'WebAuthnJS',
     RPID: 'localhost',
     RPOrigin: `https://localhost:${port}`,
-    RPIcon: 'https://webauthnjs.example.com/logo.png',
+    RPIcon: `https://localhost:${port}/logo.png`,
     AuthenticatorSelection: {
         userVerification: 'preferred'
     }

@@ -17,6 +17,11 @@ class WebAuthn4JS extends EventEmitter {
             this._begin.bind(this, 'Login'));
         this.finishLogin = promisify(
             this._finish.bind(this, 'Login'));
+
+    }
+
+    exit() {
+        this.methods.checked_exit();
     }
 
     _user(user) {
@@ -96,7 +101,14 @@ module.exports = promisify((config, cb) => {
 
         global[uid] = methods => {
             delete global[uid];
-            process.on('beforeExit', () => methods.exit());
+            methods.exit_called = false;
+            methods.checked_exit = function () {
+                if (!this.exit_called) {
+                    this.exit_called = true;
+                    this.exit();
+                }
+            };
+            process.on('beforeExit', () => methods.checked_exit());
             methods.init(JSON.stringify(config), err => {
                 if (err) {
                     return done(new Error(err));
