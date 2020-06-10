@@ -4,10 +4,12 @@ const mod_fastify = require('fastify');
 const fastify_static = require('fastify-static');
 const { SodiumPlus } = require('sodium-plus');
 const makeWebAuthn = require('..');
+const { expect } = require('chai');
 
 const challenge_timeout = 60000;
 const port = 3000;
 const origin = `https://localhost:${port}`;
+const username = 'foo@bar.com';
 
 class ErrorWithStatus extends Error {
     constructor(message, statusCode) {
@@ -15,6 +17,9 @@ class ErrorWithStatus extends Error {
         this.statusCode = statusCode;
     }
 }
+
+const users = new Map();
+let num_users = 0;
 
 before(async function () {
     const keys_dir = join(__dirname, 'keys');
@@ -31,9 +36,6 @@ before(async function () {
         root: join(__dirname, 'fixtures'),
         prefix: '/test'
     });
-
-    const users = new Map();
-    let num_users = 0;
 
     const webAuthn = await makeWebAuthn({
         RPDisplayName: 'WebAuthnJS',
@@ -196,8 +198,79 @@ before(async function () {
     await browser.url(`${origin}/test/test.html`);
 });
 
+async function executeAsync(f, ...args) {
+    const r = await browser.executeAsync(function (f, ...args) {
+        (async function () {
+            let done = args[args.length - 1];
+            function bufferDecode(value) {
+                return Uint8Array.from(atob(value), c => c.charCodeAt(0));
+            }
+            function bufferEncode(value) {
+                return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
+                    .replace(/\+/g, "-")
+                    .replace(/\//g, "_")
+                    .replace(/=/g, "");
+            }
+            try {
+                done(await eval(f)(...args.slice(0, -1)));
+            } catch (ex) {
+                done({ error: ex.message });
+            }
+        })();
+    }, f.toString(), ...args);
+
+    if (r && r.error) {
+        throw new Error(r.error);
+    }
+
+    return r;
+}
+
 describe('register', function () {
     it('should register credential', async function () {
+        await executeAsync(async username => {
+            const get_response = await fetch(`/register/${username}`);
+            if (!get_response.ok) {
+                throw new Error(`Registration GET failed with ${get_response.status}`);
+            }
+            const { options, session_data } = await get_response.json();
+            const { publicKey } = options;
+            publicKey.challenge = bufferDecode(publicKey.challenge);
+            publicKey.user.id = bufferDecode(publicKey.user.id);
+            if (publicKey.excludeCredentials) {
+                for (const c of publicKey.excludeCredentials) {
+                    c.id = bufferDecode(c.id);
+                }
+            }
+            const credential = await navigator.credentials.create(options);
+            const { id, rawId, type, response: cred_response } = credential;
+            const { attestationObject, clientDataJSON } = cred_response;
+            const put_response = await fetch(`/register/${username}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ccr: {
+                        id,
+                        rawId: bufferEncode(rawId),
+                        type,
+                        response: {
+                            attestationObject: bufferEncode(attestationObject),
+                            clientDataJSON: bufferEncode(clientDataJSON)
+                        }
+                    },
+                    session_data
+                })
+            });
+            if (!put_response.ok) {
+                throw new Error(`Registration PUT failed with ${put_response.status}`);
+            }
+        }, username);
+
+        expect(num_users).to.equal(1);
+
+        console.log(JSON.stringify(users.get(username)));
 
 
     });
