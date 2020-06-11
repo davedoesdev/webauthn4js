@@ -226,54 +226,89 @@ async function executeAsync(f, ...args) {
     return r;
 }
 
+let cred_id;
+let cred_pubkey;
+
+async function register(username) {
+    return await executeAsync(async username => {
+        const get_response = await fetch(`/register/${username}`);
+        if (!get_response.ok) {
+            throw new Error(`Registration GET failed with ${get_response.status}`);
+        }
+        const { options, session_data } = await get_response.json();
+        const { publicKey } = options;
+        publicKey.challenge = bufferDecode(publicKey.challenge);
+        publicKey.user.id = bufferDecode(publicKey.user.id);
+        if (publicKey.excludeCredentials) {
+            for (const c of publicKey.excludeCredentials) {
+                c.id = bufferDecode(c.id);
+            }
+        }
+        const credential = await navigator.credentials.create(options);
+        const { id, rawId, type, response: cred_response } = credential;
+        const { attestationObject, clientDataJSON } = cred_response;
+        const put_response = await fetch(`/register/${username}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ccr: {
+                    id,
+                    rawId: bufferEncode(rawId),
+                    type,
+                    response: {
+                        attestationObject: bufferEncode(attestationObject),
+                        clientDataJSON: bufferEncode(clientDataJSON)
+                    }
+                },
+                session_data
+            })
+        });
+        if (!put_response.ok) {
+            throw new Error(`Registration PUT failed with ${put_response.status}`);
+        }
+        return { id, type };
+    }, username);
+}
+
 describe('register', function () {
     it('should register credential', async function () {
-        await executeAsync(async username => {
-            const get_response = await fetch(`/register/${username}`);
-            if (!get_response.ok) {
-                throw new Error(`Registration GET failed with ${get_response.status}`);
-            }
-            const { options, session_data } = await get_response.json();
-            const { publicKey } = options;
-            publicKey.challenge = bufferDecode(publicKey.challenge);
-            publicKey.user.id = bufferDecode(publicKey.user.id);
-            if (publicKey.excludeCredentials) {
-                for (const c of publicKey.excludeCredentials) {
-                    c.id = bufferDecode(c.id);
-                }
-            }
-            const credential = await navigator.credentials.create(options);
-            const { id, rawId, type, response: cred_response } = credential;
-            const { attestationObject, clientDataJSON } = cred_response;
-            const put_response = await fetch(`/register/${username}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    ccr: {
-                        id,
-                        rawId: bufferEncode(rawId),
-                        type,
-                        response: {
-                            attestationObject: bufferEncode(attestationObject),
-                            clientDataJSON: bufferEncode(clientDataJSON)
-                        }
-                    },
-                    session_data
-                })
-            });
-            if (!put_response.ok) {
-                throw new Error(`Registration PUT failed with ${put_response.status}`);
-            }
-        }, username);
+        const { id, type } = await register(username);
 
         expect(num_users).to.equal(1);
 
-        console.log(JSON.stringify(users.get(username)));
+        expect(type).to.equal('public-key');
 
+        const user = users.get(username);
 
+        expect(user.id).to.equal('user0');
+        expect(user.name).to.equal(username);
+        expect(user.displayName).to.equal('foo');
+        expect(user.iconURL).to.equal('');
+
+        expect(user.credentials.length).to.equal(1);
+
+        const cred = user.credentials[0];
+        // ID returned from credentials.create is b64url encoded
+        // ID from Go is b64 encoded
+        expect(cred.ID.replace(/\+/g, "-")
+                      .replace(/\//g, "_")
+                      .replace(/=/g, "")).to.equal(id);
+        expect(cred.AttestationType).to.equal('none');
+        expect(cred.Authenticator.SignCount).to.equal(0);
+        expect(cred.Authenticator.CloneWarning).to.be.false;
+
+        cred_id = id;
+        cred_pubkey = cred.PublicKey;
     });
 
+    // register again
+
+    // clone warning - different user
+
+    // login
+
+    // can we use a different authenticator in test mode?
 
 });
