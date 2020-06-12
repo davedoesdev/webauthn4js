@@ -276,6 +276,7 @@ async function register(username) {
                 },
                 session_data
             })
+        };
         const put_response = await fetch(`/register/${username}`, put_request);
         if (!put_response.ok) {
             throw new Error(`Registration PUT failed with ${put_response.status}`);
@@ -365,10 +366,19 @@ describe('register', function () {
         expect(cred2.PublicKey).not.to.equal(cred_pubkey);
     });
 
-    it('should fail to register duplicate credentials', async function () {
-    // register same credential but for different or same user
-    // use last_put_request
-
+    it('should fail to register duplicate credential', async function () {
+        let ex;
+        try {
+            await executeAsync(async username => {
+                const put_response = await fetch(`/register/${username}`, last_put_request);
+                if (!put_response.ok) {
+                    throw new Error(`Registration PUT failed with ${put_response.status}`);
+                }
+            }, username2);
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Registration PUT failed with 409');
 
     });
 

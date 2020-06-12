@@ -153,13 +153,18 @@ const register : FastifyPlugin = async function (fastify) {
         }
         const session_data = await verify_secret_session_data(
             request.params.username, 'registration', request.body.session_data);
-        let credential;
+        let credential : Credential;
         try {
             credential = await webAuthn.finishRegistration(
                 user, session_data, request.body.ccr);
         } catch (ex) {
             ex.statusCode = 400;
             throw ex;
+        }
+        for (const u of users.values()) {
+            if (u.credentials.find(c => c.ID === credential.ID)) {
+                throw new ErrorWithStatus('credential in use', 409);
+            }
         }
         user.credentials.push(credential);
         reply.code(204);

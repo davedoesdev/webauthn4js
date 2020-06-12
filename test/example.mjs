@@ -136,6 +136,11 @@ async function register(fastify) {
             ex.statusCode = 400;
             throw ex;
         }
+        for (const u of users.values()) {
+            if (u.credentials.find(c => c.ID === credential.ID)) {
+                throw new ErrorWithStatus('credential in use', 409);
+            }
+        }
         user.credentials.push(credential);
         reply.code(204);
     });
