@@ -10,12 +10,19 @@ const challenge_timeout = 60000;
 const port = 3000;
 const origin = `https://localhost:${port}`;
 const username = 'foo@bar.com';
+const username2 = 'foo2@bar.com';
 
 class ErrorWithStatus extends Error {
     constructor(message, statusCode) {
         super(message);
         this.statusCode = statusCode;
     }
+}
+
+function b64url(b64) {
+    return b64.replace(/\+/g, "-")
+              .replace(/\//g, "_")
+              .replace(/=/g, "");
 }
 
 const users = new Map();
@@ -133,6 +140,11 @@ before(async function () {
                 ex.statusCode = 400;
                 throw ex;
             }
+            for (const u of users.values()) {
+                if (u.credentials.find(c => c.ID === credential.ID)) {
+                    throw new ErrorWithStatus('credential in use', 409);
+                }
+            }
             user.credentials.push(credential);
             reply.code(204);
         });
@@ -214,13 +226,13 @@ async function executeAsync(f, ...args) {
             try {
                 done(await eval(f)(...args.slice(0, -1)));
             } catch (ex) {
-                done({ error: ex.message });
+                done({ err: ex.message });
             }
         })();
     }, f.toString(), ...args);
 
-    if (r && r.error) {
-        throw new Error(r.error);
+    if (r && r.err) {
+        throw new Error(r.err);
     }
 
     return r;
@@ -247,7 +259,7 @@ async function register(username) {
         const credential = await navigator.credentials.create(options);
         const { id, rawId, type, response: cred_response } = credential;
         const { attestationObject, clientDataJSON } = cred_response;
-        const put_response = await fetch(`/register/${username}`, {
+        const put_request =  {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -264,10 +276,11 @@ async function register(username) {
                 },
                 session_data
             })
-        });
+        const put_response = await fetch(`/register/${username}`, put_request);
         if (!put_response.ok) {
             throw new Error(`Registration PUT failed with ${put_response.status}`);
         }
+        window.last_put_request = put_request;
         return { id, type };
     }, username);
 }
@@ -290,11 +303,9 @@ describe('register', function () {
         expect(user.credentials.length).to.equal(1);
 
         const cred = user.credentials[0];
-        // ID returned from credentials.create is b64url encoded
+        // id returned from credentials.create is b64url encoded
         // ID from Go is b64 encoded
-        expect(cred.ID.replace(/\+/g, "-")
-                      .replace(/\//g, "_")
-                      .replace(/=/g, "")).to.equal(id);
+        expect(b64url(cred.ID)).to.equal(id);
         expect(cred.AttestationType).to.equal('none');
         expect(cred.Authenticator.SignCount).to.equal(0);
         expect(cred.Authenticator.CloneWarning).to.be.false;
@@ -303,12 +314,68 @@ describe('register', function () {
         cred_pubkey = cred.PublicKey;
     });
 
-    // register again
+    it('should fail to use same credential', async function () {
+        let ex;
+        try {
+            await register(username);
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('An attempt was made to use an object that is not, or is no longer, usable');
+    });
 
-    // clone warning - different user
+    it('should register second user', async function () {
+        const { id, type } = await register(username2);
+
+        expect(num_users).to.equal(2);
+
+        expect(type).to.equal('public-key');
+
+        const user = users.get(username);
+
+        expect(user.id).to.equal('user0');
+        expect(user.name).to.equal(username);
+        expect(user.displayName).to.equal('foo');
+        expect(user.iconURL).to.equal('');
+
+        expect(user.credentials.length).to.equal(1);
+
+        const cred = user.credentials[0];
+        expect(b64url(cred.ID)).to.equal(cred_id);
+        expect(cred.AttestationType).to.equal('none');
+        expect(cred.Authenticator.SignCount).to.equal(0);
+        expect(cred.Authenticator.CloneWarning).to.be.false;
+        expect(cred.PublicKey).to.equal(cred_pubkey);
+
+        const user2 = users.get(username2);
+
+        expect(user2.id).to.equal('user1');
+        expect(user2.name).to.equal(username2);
+        expect(user2.displayName).to.equal('foo2');
+        expect(user2.iconURL).to.equal('');
+
+        expect(user2.credentials.length).to.equal(1);
+
+        const cred2 = user2.credentials[0];
+        expect(b64url(cred2.ID)).to.equal(id);
+        expect(cred2.AttestationType).to.equal('none');
+        expect(cred2.Authenticator.SignCount).to.equal(0);
+        expect(cred2.Authenticator.CloneWarning).to.be.false;
+        expect(b64url(cred2.ID)).not.to.equal(cred_id);
+        expect(cred2.PublicKey).not.to.equal(cred_pubkey);
+    });
+
+    it('should fail to register duplicate credentials', async function () {
+    // register same credential but for different or same user
+    // use last_put_request
+
+
+    });
+
+
+    // clone warning - replay
 
     // login
 
-    // can we use a different authenticator in test mode?
 
 });
