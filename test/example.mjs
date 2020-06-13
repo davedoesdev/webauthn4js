@@ -176,7 +176,7 @@ async function login(fastify) {
             throw ex;
         }
         if (credential.Authenticator.CloneWarning) {
-            throw new Error('credential appears to be cloned', 403);
+            throw new ErrorWithStatus('credential appears to be cloned', 403);
         }
         const user_cred = user.credentials.find(c => c.ID === credential.ID);
         if (!user_cred) {

@@ -106,6 +106,9 @@ before(async function () {
                     iconURL: '',
                     credentials: []
                 };
+                if (request.params.username === username2) {
+                    user.id = Buffer.from(user.id);
+                }
                 users.set(request.params.username, user);
             }
             const excludeCredentials = user.credentials.map(c => ({
@@ -180,7 +183,7 @@ before(async function () {
                 throw ex;
             }
             if (credential.Authenticator.CloneWarning) {
-                throw new Error('credential appears to be cloned', 403);
+                throw new ErrorWithStatus('credential appears to be cloned', 403);
             }
             const user_cred = user.credentials.find(c => c.ID === credential.ID);
             if (!user_cred) {
@@ -205,11 +208,16 @@ before(async function () {
     browser.config.after.push(async function () {
         await fastify.close();
         webAuthn.exit();
+
+        // Check Go exit isn't called twice by our beforeExit handler
+        const handlers = process.listeners('beforeExit');
+        handlers[handlers.length - 1]();
     });
 
     await browser.url(`${origin}/test/test.html`);
 });
 
+/* istanbul ignore next */
 async function executeAsync(f, ...args) {
     const r = await browser.executeAsync(function (f, ...args) {
         (async function () {
@@ -238,9 +246,7 @@ async function executeAsync(f, ...args) {
     return r;
 }
 
-let cred_id;
-let cred_pubkey;
-
+/* istanbul ignore next */
 async function register(username) {
     return await executeAsync(async username => {
         const get_response = await fetch(`/register/${username}`);
@@ -285,6 +291,54 @@ async function register(username) {
         return { id, type };
     }, username);
 }
+
+/* istanbul ignore next */
+async function login(username) {
+    return await executeAsync(async username => {
+        const get_response = await fetch(`/login/${username}`);
+        if (!get_response.ok) {
+            throw new Error(`Login GET failed with ${get_response.status}`);
+        }
+        const { options, session_data } = await get_response.json();
+        const { publicKey } = options;
+        publicKey.challenge = bufferDecode(publicKey.challenge);
+        for (const c of publicKey.allowCredentials) {
+            c.id = bufferDecode(c.id);
+        }
+        const assertion = await navigator.credentials.get(options);
+        const { id, rawId, type, response: assertion_response } = assertion;
+        const { authenticatorData, clientDataJSON, signature, userHandle } = assertion_response;
+        const post_request = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                car: {
+                    id,
+                    rawId: bufferEncode(rawId),
+                    type,
+                    response: {
+                        authenticatorData: bufferEncode(authenticatorData),
+                        clientDataJSON: bufferEncode(clientDataJSON),
+                        signature: bufferEncode(signature),
+                        userHandle: bufferEncode(userHandle)
+                    }
+                },
+                session_data
+            })
+        };
+        const post_response = await fetch(`/login/${username}`, post_request);
+        if (!post_response.ok) {
+            throw new Error(`Login POST failed with ${post_response.status}`);
+        }
+        window.last_post_request = post_request;
+        return { id, type }; 
+    }, username);
+}
+
+let cred_id;
+let cred_pubkey;
 
 describe('register', function () {
     it('should register credential', async function () {
@@ -350,7 +404,7 @@ describe('register', function () {
 
         const user2 = users.get(username2);
 
-        expect(user2.id).to.equal('user1');
+        expect(user2.id.toString()).to.equal('user1');
         expect(user2.name).to.equal(username2);
         expect(user2.displayName).to.equal('foo2');
         expect(user2.iconURL).to.equal('');
@@ -366,9 +420,10 @@ describe('register', function () {
         expect(cred2.PublicKey).not.to.equal(cred_pubkey);
     });
 
-    it('should fail to register duplicate credential', async function () {
+    it('should fail to register with duplicate attestation', async function () {
         let ex;
         try {
+            /* istanbul ignore next */
             await executeAsync(async username => {
                 const put_response = await fetch(`/register/${username}`, last_put_request);
                 if (!put_response.ok) {
@@ -379,13 +434,56 @@ describe('register', function () {
             ex = e;
         }
         expect(ex.message).to.equal('Registration PUT failed with 409');
+    });
+});
 
+describe('login', function () {
+    it('should login', async function () {
+        const { id, type } = await login(username);
+
+        expect(num_users).to.equal(2);
+
+        expect(type).to.equal('public-key');
+
+        const user = users.get(username);
+
+        expect(user.id).to.equal('user0');
+        expect(user.name).to.equal(username);
+        expect(user.displayName).to.equal('foo');
+        expect(user.iconURL).to.equal('');
+
+        expect(user.credentials.length).to.equal(1);
+
+        const cred = user.credentials[0];
+        expect(b64url(cred.ID)).to.equal(id);
+        expect(cred.AttestationType).to.equal('none');
+        expect(cred.Authenticator.SignCount).to.equal(1);
+        expect(cred.Authenticator.CloneWarning).to.be.false;
+    });
+
+    it('should fail to register with duplicate assertion', async function () {
+        let ex;
+        try {
+            /* istanbul ignore next */
+            await executeAsync(async username => {
+                const post_response = await fetch(`/login/${username}`, last_post_request);
+                if (!post_response.ok) {
+                    throw new Error(`Login POST failed with ${post_response.status}`);
+                }
+            }, username);
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login POST failed with 403');
     });
 
 
     // clone warning - replay
 
     // login
+    // fail to login unknown user
+    // login second user?
 
 
+    // how can we get Go logs?
 });
