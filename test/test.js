@@ -11,6 +11,7 @@ const port = 3000;
 const origin = `https://localhost:${port}`;
 const username = 'foo@bar.com';
 const username2 = 'foo2@bar.com';
+const username3 = 'foo3@bar.com';
 
 class ErrorWithStatus extends Error {
     constructor(message, statusCode) {
@@ -186,6 +187,7 @@ before(async function () {
                 throw new ErrorWithStatus('credential appears to be cloned', 403);
             }
             const user_cred = user.credentials.find(c => c.ID === credential.ID);
+            /* istanbul ignore if */
             if (!user_cred) {
                 // Should have been checked already in Go by webAuthn.finishLogin
                 throw new ErrorWithStatus('no credential', 500);
@@ -247,11 +249,14 @@ async function executeAsync(f, ...args) {
 }
 
 /* istanbul ignore next */
-async function register(username) {
-    return await executeAsync(async username => {
+async function register(username, opts) {
+    return await executeAsync(async (username, opts) => {
+        opts = Object.assign({
+            alter_challenge: false
+        }, opts);
         const get_response = await fetch(`/register/${username}`);
         if (!get_response.ok) {
-            throw new Error(`Registration GET failed with ${get_response.status}`);
+            throw new Error(`Registration GET failed with ${get_response.status} ${await get_response.text()}`);
         }
         const { options, session_data } = await get_response.json();
         const { publicKey } = options;
@@ -261,6 +266,9 @@ async function register(username) {
             for (const c of publicKey.excludeCredentials) {
                 c.id = bufferDecode(c.id);
             }
+        }
+        if (opts.alter_challenge) {
+            publicKey.challenge[0] ^= 0xff;
         }
         const credential = await navigator.credentials.create(options);
         const { id, rawId, type, response: cred_response } = credential;
@@ -285,21 +293,24 @@ async function register(username) {
         };
         const put_response = await fetch(`/register/${username}`, put_request);
         if (!put_response.ok) {
-            throw new Error(`Registration PUT failed with ${put_response.status}`);
+            throw new Error(`Registration PUT failed with ${put_response.status} ${await put_response.text()}`);
         }
         window.last_put_request = put_request;
         return { id, type };
-    }, username);
+    }, username, opts);
 }
 
 /* istanbul ignore next */
-async function login(username) {
-    return await executeAsync(async username => {
+async function login(username, opts) {
+    return await executeAsync(async (username, opts) => {
+        opts = Object.assign({
+            post_username: username
+        }, opts);
         const get_response = await fetch(`/login/${username}`);
         if (!get_response.ok) {
-            throw new Error(`Login GET failed with ${get_response.status}`);
+            throw new Error(`Login GET failed with ${get_response.status} ${await get_response.text()}`);
         }
-        const { options, session_data } = await get_response.json();
+        let { options, session_data } = await get_response.json();
         const { publicKey } = options;
         publicKey.challenge = bufferDecode(publicKey.challenge);
         for (const c of publicKey.allowCredentials) {
@@ -308,6 +319,13 @@ async function login(username) {
         const assertion = await navigator.credentials.get(options);
         const { id, rawId, type, response: assertion_response } = assertion;
         const { authenticatorData, clientDataJSON, signature, userHandle } = assertion_response;
+        if (opts.post_username !== username) {
+            const get_response = await fetch(`/login/${opts.post_username}`);
+            if (!get_response.ok) {
+                throw new Error(`Login GET failed with ${get_response.status} ${await get_response.text()}`);
+            }
+            ({ session_data } = await get_response.json());
+        }
         const post_request = {
             method: 'POST',
             headers: {
@@ -328,13 +346,13 @@ async function login(username) {
                 session_data
             })
         };
-        const post_response = await fetch(`/login/${username}`, post_request);
+        const post_response = await fetch(`/login/${opts.post_username}`, post_request);
         if (!post_response.ok) {
-            throw new Error(`Login POST failed with ${post_response.status}`);
+            throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
         }
         window.last_post_request = post_request;
         return { id, type }; 
-    }, username);
+    }, username, opts);
 }
 
 let cred_id;
@@ -427,13 +445,23 @@ describe('register', function () {
             await executeAsync(async username => {
                 const put_response = await fetch(`/register/${username}`, last_put_request);
                 if (!put_response.ok) {
-                    throw new Error(`Registration PUT failed with ${put_response.status}`);
+                    throw new Error(`Registration PUT failed with ${put_response.status} ${await put_response.text()}`);
                 }
             }, username2);
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Registration PUT failed with 409');
+        expect(ex.message).to.equal('Registration PUT failed with 409 {"statusCode":409,"error":"Conflict","message":"credential in use"}');
+    });
+
+    it('should fail to register with wrong challenge', async function () {
+        let ex;
+        try {
+            await register(username3, { alter_challenge: true });
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Registration PUT failed with 500 Error validating challenge');
     });
 });
 
@@ -441,7 +469,8 @@ describe('login', function () {
     it('should login', async function () {
         const { id, type } = await login(username);
 
-        expect(num_users).to.equal(2);
+        // username3 although not registered is still in the DB
+        expect(num_users).to.equal(3);
 
         expect(type).to.equal('public-key');
 
@@ -461,26 +490,33 @@ describe('login', function () {
         expect(cred.Authenticator.CloneWarning).to.be.false;
     });
 
-    it('should fail to register with duplicate assertion', async function () {
+    it('should fail to login with duplicate assertion', async function () {
         let ex;
         try {
             /* istanbul ignore next */
             await executeAsync(async username => {
                 const post_response = await fetch(`/login/${username}`, last_post_request);
                 if (!post_response.ok) {
-                    throw new Error(`Login POST failed with ${post_response.status}`);
+                    throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
                 }
             }, username);
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Login POST failed with 403');
+        expect(ex.message).to.equal('Login POST failed with 403 {"statusCode":403,"error":"Forbidden","message":"credential appears to be cloned"}');
+    });
+
+    it('should fail to login as different user', async function () {
+        let ex;
+        try {
+            await login(username, { post_username: username2 });
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login POST failed with 500 User does not own the credential returned');
     });
 
 
-    // clone warning - replay
-
-    // login
     // fail to login unknown user
     // login second user?
 
