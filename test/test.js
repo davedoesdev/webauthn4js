@@ -86,7 +86,7 @@ before(async function () {
             if (type !== expected_type) {
                 throw new Error('wrong type');
             }
-            if ((timestamp + challenge_timeout) <= Date.now()) {
+            if ((timestamp + challenge_timeout) <= Date.now("dummy")) {
                 throw new Error('session timed out');
             }
             return session_data;
@@ -528,6 +528,116 @@ describe('login', function () {
             ex = e;
         }
         expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"wrong username"}');
+    });
+
+    it('should check session type', async function () {
+        let ex;
+        try {
+            /* istanbul ignore next */
+            await executeAsync(async username => {
+                const get_response = await fetch(`/register/${username}`);
+                if (!get_response.ok) {
+                    throw new Error(`Registration GET failed with ${get_response.status} ${await get_response.text()}`);
+                }
+                const { session_data } = await get_response.json();
+                const post_response = await fetch(`/login/${username}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ session_data })
+                });
+                if (!post_response.ok) {
+                    throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
+                }
+            }, username);
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"wrong type"}');
+    });
+
+    it('should check user exists', async function () {
+        let ex;
+        try {
+            /* istanbul ignore next */
+            await executeAsync(async username => {
+                const put_response = await fetch(`/register/${username}`, {
+                    method: 'PUT'
+                });
+                if (!put_response.ok) {
+                    throw new Error(`Registration PUT failed with ${put_response.status} ${await put_response.text()}`);
+                }
+            }, 'bar@foo.com');
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Registration PUT failed with 404 {"statusCode":404,"error":"Not Found","message":"no user"}');
+
+        try {
+            /* istanbul ignore next */
+            await executeAsync(async username => {
+                const get_response = await fetch(`/login/${username}`);
+                if (!get_response.ok) {
+                    throw new Error(`Login GET failed with ${get_response.status} ${await get_response.text()}`);
+                }
+            }, 'bar@foo.com');
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login GET failed with 404 {"statusCode":404,"error":"Not Found","message":"no user"}');
+
+        try {
+            /* istanbul ignore next */
+            await executeAsync(async username => {
+                const post_response = await fetch(`/login/${username}`, {
+                    method: 'POST'
+                });
+                if (!post_response.ok) {
+                    throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
+                }
+            }, 'bar@foo.com');
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login POST failed with 404 {"statusCode":404,"error":"Not Found","message":"no user"}');
+    });
+
+    it('should check timestamp', async function () {
+        let ex;
+        const orig_now = Date.now;
+        Date.now = function (dummy) {
+            let now = orig_now.call(this);
+            if (dummy === 'dummy') {
+                now += 60000;
+            }
+            return now;
+        };
+        try {
+            /* istanbul ignore next */
+            await executeAsync(async username => {
+                const get_response = await fetch(`/login/${username}`);
+                if (!get_response.ok) {
+                    throw new Error(`Login GET failed with ${get_response.status} ${await get_response.text()}`);
+                }
+                const { session_data } = await get_response.json();
+                const post_response = await fetch(`/login/${username}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ session_data })
+                });
+                if (!post_response.ok) {
+                    throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
+                }
+            }, username);
+        } catch (e) {
+            ex = e;
+        } finally {
+            Date.now = orig_now;
+        }
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"session timed out"}');
     });
 
     // 100% coverage
