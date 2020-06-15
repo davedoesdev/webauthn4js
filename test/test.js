@@ -304,7 +304,8 @@ async function register(username, opts) {
 async function login(username, opts) {
     return await executeAsync(async (username, opts) => {
         opts = Object.assign({
-            post_username: username
+            post_username: username,
+            session_username: username
         }, opts);
         const get_response = await fetch(`/login/${username}`);
         if (!get_response.ok) {
@@ -319,8 +320,8 @@ async function login(username, opts) {
         const assertion = await navigator.credentials.get(options);
         const { id, rawId, type, response: assertion_response } = assertion;
         const { authenticatorData, clientDataJSON, signature, userHandle } = assertion_response;
-        if (opts.post_username !== username) {
-            const get_response = await fetch(`/login/${opts.post_username}`);
+        if (opts.session_username !== username) {
+            const get_response = await fetch(`/login/${opts.session_username}`);
             if (!get_response.ok) {
                 throw new Error(`Login GET failed with ${get_response.status} ${await get_response.text()}`);
             }
@@ -461,7 +462,7 @@ describe('register', function () {
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Registration PUT failed with 500 Error validating challenge');
+        expect(ex.message).to.equal('Registration PUT failed with 400 {"statusCode":400,"error":"Bad Request","message":"Error validating challenge"}');
     });
 });
 
@@ -509,16 +510,31 @@ describe('login', function () {
     it('should fail to login as different user', async function () {
         let ex;
         try {
+            await login(username, {
+                post_username: username2,
+                session_username: username2
+            });
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"User does not own the credential returned"}');
+    });
+
+    it('should check username in session', async function () {
+        let ex;
+        try {
             await login(username, { post_username: username2 });
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Login POST failed with 500 User does not own the credential returned');
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"wrong username"}');
     });
 
+    // 100% coverage
 
     // fail to login unknown user
     // login second user?
+
 
 
     // how can we get Go logs?

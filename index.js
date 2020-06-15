@@ -43,7 +43,7 @@ class WebAuthn4JS extends EventEmitter {
                 ...opts,
                 (err, options, sessionData) => {
                     if (err) {
-                        return process.nextTick(cb, err);
+                        return process.nextTick(cb, new Error(err));
                     }
                     process.nextTick(cb, null, {
                         options: JSON.parse(options),
@@ -63,7 +63,7 @@ class WebAuthn4JS extends EventEmitter {
                 JSON.stringify(response),
                 (err, credential) => {
                     if (err) {
-                        return process.nextTick(cb, err);
+                        return process.nextTick(cb, new Error(err));
                     }
                     process.nextTick(cb, null, JSON.parse(credential));
                 });
