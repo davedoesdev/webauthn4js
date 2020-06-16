@@ -5,6 +5,8 @@ const fastify_static = require('fastify-static');
 const { SodiumPlus } = require('sodium-plus');
 const makeWebAuthn = require('..');
 const { expect } = require('chai');
+const crypto = require('crypto');
+const { promisify } = require('util');
 
 const challenge_timeout = 60000;
 const port = 3000;
@@ -12,6 +14,16 @@ const origin = `https://localhost:${port}`;
 const username = 'foo@bar.com';
 const username2 = 'foo2@bar.com';
 const username3 = 'foo3@bar.com';
+
+const config = {
+    RPDisplayName: 'WebAuthnJS',
+    RPID: 'localhost',
+    RPOrigin: origin,
+    RPIcon: `${origin}/test/logo.png`,
+    AuthenticatorSelection: {
+        userVerification: 'preferred'
+    }
+};
 
 class ErrorWithStatus extends Error {
     constructor(message, statusCode) {
@@ -45,16 +57,7 @@ before(async function () {
         prefix: '/test'
     });
 
-    const webAuthn = await makeWebAuthn({
-        RPDisplayName: 'WebAuthnJS',
-        RPID: 'localhost',
-        RPOrigin: origin,
-        RPIcon: `${origin}/test/logo.png`,
-        AuthenticatorSelection: {
-            userVerification: 'preferred'
-        }
-    });
-
+    const webAuthn = await makeWebAuthn(config);
     const sodium = await SodiumPlus.auto();
     const session_data_key = await sodium.crypto_secretbox_keygen();
 
@@ -639,6 +642,44 @@ describe('login', function () {
         }
         expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"session timed out"}');
     });
+});
+
+describe('init', function () {
+    it('should error with invalid config', async function () {
+        let ex;
+        try {
+            await makeWebAuthn({});
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Configuration error: Missing RPDisplayName');
+        // Note: also tests exit without webauthn being made
+    });
+
+    it('should error if it fails to generate random bytes', async function () {
+        let ex;
+        const orig_randomBytes = crypto.randomBytes;
+        crypto.randomBytes = (n, cb) => cb(new Error('dummy'));
+        try {
+            await makeWebAuthn({});
+        } catch (e) {
+            ex = e;
+        } finally {
+            crypto.randomBytes = orig_randomBytes;
+        }
+        expect(ex.message).to.equal('dummy');
+    });
+
+    it('should emit exit event', async function () {
+        const webAuthn = await makeWebAuthn(config);
+        await promisify(cb => {
+            webAuthn.on('exit', cb);
+            webAuthn.exit();
+        })();
+    });
+
+
+});
 
     // 100% coverage
 
@@ -648,4 +689,3 @@ describe('login', function () {
 
 
     // how can we get Go logs?
-});

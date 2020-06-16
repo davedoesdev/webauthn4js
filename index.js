@@ -1,23 +1,34 @@
 /*eslint-env node */
 'use strict';
 const path = require('path');
-const { EventEmitter } = require('events');
-const { randomBytes } = require('crypto');
+const events = require('events');
+const crypto = require('crypto');
 const { promisify } = require('util');
 
-class WebAuthn4JS extends EventEmitter {
+function argify(f) {
+    return promisify((...args) => {
+        const cb = args[args.length - 1];
+        f(...args.slice(0, args.length - 1), (err, ...r) => {
+            if (err) {
+                return cb(new Error(err));
+            }
+            cb(null, r);
+        });
+    });
+}
+
+class WebAuthn4JS extends events.EventEmitter {
     constructor(methods) {
         super();
         this.methods = methods;
-        this.beginRegistration = promisify(
-            this._begin.bind(this, 'Registration'));
-        this.finishRegistration = promisify(
-            this._finish.bind(this, 'Registration'));
-        this.beginLogin = promisify(
-            this._begin.bind(this, 'Login'));
-        this.finishLogin = promisify(
-            this._finish.bind(this, 'Login'));
-
+        this.beginRegistration = this._begin.bind(this,
+            argify(methods.beginRegistration.bind(methods)));
+        this.finishRegistration = this._finish.bind(this,
+            argify(methods.finishRegistration.bind(methods)));
+        this.beginLogin = this._begin.bind(this,
+            argify(methods.beginLogin.bind(methods)));
+        this.finishLogin = this._finish.bind(this,
+            argify(methods.finishLogin.bind(methods)));
     }
 
     exit() {
@@ -33,43 +44,21 @@ class WebAuthn4JS extends EventEmitter {
         return user;
     }
 
-    _begin(type, user, ...args) {
-        const cb = args[args.length - 1];
-        try {
-            const opts = args.slice(0, args.length - 1).map(f =>
-                cxo => JSON.stringify(f(JSON.parse(cxo))));
-            this.methods[`begin${type}`](
-                JSON.stringify(this._user(user)),
-                ...opts,
-                (err, options, sessionData) => {
-                    if (err) {
-                        return process.nextTick(cb, new Error(err));
-                    }
-                    process.nextTick(cb, null, {
-                        options: JSON.parse(options),
-                        sessionData: JSON.parse(sessionData)
-                    });
-                });
-        } catch (ex) {
-            cb(ex);
-        }
+    async _begin(method, user, ...args) {
+        const [options, sessionData] = await method(
+            JSON.stringify(this._user(user)),
+            ...args.map(f => cxo => JSON.stringify(f(JSON.parse(cxo)))));
+        return {
+            options: JSON.parse(options),
+            sessionData: JSON.parse(sessionData)
+        };
     }
 
-    _finish(type, user, sessionData, response, cb) {
-        try {
-            this.methods[`finish${type}`](
-                JSON.stringify(this._user(user)),
-                JSON.stringify(sessionData),
-                JSON.stringify(response),
-                (err, credential) => {
-                    if (err) {
-                        return process.nextTick(cb, new Error(err));
-                    }
-                    process.nextTick(cb, null, JSON.parse(credential));
-                });
-        } catch (ex) {
-            cb(ex);
-        }
+    async _finish(method, user, sessionData, response) {
+        return JSON.parse(await method(
+            JSON.stringify(this._user(user)),
+            JSON.stringify(sessionData),
+            JSON.stringify(response)));
     }
 }
 
@@ -92,12 +81,14 @@ module.exports = promisify((config, cb) => {
         }
     }
 
-    randomBytes(64, (err, uid) => {
+    crypto.randomBytes(64, (err, uid) => {
         if (err) {
             return done(err);
         }
 
         uid = uid.toString('hex');
+
+        let init_err;
 
         global[uid] = methods => {
             delete global[uid];
@@ -111,7 +102,8 @@ module.exports = promisify((config, cb) => {
             process.on('beforeExit', () => methods.checked_exit());
             methods.init(JSON.stringify(config), err => {
                 if (err) {
-                    return done(new Error(err));
+                    init_err = new Error(err);
+                    return process.nextTick(() => methods.checked_exit());
                 }
                 done(null, new WebAuthn4JS(methods));
             });
@@ -126,6 +118,9 @@ module.exports = promisify((config, cb) => {
                     uid
                 ],
                 exit(n) {
+                    if (init_err) {
+                        return done(init_err);
+                    }
                     if ((n !== 0) || !webauthn) {
                         return done(new Error(`wasm_exec exit with code ${n}`));
                     }
