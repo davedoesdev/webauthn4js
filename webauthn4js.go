@@ -32,10 +32,10 @@ func (user User) WebAuthnCredentials() []webauthn.Credential {
 }
 
 var webAuthn *webauthn.WebAuthn
-var c chan bool
+var c chan int
 
 func init() {
-	c = make(chan bool)
+	c = make(chan int)
 }
 
 func main() {
@@ -48,11 +48,11 @@ func main() {
 		"finishLogin": js.FuncOf(finishLogin),
 	})
 
-	<-c
+	os.Exit(<-c)
 }
 
 func exit(this js.Value, arguments []js.Value) interface{} {
-	c <- true
+	c <- arguments[0].Int()
 	return js.Null()
 }
 

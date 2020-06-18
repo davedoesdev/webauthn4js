@@ -216,7 +216,10 @@ before(async function () {
 
         // Check Go exit isn't called twice by our beforeExit handler
         const handlers = process.listeners('beforeExit');
-        handlers[handlers.length - 1]();
+        // First handler is async-exit-hook
+        for (let i = 1; i < handlers.length; ++i) {
+            handlers[i]();
+        }
     });
 
     await browser.url(`${origin}/test/test.html`);
@@ -642,6 +645,40 @@ describe('login', function () {
         }
         expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"session timed out"}');
     });
+
+    it('should login second user', async function () {
+        const { id, type } = await login(username2);
+
+        // username3 although not registered is still in the DB
+        expect(num_users).to.equal(3);
+
+        expect(type).to.equal('public-key');
+
+        const user = users.get(username2);
+
+        expect(user.id.toString()).to.equal('user1');
+        expect(user.name).to.equal(username2);
+        expect(user.displayName).to.equal('foo2');
+        expect(user.iconURL).to.equal('');
+
+        expect(user.credentials.length).to.equal(1);
+
+        const cred = user.credentials[0];
+        expect(b64url(cred.ID)).to.equal(id);
+        expect(cred.AttestationType).to.equal('none');
+        expect(cred.Authenticator.SignCount).to.equal(4);
+        expect(cred.Authenticator.CloneWarning).to.be.false;
+    });
+
+    it('should fail to login third user', async function () {
+        let ex;
+        try {
+            await login(username3);
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login GET failed with 500 {"statusCode":500,"error":"Internal Server Error","message":"Found no credentials for user"}');
+    });
 });
 
 describe('init', function () {
@@ -673,19 +710,49 @@ describe('init', function () {
     it('should emit exit event', async function () {
         const webAuthn = await makeWebAuthn(config);
         await promisify(cb => {
-            webAuthn.on('exit', cb);
+            webAuthn.on('exit', n => {
+                expect(n).to.equal(0);
+                cb();
+            });
             webAuthn.exit();
         })();
     });
 
+    it('should pass through exit code', async function () {
+        const webAuthn = await makeWebAuthn(config);
+        await promisify(cb => {
+            webAuthn.on('error', err => {
+                expect(err.message).to.equal('wasm_exec exit with code 123');
+            });
+            webAuthn.on('exit', n => {
+                expect(n).to.equal(123);
+                cb();
+            });
+            webAuthn.exit(123);
+        })();
+    });
 
+    it('should catch errors instantiating wasm', async function () {
+        const Mod = require('module');
+        const req = Mod.prototype.require;
+        Mod.prototype.require = function (f) {
+            const r = req.call(this, f);
+            if (f === './wasm_exec.js') {
+                return (...args) => {
+                    r(...args);
+                    throw new Error('dummy');
+                };
+            }
+            return r;
+        };
+        let ex;
+        try {
+            await makeWebAuthn(config);
+        } catch (e) {
+            ex = e;
+        } finally {
+            Mod.prototype.require = req;
+        }
+        expect(ex.message).to.equal('dummy');
+    });
 });
-
-    // 100% coverage
-
-    // fail to login unknown user
-    // login second user?
-
-
-
-    // how can we get Go logs?

@@ -18,9 +18,9 @@ function argify(f) {
 }
 
 class WebAuthn4JS extends events.EventEmitter {
-    constructor(methods) {
-        super();
+    init(methods, checked_exit) {
         this.methods = methods;
+        this.checked_exit = checked_exit;
         this.beginRegistration = this._begin.bind(this,
             argify(methods.beginRegistration.bind(methods)));
         this.finishRegistration = this._finish.bind(this,
@@ -31,8 +31,8 @@ class WebAuthn4JS extends events.EventEmitter {
             argify(methods.finishLogin.bind(methods)));
     }
 
-    exit() {
-        this.methods.checked_exit();
+    exit(n) {
+        this.checked_exit(n);
     }
 
     _user(user) {
@@ -63,27 +63,18 @@ class WebAuthn4JS extends events.EventEmitter {
 }
 
 module.exports = promisify((config, cb) => {
-    let called = false;
-    let webauthn = null;
+    const webauthn = new WebAuthn4JS();
 
-    function done(err, obj) {
-        if (!called) {
-            called = true;
-            webauthn = obj;
-            return cb(err, obj);
+    function error(err) {
+        if (webauthn.methods) {
+            return webauthn.emit('error', err);
         }
-
-        if (err) {
-            if (!webauthn) {
-                throw err;
-            }
-            webauthn.emit('error', err);
-        }
-    }
+        cb(err);
+    };
 
     crypto.randomBytes(64, (err, uid) => {
         if (err) {
-            return done(err);
+            return error(err);
         }
 
         uid = uid.toString('hex');
@@ -92,20 +83,24 @@ module.exports = promisify((config, cb) => {
 
         global[uid] = methods => {
             delete global[uid];
-            methods.exit_called = false;
-            methods.checked_exit = function () {
-                if (!this.exit_called) {
-                    this.exit_called = true;
-                    this.exit();
+
+            let exit_called = false;
+            function checked_exit(n) {
+                if (!exit_called) {
+                    exit_called = true;
+                    methods.exit(n || 0);
                 }
-            };
-            process.on('beforeExit', () => methods.checked_exit());
+            }
+            webauthn.on('exit', () => exit_called = true);
+            process.on('beforeExit', () => checked_exit());
+
             methods.init(JSON.stringify(config), err => {
                 if (err) {
                     init_err = new Error(err);
-                    return process.nextTick(() => methods.checked_exit());
+                    return process.nextTick(checked_exit);
                 }
-                done(null, new WebAuthn4JS(methods));
+                webauthn.init(methods, checked_exit);
+                cb(null, webauthn);
             });
         };
 
@@ -119,18 +114,18 @@ module.exports = promisify((config, cb) => {
                 ],
                 exit(n) {
                     if (init_err) {
-                        return done(init_err);
+                        return error(init_err);
                     }
-                    if ((n !== 0) || !webauthn) {
-                        return done(new Error(`wasm_exec exit with code ${n}`));
+                    if ((n !== 0) || !webauthn.methods) {
+                        error(new Error(`wasm_exec exit with code ${n}`));
                     }
-                    webauthn.emit('exit');
+                    webauthn.emit('exit', n);
                 },
                 hrtime: process.hrtime.bind(process),
                 on: process.on.bind(process)
             }, require.main);
         } catch (ex) {
-            done(ex);
+            error(ex);
         }
     });
 });
