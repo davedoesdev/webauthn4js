@@ -5,7 +5,7 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mod_fastify from 'fastify';
 import fastify_static from 'fastify-static';
-import sodium_plus  from 'sodium-plus';
+import sodium_plus from 'sodium-plus';
 const { SodiumPlus } = sodium_plus;
 import makeWebAuthn from '../index.js';
 const readFile = fs.promises.readFile;
@@ -16,7 +16,6 @@ const port = 3000;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const users = new Map();
-let num_users = 0;
 
 class ErrorWithStatus extends Error {
     constructor(message, statusCode) {
@@ -96,7 +95,7 @@ async function register(fastify) {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
-                id: `user${num_users++}`,
+                id: `user${users.size}`,
                 name: request.params.username,
                 displayName: request.params.username.split('@')[0],
                 iconURL: '',

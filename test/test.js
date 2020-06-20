@@ -1,3 +1,10 @@
+/* eslint-env node, mocha, browser */
+/* global browser,
+          bufferEncode,
+          bufferDecode,
+          last_post_request,
+          last_put_request */
+
 const { join } = require('path');
 const { readFile } = require('fs').promises;
 const mod_fastify = require('fastify');
@@ -33,13 +40,13 @@ class ErrorWithStatus extends Error {
 }
 
 function b64url(b64) {
-    return b64.replace(/\+/g, "-")
-              .replace(/\//g, "_")
-              .replace(/=/g, "");
+    return b64
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=/g, "");
 }
 
 const users = new Map();
-let num_users = 0;
 
 before(async function () {
     const keys_dir = join(__dirname, 'keys');
@@ -104,7 +111,7 @@ before(async function () {
             let user = users.get(request.params.username);
             if (!user) {
                 user = {
-                    id: `user${num_users++}`,
+                    id: `user${users.size}`,
                     name: request.params.username,
                     displayName: request.params.username.split('@')[0],
                     iconURL: '',
@@ -230,15 +237,15 @@ async function executeAsync(f, ...args) {
     const r = await browser.executeAsync(function (f, ...args) {
         (async function () {
             let done = args[args.length - 1];
-            function bufferDecode(value) {
+            window.bufferDecode = function (value) {
                 return Uint8Array.from(atob(value), c => c.charCodeAt(0));
-            }
-            function bufferEncode(value) {
+            };
+            window.bufferEncode = function (value) {
                 return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
                     .replace(/\+/g, "-")
                     .replace(/\//g, "_")
                     .replace(/=/g, "");
-            }
+            };
             try {
                 done(await eval(f)(...args.slice(0, -1)));
             } catch (ex) {
@@ -369,7 +376,7 @@ describe('register', function () {
     it('should register credential', async function () {
         const { id, type } = await register(username);
 
-        expect(num_users).to.equal(1);
+        expect(users.size).to.equal(1);
 
         expect(type).to.equal('public-key');
 
@@ -407,7 +414,7 @@ describe('register', function () {
     it('should register second user', async function () {
         const { id, type } = await register(username2);
 
-        expect(num_users).to.equal(2);
+        expect(users.size).to.equal(2);
 
         expect(type).to.equal('public-key');
 
@@ -477,7 +484,7 @@ describe('login', function () {
         const { id, type } = await login(username);
 
         // username3 although not registered is still in the DB
-        expect(num_users).to.equal(3);
+        expect(users.size).to.equal(3);
 
         expect(type).to.equal('public-key');
 
@@ -650,7 +657,7 @@ describe('login', function () {
         const { id, type } = await login(username2);
 
         // username3 although not registered is still in the DB
-        expect(num_users).to.equal(3);
+        expect(users.size).to.equal(3);
 
         expect(type).to.equal('public-key');
 

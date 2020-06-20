@@ -1,36 +1,89 @@
-/*eslint-env node */
+= Webauthn4JS {nbsp}{nbsp}{nbsp} image:https://gitlab.com/davedoesdev/webauthn4js/badges/master/pipeline.svg[pipeline status,link=https://gitlab.com/davedoesdev/webauthn4js/pipelines] image:https://gitlab.com/davedoesdev/webauthn4js/badges/master/coverage.svg[coverage report,link="https://gitlab.com/davedoesdev/webauthn4js/builds/artifacts/master/download?job=ci"] image:https://img.shields.io/npm/v/webauthn4js.svg[NPM version,link=https://www.npmjs.com/package/webauthn4js]
+:prewrap!:
 
-import * as fs from 'fs';
+This library handles https://w3c.github.io/webauthn/[Web Authentication] for
+Node.js applications that wish to implement a passwordless solution for users.
+
+It's implemented as bindings to the
+https://github.com/duo-labs/webauthn[Duo Labs Go WebAuthn library], which has
+been compiled to Web Assembly. It was inspired by
+https://github.com/pulsejet/go-webauthn-js[go-webauthn-js] but uses Go's
+built-in Web Assembly compiler instead of GopherJS.
+
+== Example
+
+Here's an example program which uses Webauthn4JS to register and authenticate
+users. It uses https://github.com/fastify/fastify[Fastify] to run a Web server
+with handlers to allow users to register and login.
+
+A <<index.js,corresponding Web page>> uses the Web Authentication browser API
+to interact with the user's authenticator, such as a FIDO2 token, and then makes
+requests to the server.
+
+The example is modelled after
+https://github.com/hbolimovsky/webauthn-example[this example] of the Duo Labs
+library. Users are stored in memory so have to re-register when the server
+is restarted. In a real implementation, you'd store users in a database.
+
+I'll describe the example bit-by-bit below. You can also find it in
+link:test/example.mjs[]. Run it using:
+
+[source,bash]
+----
+node --harmony-top-level-await test/example.mjs
+----
+
+[source,javascript]
+.example.mjs
+----
+import fs from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import mod_fastify, {  FastifyPlugin } from 'fastify';
+import mod_fastify from 'fastify';
 import fastify_static from 'fastify-static';
 import sodium_plus from 'sodium-plus';
-import makeWebAuthn from '../index.js';
-import {
-    User,
-    Credential,
-    CredentialCreationResponse,
-    CredentialAssertionResponse,
-    SessionData
-} from './webauthn';
+const { SodiumPlus } = sodium_plus;
+import makeWebAuthn from 'webauthn4js';
 const readFile = fs.promises.readFile;
+----
 
+First the imports. Notice that ``webauthn4js```'s default export is a factory
+function which will let us make an object to handle Web Authentication requests.
+Besides the Fastify imports, we'll also be using
+https://github.com/paragonie/sodium-plus[sodium-plus] to sign session data so
+it can't be tampered with.
+
+[source,javascript]
+----
 const challenge_timeout = 60000;
 const port = 3000;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+----
 
-const users = new Map<string, User>();
+Web Authentication uses challenges sent by the server to the browser, which
+the user's authenticator signs in order to prove possession of its public key.
+Here we specify a timeout for these challenges so they're not valid forever.
+Also, we define the port number that the server will listen on and find the
+directory on the filesystem that we're running from.
 
+[source,javascript]
+----
+const users = new Map();
+----
+
+The users are kept in memory, indexed by their username.
+
+[source,javascript]
+----
 class ErrorWithStatus extends Error {
-    constructor(message : string, public statusCode : number) {
+    constructor(message, statusCode) {
         super(message);
+        this.statusCode = statusCode;
     }
 }
 
-const test_dir = join(__dirname, '..', 'test');
-const keys_dir = join(test_dir, 'keys');
+const keys_dir = join(__dirname, 'keys');
 
 const fastify = mod_fastify({
     logger: true,
@@ -41,8 +94,8 @@ const fastify = mod_fastify({
 });
 
 fastify.register(fastify_static, {
-    root: join(test_dir, 'fixtures'),
-    index: ['example.html']
+    root: join(__dirname, 'fixtures'),
+    index: 'example.html'
 });
 
 const webAuthn = await makeWebAuthn({
@@ -55,18 +108,10 @@ const webAuthn = await makeWebAuthn({
     }
 });
 
-const sodium = await sodium_plus.SodiumPlus.auto();
+const sodium = await SodiumPlus.auto();
 const session_data_key = await sodium.crypto_secretbox_keygen();
 
-interface ISecretSessionData {
-    ciphertext : string,
-    nonce : string
-}
-
-async function make_secret_session_data(
-    username : string,
-    type : string,
-    session_data : SessionData) : Promise<ISecretSessionData> {
+async function make_secret_session_data(username, type, session_data) {
     const nonce = await sodium.randombytes_buf(
         sodium.CRYPTO_SECRETBOX_NONCEBYTES);
     return {
@@ -79,15 +124,15 @@ async function make_secret_session_data(
 }
 
 async function verify_secret_session_data(
-    expected_username : string,
-    expected_type : string,
-    secret_session_data : ISecretSessionData) : Promise<SessionData> {
+    expected_username,
+    expected_type,
+    secret_session_data) {
     try {
         const [ username, type, session_data, timestamp ] = JSON.parse(
-            (await sodium.crypto_secretbox_open(
+            await sodium.crypto_secretbox_open(
                 Buffer.from(secret_session_data.ciphertext, 'base64'),
                 Buffer.from(secret_session_data.nonce, 'base64'),
-                session_data_key)).toString());
+                session_data_key));
         if (username !== expected_username) {
             throw new Error('wrong username');
         }
@@ -104,12 +149,8 @@ async function verify_secret_session_data(
     }
 }
 
-interface IUserRoute {
-    Params: { username : string }
-}
-
-const register : FastifyPlugin = async function (fastify) {
-    fastify.get<IUserRoute>('/:username',  async request => {
+async function register(fastify) {
+    fastify.get('/:username',  async request => {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
@@ -138,21 +179,14 @@ const register : FastifyPlugin = async function (fastify) {
         };
     });
 
-    interface ICreateRoute extends IUserRoute {
-        Body: {
-            ccr : CredentialCreationResponse,
-            session_data : ISecretSessionData
-        }
-    }
-
-    fastify.put<ICreateRoute>('/:username', async (request, reply) => {
+    fastify.put('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
         }
         const session_data = await verify_secret_session_data(
             request.params.username, 'registration', request.body.session_data);
-        let credential : Credential;
+        let credential;
         try {
             credential = await webAuthn.finishRegistration(
                 user, session_data, request.body.ccr);
@@ -170,8 +204,8 @@ const register : FastifyPlugin = async function (fastify) {
     });
 }
 
-const login : FastifyPlugin = async function (fastify) {
-    fastify.get<IUserRoute>('/:username',  async request => {
+async function login(fastify) {
+    fastify.get('/:username',  async request => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -184,21 +218,14 @@ const login : FastifyPlugin = async function (fastify) {
         };
     });
 
-    interface IAssertRoute extends IUserRoute {
-        Body: {
-            car : CredentialAssertionResponse,
-            session_data : ISecretSessionData
-        }
-    }
-
-    fastify.post<IAssertRoute>('/:username', async (request, reply) => {
+    fastify.post('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
         }
         const session_data = await verify_secret_session_data(
             request.params.username, 'login', request.body.session_data);
-        let credential : Credential;
+        let credential;
         try {
             credential = await webAuthn.finishLogin(
                 user, session_data, request.body.car);
@@ -230,3 +257,5 @@ fastify.register(login, {
 await fastify.listen(port);
 
 console.log(`Please visit https://localhost:${port}`);
+
+----

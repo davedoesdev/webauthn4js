@@ -70,7 +70,7 @@ module.exports = promisify((config, cb) => {
             return webauthn.emit('error', err);
         }
         cb(err);
-    };
+    }
 
     crypto.randomBytes(64, (err, uid) => {
         if (err) {
