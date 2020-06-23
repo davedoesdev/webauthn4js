@@ -16,7 +16,7 @@ Here's an example program which uses Webauthn4JS to register and authenticate
 users. It uses https://github.com/fastify/fastify[Fastify] to run a Web server
 with handlers to allow users to register and login.
 
-A <<index.js,corresponding Web page>> uses the Web Authentication browser API
+A <<browser,corresponding Web page>> uses the Web Authentication browser API
 to interact with the user's authenticator, such as a FIDO2 token, and then makes
 requests to the server.
 
@@ -101,7 +101,7 @@ fastify.register(fastify_static, {
 });
 ----
 
-Here we configure Fastify to serve over HTTPS the Web page users will use to
+Here we configure Fastify to serve over HTTPS the <<Web page,index.html>> users will use to
 interact with their authenticators.
 
 [source,javascript]
@@ -340,5 +340,244 @@ console.log(`Please visit https://localhost:${port}`);
 
 The server-side code ends by registering our handlers with Fastify and then listening for requests.
 
-[[index.js]]
+[[browser]]
 === Browser-side
+
+You can find the browser files in the link:test/fixtures[] directory.
+
+It's driven by the following HTML file, which is served when you connect to the server.
+
+[[index.html]]
+[source,html]
+.example.html
+----
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>WebAuthn Demo</title>
+    <script src="example.js"></script>
+  </head>
+  <body>
+    <p>
+      <label for="email">Username:</label>
+      <input type="text" name="username" id="email" placeholder="e.g. foo@bar.com">
+    </p>
+    <p>
+      <button onclick="registerUser()">Register</button>
+      <button onclick="loginUser()">Login</button>
+    </p>
+  </body>
+</html>
+----
+
+The code for `registerUser()` and `loginUser()` is contained in link:test/fixtures/example.js[],
+which I'll describe now.
+
+[source,javascript]
+.example.js
+----
+// Base64 to ArrayBuffer
+function bufferDecode(value) {
+    return Uint8Array.from(atob(value), c => c.charCodeAt(0));
+}
+
+// ArrayBuffer to URLBase64
+function bufferEncode(value) {
+    return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=/g, "");
+}
+----
+
+First some functions to decode data we receive from the server and encode data we send to the
+server. WebAuthn4JS (and the Go library) expect data to be base64 encoded.
+
+[source,javascript]
+----
+async function registerUser() { // eslint-disable-line no-unused-vars
+    const username = document.getElementById('email').value;
+    try {
+        const get_response = await fetch(`/register/${username}`);
+        if (!get_response.ok) {
+            throw new Error(`Registration GET failed with ${get_response.status}`);
+        }
+        const { options, session_data } = await get_response.json();
+----
+
+To register, we first make a GET request to the server in order to get the options we should
+pass to `navigator.credentials.create()`.
+
+[source,javascript]
+----
+        const { publicKey } = options;
+        publicKey.challenge = bufferDecode(publicKey.challenge);
+        publicKey.user.id = bufferDecode(publicKey.user.id);
+        if (publicKey.excludeCredentials) {
+            for (const c of publicKey.excludeCredentials) {
+                c.id = bufferDecode(c.id);
+            }
+        }
+----
+
+Then we decode the options that are base64 encoded.
+
+[source,javascript]
+----
+        const credential = await navigator.credentials.create(options);
+        const { id, rawId, type, response: cred_response } = credential;
+        const { attestationObject, clientDataJSON } = cred_response;
+----
+
+Now we can call `navigator.credentials.create()`. The browser will ask the user to interact with
+their authenticator to sign the challenge that the server sent in the options.
+
+[source,javascript]
+----
+        const put_response = await fetch(`/register/${username}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ccr: {
+                    id,
+                    rawId: bufferEncode(rawId),
+                    type,
+                    response: {
+                        attestationObject: bufferEncode(attestationObject),
+                        clientDataJSON: bufferEncode(clientDataJSON)
+                    }
+                },
+                session_data
+            })
+        });
+        if (!put_response.ok) {
+            throw new Error(`Registration PUT failed with ${put_response.status}`);
+        }
+    } catch (ex) {
+        console.error(ex);
+        return alert(`Failed to register ${username}`);
+    }
+    alert(`Successfully registered ${username}`);
+}
+----
+
+To complete registration, we make a PUT request to the server with the result from
+`navigator.credentials.create()`, base64 encoding as necessary.
+
+[source,javascript]
+----
+async function loginUser() { // eslint-disable-line no-unused-vars
+    const username = document.getElementById('email').value;
+    try {
+        const get_response = await fetch(`/login/${username}`);
+        if (!get_response.ok) {
+            throw new Error(`Login GET failed with ${get_response.status}`);
+        }
+----
+
+To login, we first make a GET request to the server in order to get the options we should
+pass to `navigator.credentials.get()`.
+
+[source,javascript]
+----
+        const { options, session_data } = await get_response.json();
+        const { publicKey } = options;
+        publicKey.challenge = bufferDecode(publicKey.challenge);
+        for (const c of publicKey.allowCredentials) {
+            c.id = bufferDecode(c.id);
+        }
+----
+
+Then we decode the options that are base64 encoded.
+
+[source,javascript]
+----
+        const assertion = await navigator.credentials.get(options);
+        const { id, rawId, type, response: assertion_response } = assertion;
+        const { authenticatorData, clientDataJSON, signature, userHandle } = assertion_response;
+----
+
+Now we can call `navigator.credentials.get()`. The browser will ask the user to interact with
+their authenticator to sign the challenge that the server sent in the options.
+
+[source,javascript]
+----
+        const post_response = await fetch(`/login/${username}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                car: {
+                    id,
+                    rawId: bufferEncode(rawId),
+                    type,
+                    response: {
+                        authenticatorData: bufferEncode(authenticatorData),
+                        clientDataJSON: bufferEncode(clientDataJSON),
+                        signature: bufferEncode(signature),
+                        userHandle: bufferEncode(userHandle)
+                    }
+                },
+                session_data
+            })
+        });
+        if (!post_response.ok) {
+            throw new Error(`Login POST failed with ${post_response.status}`);
+        }
+    } catch (ex) {
+        console.error(ex);
+        return alert(`Failed to log in ${username}`);
+    }
+    alert(`Successfully logged in ${username}`);
+}
+----
+
+To complete login, we make a POST request to the server with the result from
+`navigator.credentials.get()`, base 64 encoding as necessary.
+
+== Installation
+
+[source,bash]
+----
+npm install webauthn4js
+----
+
+== Licence
+
+The licence for WebAuthn4JS is link:LICENCE[here].
+
+The licence for Duo Labs Go WebAuthn library is link:LICENCE_webauthn[here].
+
+I've also modified https://github.com/golang/go/blob/go1.13.8/misc/wasm/wasm_exec.js[`wasm_exec.js`]
+from Go's distribution. I've included the original link:wasm_exec.js.orig[here] and Go's
+licence link:LICENSE_wasm_exec[here]. The modified version is link:wasm_exec.js[here].
+
+== Test
+
+[source,bash]
+----
+grunt test
+----
+
+== Coverage
+
+[source,bash]
+----
+grunt coverage
+----
+
+http://gotwarlost.github.io/istanbul/[Istanbul] results are available
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/coverage/lcov-report/index.html[here].
+
+Coveralls page is https://coveralls.io/r/davedoesdev/webauthn4js[here].
+
+== Lint
+
+[source,bash]
+----
+grunt lint
+----
