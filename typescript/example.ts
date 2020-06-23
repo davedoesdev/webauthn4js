@@ -109,7 +109,7 @@ interface IUserRoute {
 }
 
 const register : FastifyPlugin = async function (fastify) {
-    fastify.get<IUserRoute>('/:username',  async request => {
+    fastify.get<IUserRoute>('/:username', async request => {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
@@ -171,7 +171,7 @@ const register : FastifyPlugin = async function (fastify) {
 }
 
 const login : FastifyPlugin = async function (fastify) {
-    fastify.get<IUserRoute>('/:username',  async request => {
+    fastify.get<IUserRoute>('/:username', async request => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);

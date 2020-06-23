@@ -107,7 +107,7 @@ before(async function () {
     }
 
     async function register(fastify) {
-        fastify.get('/:username',  async request => {
+        fastify.get('/:username', async request => {
             let user = users.get(request.params.username);
             if (!user) {
                 user = {
@@ -165,7 +165,7 @@ before(async function () {
     }
 
     async function login(fastify) {
-        fastify.get('/:username',  async request => {
+        fastify.get('/:username', async request => {
             const user = users.get(request.params.username);
             if (!user) {
                 throw new ErrorWithStatus('no user', 404);

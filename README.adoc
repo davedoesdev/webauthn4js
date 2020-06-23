@@ -22,8 +22,12 @@ requests to the server.
 
 The example is modelled after
 https://github.com/hbolimovsky/webauthn-example[this example] of the Duo Labs
-library. Users are stored in memory so have to re-register when the server
-is restarted. In a real implementation, you'd store users in a database.
+library.
+
+=== Server-side
+
+Users are stored in memory so have to re-register when the server is restarted.
+In a real implementation, you'd store users in a database.
 
 I'll describe the example bit-by-bit below. You can also find it in
 link:test/example.mjs[]. Run it using:
@@ -41,30 +45,22 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mod_fastify from 'fastify';
 import fastify_static from 'fastify-static';
-import sodium_plus from 'sodium-plus';
-const { SodiumPlus } = sodium_plus;
+import { make_secret_session_data, verify_secret_session_data } from './session.mjs';
 import makeWebAuthn from 'webauthn4js';
 const readFile = fs.promises.readFile;
 ----
 
 First the imports. Notice that ``webauthn4js```'s default export is a factory
-function which will let us make an object to handle Web Authentication requests.
-Besides the Fastify imports, we'll also be using
-https://github.com/paragonie/sodium-plus[sodium-plus] to sign session data so
-it can't be tampered with.
+function which will let us make an object to handle Web Authentication
+registration and login.
 
 [source,javascript]
 ----
-const challenge_timeout = 60000;
 const port = 3000;
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 ----
 
-Web Authentication uses challenges sent by the server to the browser, which
-the user's authenticator signs in order to prove possession of its public key.
-Here we specify a timeout for these challenges so they're not valid forever.
-Also, we define the port number that the server will listen on and find the
+Here we define the port number that the server will listen on and find the
 directory on the filesystem that we're running from.
 
 [source,javascript]
@@ -82,7 +78,13 @@ class ErrorWithStatus extends Error {
         this.statusCode = statusCode;
     }
 }
+----
 
+Fastify uses `statusCode` properties on thrown `Error` objects to return HTTP
+status codes to the browser. This is just a convenience class.
+
+[source,javascript]
+----
 const keys_dir = join(__dirname, 'keys');
 
 const fastify = mod_fastify({
@@ -97,7 +99,13 @@ fastify.register(fastify_static, {
     root: join(__dirname, 'fixtures'),
     index: 'example.html'
 });
+----
 
+Here we configure Fastify to serve over HTTPS the Web page users will use to
+interact with their authenticators.
+
+[source,javascript]
+----
 const webAuthn = await makeWebAuthn({
     RPDisplayName: 'WebAuthnJS',
     RPID: 'localhost',
@@ -107,50 +115,16 @@ const webAuthn = await makeWebAuthn({
         userVerification: 'preferred'
     }
 });
+----
 
-const sodium = await SodiumPlus.auto();
-const session_data_key = await sodium.crypto_secretbox_keygen();
+Now we make our link:docs.html#WebAuthn4JS[`WebAuthn4JS`] object which will
+handle registration and login. Note this example assumes it's running on
+`localhost`.
 
-async function make_secret_session_data(username, type, session_data) {
-    const nonce = await sodium.randombytes_buf(
-        sodium.CRYPTO_SECRETBOX_NONCEBYTES);
-    return {
-        ciphertext: (await sodium.crypto_secretbox(
-            JSON.stringify([ username, type, session_data, Date.now() ]),
-            nonce,
-            session_data_key)).toString('base64'),
-        nonce: nonce.toString('base64')
-    };
-}
-
-async function verify_secret_session_data(
-    expected_username,
-    expected_type,
-    secret_session_data) {
-    try {
-        const [ username, type, session_data, timestamp ] = JSON.parse(
-            await sodium.crypto_secretbox_open(
-                Buffer.from(secret_session_data.ciphertext, 'base64'),
-                Buffer.from(secret_session_data.nonce, 'base64'),
-                session_data_key));
-        if (username !== expected_username) {
-            throw new Error('wrong username');
-        }
-        if (type !== expected_type) {
-            throw new Error('wrong type');
-        }
-        if ((timestamp + challenge_timeout) <= Date.now()) {
-            throw new Error('session timed out');
-        }
-        return session_data;
-    } catch (ex) {
-        ex.statusCode = 400;
-        throw ex;
-    }
-}
-
+[source,javascript]
+----
 async function register(fastify) {
-    fastify.get('/:username',  async request => {
+    fastify.get('/:username', async request => {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
@@ -162,30 +136,77 @@ async function register(fastify) {
             };
             users.set(request.params.username, user);
         }
+----
+
+We set up a GET handler to start the registration of a new credential (public key) for a user.
+Note in this example we don't verify user name belongs to the requester. In a real application we
+might perform email verification or generate unguessable user names, for example.
+
+We generate a unique ID and maintain a list of credentials for each user and store this information
+in the `users` `Map`.
+
+[source,javascript]
+----
         const excludeCredentials = user.credentials.map(c => ({
             type: 'public-key',
             id: c.ID
         }));
+----
+
+This is a list of credentials that the user shouldn't use for registering with this server.
+We specify here that the browser shouldn't use any credential that the user has already registerd.
+
+[source,javascript]
+----
         const { options, sessionData } = await webAuthn.beginRegistration(
             user,
             cco => {
                 cco.excludeCredentials = excludeCredentials;
                 return cco;
             });
+----
+
+Now we begin registration, calling link:docs.html#WebAuthn4JS[`beginRegistration`] and passing in
+the user and the excluded (existing) credentials.
+
+[source,javascript]
+----
         return {
             options,
             session_data: await make_secret_session_data(
                 request.params.username, 'registration', sessionData)
         };
     });
+----
 
+Once registration has started, we need to return data to the browser so it can ask the user to
+register using their authenticator. We return the options that WebAuthn4JS generates for the
+browser's `navigator.credentials.create()` call, along with session data that WebAuthn4JS will check
+when the browser makes its PUT request to complete registration. Note we sign and encrypt this data
+to ensure it won't be tampered with.
+
+[source,javascript]
+----
     fastify.put('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
         }
+----
+
+We set up a PUT handler to complete a registration previously started with a GET request for the
+same user. If the user doesn't exist then registration wasn't started and a 404 error is returned.
+
+[source,javascript]
+----
         const session_data = await verify_secret_session_data(
             request.params.username, 'registration', request.body.session_data);
+----
+
+First we verify the session data to ensure it hasn't been tampered with.
+
+[source,javascript]
+----
         let credential;
         try {
             credential = await webAuthn.finishRegistration(
@@ -194,18 +215,37 @@ async function register(fastify) {
             ex.statusCode = 400;
             throw ex;
         }
+----
+
+Then we complete the registration process, calling link:docs.html#WebAuthn4JS[`finishRegistration`] 
+and receiving a link:docs.html#WebAuthn4JS[`Credential`] object. Note the credential isn't yet
+associated with a user.
+
+[source,javascript]
+----
         for (const u of users.values()) {
             if (u.credentials.find(c => c.ID === credential.ID)) {
                 throw new ErrorWithStatus('credential in use', 409);
             }
         }
+----
+
+If the credential is in use by any user already, this is an error.
+
+[source,javascript]
+----
         user.credentials.push(credential);
         reply.code(204);
     });
 }
+----
 
+Finally for registration, we associate the credential with the requested user.
+
+[source,javascript]
+----
 async function login(fastify) {
-    fastify.get('/:username',  async request => {
+    fastify.get('/:username', async request => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -217,6 +257,14 @@ async function login(fastify) {
                 request.params.username, 'login', sessionData)
         };
     });
+----
+
+Login's GET handler first checks the user exists and then calls
+link:docs.html#WebAuthn4JS[`beginLogin`], passing in the user object. We then return to the browser
+the options for `navigator.credentials.get()` and signed and encrypted session data.
+
+[source,javascript]
+----
 
     fastify.post('/:username', async (request, reply) => {
         const user = users.get(request.params.username);
@@ -225,6 +273,13 @@ async function login(fastify) {
         }
         const session_data = await verify_secret_session_data(
             request.params.username, 'login', request.body.session_data);
+----
+
+Login's POST handler checks the user exists and verifies the session data it received from the
+browser.
+
+[source,javascript]
+----
         let credential;
         try {
             credential = await webAuthn.finishLogin(
@@ -233,6 +288,14 @@ async function login(fastify) {
             ex.statusCode = 400;
             throw ex;
         }
+----
+
+It then completes the login process by calling link:docs.html#WebAuthn4JS[`finishLogin`], passing in
+the user object, session data and authentication request it received from the browser (i.e. the
+result of `navigator.credentials.get()`).
+
+[source,javascript]
+----
         if (credential.Authenticator.CloneWarning) {
             throw new ErrorWithStatus('credential appears to be cloned', 403);
         }
@@ -241,11 +304,27 @@ async function login(fastify) {
             // Should have been checked already in Go by webAuthn.finishLogin
             throw new ErrorWithStatus('no credential', 500);
         }
+----
+
+Here we do a couple of checks on the credential used for login:
+
+* The credential hasn't been cloned, i.e. we received a duplicate login request from the same
+  authenticator. This is actually checked by the underlying Go WebAuthn library.
+* The credential belongs to the requested user. Again, this should have already been checked in Go.
+
+[source,javascript]
+----
         user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
         reply.code(204);
     });
 }
+----
 
+Finally for login, we have to update the `SignCount` for the credential in the user's credentials
+list. This enables the Go library to check for duplicate requests.
+
+[source,javascript]
+----
 fastify.register(register, {
     prefix: '/register/'
 });
@@ -257,5 +336,9 @@ fastify.register(login, {
 await fastify.listen(port);
 
 console.log(`Please visit https://localhost:${port}`);
-
 ----
+
+The server-side code ends by registering our handlers with Fastify and then listening for requests.
+
+[[index.js]]
+=== Browser-side
