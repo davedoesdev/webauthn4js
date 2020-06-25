@@ -1,0 +1,532 @@
+{
+  "required": [
+    "Config",
+    "User",
+    "CredentialCreation",
+    "CredentialCreationResponse",
+    "CredentialAssertion",
+    "CredentialAssertionResponse",
+    "SessionData"
+  ],
+  "properties": {
+    "Config": {
+      "$ref": "#/definitions/Config"
+    },
+    "User": {
+      "$ref": "#/definitions/User"
+    },
+    "CredentialCreation": {
+      "$ref": "#/definitions/CredentialCreation"
+    },
+    "CredentialCreationResponse": {
+      "$ref": "#/definitions/CredentialCreationResponse"
+    },
+    "CredentialAssertion": {
+      "$ref": "#/definitions/CredentialAssertion"
+    },
+    "CredentialAssertionResponse": {
+      "$ref": "#/definitions/CredentialAssertionResponse"
+    },
+    "SessionData": {
+      "$ref": "#/definitions/SessionData"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "definitions": {
+    "Authenticator": {
+      "required": [
+        "AAGUID",
+        "SignCount",
+        "CloneWarning"
+      ],
+      "properties": {
+        "AAGUID": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "SignCount": {
+          "type": "integer"
+        },
+        "CloneWarning": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AuthenticatorAssertionResponse": {
+      "required": [
+        "clientDataJSON",
+        "authenticatorData",
+        "signature"
+      ],
+      "properties": {
+        "clientDataJSON": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "authenticatorData": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "signature": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "userHandle": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AuthenticatorAttestationResponse": {
+      "required": [
+        "clientDataJSON",
+        "attestationObject"
+      ],
+      "properties": {
+        "clientDataJSON": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "attestationObject": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "AuthenticatorSelection": {
+      "properties": {
+        "authenticatorAttachment": {
+          "type": "string"
+        },
+        "requireResidentKey": {
+          "type": "boolean"
+        },
+        "userVerification": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Config": {
+      "required": [
+        "RPDisplayName",
+        "RPID"
+      ],
+      "properties": {
+        "RPDisplayName": {
+          "type": "string"
+        },
+        "RPID": {
+          "type": "string"
+        },
+        "RPOrigin": {
+          "type": "string"
+        },
+        "RPIcon": {
+          "type": "string"
+        },
+        "AttestationPreference": {
+          "type": "string"
+        },
+        "AuthenticatorSelection": {
+          "$ref": "#/definitions/AuthenticatorSelection"
+        },
+        "Timeout": {
+          "type": "integer"
+        },
+        "Debug": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Credential": {
+      "required": [
+        "ID",
+        "PublicKey",
+        "AttestationType",
+        "Authenticator"
+      ],
+      "properties": {
+        "ID": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "PublicKey": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "AttestationType": {
+          "type": "string"
+        },
+        "Authenticator": {
+          "$ref": "#/definitions/Authenticator"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CredentialAssertion": {
+      "required": [
+        "publicKey"
+      ],
+      "properties": {
+        "publicKey": {
+          "$ref": "#/definitions/PublicKeyCredentialRequestOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CredentialAssertionResponse": {
+      "required": [
+        "id",
+        "type",
+        "rawId",
+        "response"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "rawId": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "extensions": {
+          "patternProperties": {
+            ".*": {
+              "additionalProperties": true
+            }
+          },
+          "type": "object"
+        },
+        "response": {
+          "$ref": "#/definitions/AuthenticatorAssertionResponse"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CredentialCreation": {
+      "required": [
+        "publicKey"
+      ],
+      "properties": {
+        "publicKey": {
+          "$ref": "#/definitions/PublicKeyCredentialCreationOptions"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CredentialCreationResponse": {
+      "required": [
+        "id",
+        "type",
+        "rawId",
+        "response"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "rawId": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "extensions": {
+          "patternProperties": {
+            ".*": {
+              "additionalProperties": true
+            }
+          },
+          "type": "object"
+        },
+        "response": {
+          "$ref": "#/definitions/AuthenticatorAttestationResponse"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CredentialDescriptor": {
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "transports": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "CredentialParameter": {
+      "required": [
+        "type",
+        "alg"
+      ],
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "alg": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PublicKeyCredentialCreationOptions": {
+      "required": [
+        "challenge",
+        "rp",
+        "user"
+      ],
+      "properties": {
+        "challenge": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "rp": {
+          "$ref": "#/definitions/RelyingPartyEntity"
+        },
+        "user": {
+          "$ref": "#/definitions/UserEntity"
+        },
+        "pubKeyCredParams": {
+          "items": {
+            "$ref": "#/definitions/CredentialParameter"
+          },
+          "type": "array"
+        },
+        "authenticatorSelection": {
+          "$ref": "#/definitions/AuthenticatorSelection"
+        },
+        "timeout": {
+          "type": "integer"
+        },
+        "excludeCredentials": {
+          "items": {
+            "$ref": "#/definitions/CredentialDescriptor"
+          },
+          "type": "array"
+        },
+        "extensions": {
+          "patternProperties": {
+            ".*": {
+              "additionalProperties": true
+            }
+          },
+          "type": "object"
+        },
+        "attestation": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PublicKeyCredentialRequestOptions": {
+      "required": [
+        "challenge"
+      ],
+      "properties": {
+        "challenge": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "timeout": {
+          "type": "integer"
+        },
+        "rpId": {
+          "type": "string"
+        },
+        "allowCredentials": {
+          "items": {
+            "$ref": "#/definitions/CredentialDescriptor"
+          },
+          "type": "array"
+        },
+        "userVerification": {
+          "type": "string"
+        },
+        "extensions": {
+          "patternProperties": {
+            ".*": {
+              "additionalProperties": true
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RelyingPartyEntity": {
+      "required": [
+        "name",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "SessionData": {
+      "required": [
+        "challenge",
+        "user_id",
+        "userVerification"
+      ],
+      "properties": {
+        "challenge": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "allowed_credentials": {
+          "items": {
+            "type": "string",
+            "media": {
+              "binaryEncoding": "base64"
+            }
+          },
+          "type": "array"
+        },
+        "userVerification": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "User": {
+      "required": [
+        "id",
+        "name",
+        "displayName",
+        "iconURL",
+        "credentials"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        },
+        "name": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "iconURL": {
+          "type": "string"
+        },
+        "credentials": {
+          "items": {
+            "$ref": "#/definitions/Credential"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "UserEntity": {
+      "required": [
+        "name",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

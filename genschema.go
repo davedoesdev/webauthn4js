@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"fmt"
 	"os"
+	"bytes"
+	"encoding/json"
 
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/duo-labs/webauthn/protocol"
@@ -36,10 +38,12 @@ func main() {
 		},*/
 	}
 	schema := reflector.ReflectFromType(typ)
-	json, err := schema.MarshalJSON()
+	b, err := schema.MarshalJSON()
 	if  err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	fmt.Println(string(json))
+	var out bytes.Buffer
+	json.Indent(&out, b, "", "  ")
+	out.WriteTo(os.Stdout)
 }

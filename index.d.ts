@@ -47,6 +47,12 @@ export interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
     ) : Promise<Credential>;
 }
 
-declare function make(config : Config) : WebAuthn4JS;
+declare type WebAuthn4JSFactory = (config : Config) => WebAuthn4JS;
+
+interface SchemadWebAuthn4JSFactory extends WebAuthn4JSFactory {
+    schemas : any;
+}
+
+declare let make : SchemadWebAuthn4JSFactory;
 
 export default make;

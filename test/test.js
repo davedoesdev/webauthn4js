@@ -68,6 +68,19 @@ before(async function () {
     const sodium = await SodiumPlus.auto();
     const session_data_key = await sodium.crypto_secretbox_keygen();
 
+    const session_data_schema = {
+        type: 'object',
+        required: [
+            'ciphertext',
+            'nonce'
+        ],
+        additionalProperties: false,
+        properties: {
+            ciphertext: { type: 'string' },
+            nonce: { type: 'string' }
+        }
+    };
+
     async function make_secret_session_data(username, type, session_data) {
         const nonce = await sodium.randombytes_buf(
             sodium.CRYPTO_SECRETBOX_NONCEBYTES);
@@ -107,7 +120,25 @@ before(async function () {
     }
 
     async function register(fastify) {
-        fastify.get('/:username', async request => {
+        fastify.get('/:username', {
+            schema: {
+                response: {
+                    200: {
+                        type: 'object',
+                        required: [
+                            'options',
+                            'session_data'
+                        ],
+                        additionalProperties: false,
+                        properties: {
+                            options: makeWebAuthn.schemas.definitions.CredentialCreation,
+                            session_data: session_data_schema
+                        },
+                        definitions: makeWebAuthn.schemas.definitions
+                    }
+                }
+            }
+        }, async request => {
             let user = users.get(request.params.username);
             if (!user) {
                 user = {
@@ -139,7 +170,22 @@ before(async function () {
             };
         });
 
-        fastify.put('/:username', async (request, reply) => {
+        fastify.put('/:username', {
+            schema: {
+                body: {
+                    type: 'object',
+                    required: [
+                        'ccr',
+                        'session_data'
+                    ],
+                    properties: {
+                        ccr: makeWebAuthn.schemas.definitions.CredentialCreationResponse,
+                        session_data: session_data_schema
+                    },
+                    definitions: makeWebAuthn.schemas.definitions
+                }
+            }
+        }, async (request, reply) => {
             const user = users.get(request.params.username);
             if (!user) {
                 throw new ErrorWithStatus('no user', 404);
@@ -165,7 +211,25 @@ before(async function () {
     }
 
     async function login(fastify) {
-        fastify.get('/:username', async request => {
+        fastify.get('/:username', {
+            schema: {
+                response: {
+                    200: {
+                        type: 'object',
+                        required: [
+                            'options',
+                            'session_data'
+                        ],
+                        additionalProperties: false,
+                        properties: {
+                            options: makeWebAuthn.schemas.definitions.CredentialAssertion,
+                            session_data: session_data_schema
+                        },
+                        definitions: makeWebAuthn.schemas.definitions
+                    }
+                }
+            }
+        }, async request => {
             const user = users.get(request.params.username);
             if (!user) {
                 throw new ErrorWithStatus('no user', 404);
@@ -178,7 +242,22 @@ before(async function () {
             };
         });
 
-        fastify.post('/:username', async (request, reply) => {
+        fastify.post('/:username', {
+            schema: {
+                body: {
+                    type: 'object',
+                    required: [
+                        'car',
+                        'session_data'
+                    ],
+                    properties: {
+                        car: makeWebAuthn.schemas.definitions.CredentialAssertionResponse,
+                        session_data: session_data_schema
+                    },
+                    definitions: makeWebAuthn.schemas.definitions
+                }
+            }
+        }, async (request, reply) => {
             const user = users.get(request.params.username);
             if (!user) {
                 throw new ErrorWithStatus('no user', 404);
@@ -553,13 +632,11 @@ describe('login', function () {
                     throw new Error(`Registration GET failed with ${get_response.status} ${await get_response.text()}`);
                 }
                 const { session_data } = await get_response.json();
-                const post_response = await fetch(`/login/${username}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ session_data })
-                });
+                const request = Object.assign({}, last_post_request);
+                const body = JSON.parse(request.body);
+                body.session_data = session_data;
+                request.body = JSON.stringify(body);
+                const post_response = await fetch(`/login/${username}`, request);
                 if (!post_response.ok) {
                     throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
                 }
@@ -575,9 +652,7 @@ describe('login', function () {
         try {
             /* istanbul ignore next */
             await executeAsync(async username => {
-                const put_response = await fetch(`/register/${username}`, {
-                    method: 'PUT'
-                });
+                const put_response = await fetch(`/register/${username}`, last_put_request);
                 if (!put_response.ok) {
                     throw new Error(`Registration PUT failed with ${put_response.status} ${await put_response.text()}`);
                 }
@@ -603,9 +678,7 @@ describe('login', function () {
         try {
             /* istanbul ignore next */
             await executeAsync(async username => {
-                const post_response = await fetch(`/login/${username}`, {
-                    method: 'POST'
-                });
+                const post_response = await fetch(`/login/${username}`, last_post_request);
                 if (!post_response.ok) {
                     throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
                 }
@@ -634,13 +707,11 @@ describe('login', function () {
                     throw new Error(`Login GET failed with ${get_response.status} ${await get_response.text()}`);
                 }
                 const { session_data } = await get_response.json();
-                const post_response = await fetch(`/login/${username}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ session_data })
-                });
+                const request = Object.assign({}, last_post_request);
+                const body = JSON.parse(request.body);
+                body.session_data = session_data;
+                request.body = JSON.stringify(body);
+                const post_response = await fetch(`/login/${username}`, request);
                 if (!post_response.ok) {
                     throw new Error(`Login POST failed with ${post_response.status} ${await post_response.text()}`);
                 }
