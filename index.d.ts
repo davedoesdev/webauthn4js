@@ -45,6 +45,8 @@ export interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
         sessionData : SessionData,
         response : CredentialAssertionResponse
     ) : Promise<Credential>;
+
+    exit(code: number) : void;
 }
 
 declare type WebAuthn4JSFactory = (config : Config) => WebAuthn4JS;

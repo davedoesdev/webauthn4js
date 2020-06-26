@@ -31,8 +31,8 @@ class WebAuthn4JS extends events.EventEmitter {
             argify(methods.finishLogin.bind(methods)));
     }
 
-    exit(n) {
-        this.checked_exit(n);
+    exit(code) {
+        this.checked_exit(code);
     }
 
     _user(user) {
