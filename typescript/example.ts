@@ -108,8 +108,39 @@ interface IUserRoute {
     Params: { username : string }
 }
 
+const session_data_schema = {
+    type: 'object',
+    required: [
+        'ciphertext',
+        'nonce'
+    ],
+    additionalProperties: false,
+    properties: {
+        ciphertext: { type: 'string' },
+        nonce: { type: 'string' }
+    }
+};
+
 const register : FastifyPlugin = async function (fastify) {
-    fastify.get<IUserRoute>('/:username', async request => {
+    fastify.get<IUserRoute>('/:username', {
+        schema: {
+            response: {
+                200: {
+                    type: 'object',
+                    required: [
+                        'options',
+                        'session_data'
+                    ],
+                    additionalProperties: false,
+                    properties: {
+                        options: makeWebAuthn.schemas.definitions.CredentialCreation,
+                        session_data: session_data_schema
+                    },
+                    definitions: makeWebAuthn.schemas.definitions
+                }
+            }
+        }
+    }, async request => {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
@@ -145,7 +176,22 @@ const register : FastifyPlugin = async function (fastify) {
         }
     }
 
-    fastify.put<ICreateRoute>('/:username', async (request, reply) => {
+    fastify.put<ICreateRoute>('/:username', {
+        schema: {
+            body: {
+                type: 'object',
+                required: [
+                    'ccr',
+                    'session_data'
+                ],
+                properties: {
+                    ccr: makeWebAuthn.schemas.definitions.CredentialCreationResponse,
+                    session_data: session_data_schema
+                },
+                definitions: makeWebAuthn.schemas.definitions
+            }
+        }
+    }, async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -171,7 +217,25 @@ const register : FastifyPlugin = async function (fastify) {
 }
 
 const login : FastifyPlugin = async function (fastify) {
-    fastify.get<IUserRoute>('/:username', async request => {
+    fastify.get<IUserRoute>('/:username', {
+        schema: {
+            response: {
+                200: {
+                    type: 'object',
+                    required: [
+                        'options',
+                        'session_data'
+                    ],
+                    additionalProperties: false,
+                    properties: {
+                        options: makeWebAuthn.schemas.definitions.CredentialAssertion,
+                        session_data: session_data_schema
+                    },
+                    definitions: makeWebAuthn.schemas.definitions
+                }
+            }
+        }
+    }, async request => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -191,7 +255,22 @@ const login : FastifyPlugin = async function (fastify) {
         }
     }
 
-    fastify.post<IAssertRoute>('/:username', async (request, reply) => {
+    fastify.post<IAssertRoute>('/:username', {
+        schema: {
+            body: {
+                type: 'object',
+                required: [
+                    'car',
+                    'session_data'
+                ],
+                properties: {
+                    car: makeWebAuthn.schemas.definitions.CredentialAssertionResponse,
+                    session_data: session_data_schema
+                },
+                definitions: makeWebAuthn.schemas.definitions
+            }
+        }
+    }, async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);

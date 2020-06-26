@@ -68,19 +68,6 @@ before(async function () {
     const sodium = await SodiumPlus.auto();
     const session_data_key = await sodium.crypto_secretbox_keygen();
 
-    const session_data_schema = {
-        type: 'object',
-        required: [
-            'ciphertext',
-            'nonce'
-        ],
-        additionalProperties: false,
-        properties: {
-            ciphertext: { type: 'string' },
-            nonce: { type: 'string' }
-        }
-    };
-
     async function make_secret_session_data(username, type, session_data) {
         const nonce = await sodium.randombytes_buf(
             sodium.CRYPTO_SECRETBOX_NONCEBYTES);
@@ -118,6 +105,19 @@ before(async function () {
             throw ex;
         }
     }
+
+    const session_data_schema = {
+        type: 'object',
+        required: [
+            'ciphertext',
+            'nonce'
+        ],
+        additionalProperties: false,
+        properties: {
+            ciphertext: { type: 'string' },
+            nonce: { type: 'string' }
+        }
+    };
 
     async function register(fastify) {
         fastify.get('/:username', {
