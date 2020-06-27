@@ -15,7 +15,6 @@ const { expect } = require('chai');
 const crypto = require('crypto');
 const { promisify } = require('util');
 
-const challenge_timeout = 60000;
 const port = 3000;
 const origin = `https://localhost:${port}`;
 const username = 'foo@bar.com';
@@ -65,79 +64,17 @@ before(async function () {
     });
 
     const webAuthn = await makeWebAuthn(config);
-    const sodium = await SodiumPlus.auto();
-    const session_data_key = await sodium.crypto_secretbox_keygen();
 
-    async function make_secret_session_data(username, type, session_data) {
-        const nonce = await sodium.randombytes_buf(
-            sodium.CRYPTO_SECRETBOX_NONCEBYTES);
-        return {
-            ciphertext: (await sodium.crypto_secretbox(
-                JSON.stringify([ username, type, session_data, Date.now() ]),
-                nonce,
-                session_data_key)).toString('base64'),
-            nonce: nonce.toString('base64')
-        };
-    }
+    const {
+        make_secret_session_data,
+        verify_secret_session_data
+    } = await import('./example/session.mjs');
 
-    async function verify_secret_session_data(
-        expected_username,
-        expected_type,
-        secret_session_data) {
-        try {
-            const [ username, type, session_data, timestamp ] = JSON.parse(
-                await sodium.crypto_secretbox_open(
-                    Buffer.from(secret_session_data.ciphertext, 'base64'),
-                    Buffer.from(secret_session_data.nonce, 'base64'),
-                    session_data_key));
-            if (username !== expected_username) {
-                throw new Error('wrong username');
-            }
-            if (type !== expected_type) {
-                throw new Error('wrong type');
-            }
-            if ((timestamp + challenge_timeout) <= Date.now("dummy")) {
-                throw new Error('session timed out');
-            }
-            return session_data;
-        } catch (ex) {
-            ex.statusCode = 400;
-            throw ex;
-        }
-    }
-
-    const session_data_schema = {
-        type: 'object',
-        required: [
-            'ciphertext',
-            'nonce'
-        ],
-        additionalProperties: false,
-        properties: {
-            ciphertext: { type: 'string' },
-            nonce: { type: 'string' }
-        }
-    };
+    const schemas = await import('./example/schemas.mjs');
 
     async function register(fastify) {
         fastify.get('/:username', {
-            schema: {
-                response: {
-                    200: {
-                        type: 'object',
-                        required: [
-                            'options',
-                            'session_data'
-                        ],
-                        additionalProperties: false,
-                        properties: {
-                            options: makeWebAuthn.schemas.definitions.CredentialCreation,
-                            session_data: session_data_schema
-                        },
-                        definitions: makeWebAuthn.schemas.definitions
-                    }
-                }
-            }
+            schema: schemas.register.get
         }, async request => {
             let user = users.get(request.params.username);
             if (!user) {
@@ -171,20 +108,7 @@ before(async function () {
         });
 
         fastify.put('/:username', {
-            schema: {
-                body: {
-                    type: 'object',
-                    required: [
-                        'ccr',
-                        'session_data'
-                    ],
-                    properties: {
-                        ccr: makeWebAuthn.schemas.definitions.CredentialCreationResponse,
-                        session_data: session_data_schema
-                    },
-                    definitions: makeWebAuthn.schemas.definitions
-                }
-            }
+            schema: schemas.register.put
         }, async (request, reply) => {
             const user = users.get(request.params.username);
             if (!user) {
@@ -212,23 +136,7 @@ before(async function () {
 
     async function login(fastify) {
         fastify.get('/:username', {
-            schema: {
-                response: {
-                    200: {
-                        type: 'object',
-                        required: [
-                            'options',
-                            'session_data'
-                        ],
-                        additionalProperties: false,
-                        properties: {
-                            options: makeWebAuthn.schemas.definitions.CredentialAssertion,
-                            session_data: session_data_schema
-                        },
-                        definitions: makeWebAuthn.schemas.definitions
-                    }
-                }
-            }
+            schema: schemas.login.get
         }, async request => {
             const user = users.get(request.params.username);
             if (!user) {
@@ -243,20 +151,7 @@ before(async function () {
         });
 
         fastify.post('/:username', {
-            schema: {
-                body: {
-                    type: 'object',
-                    required: [
-                        'car',
-                        'session_data'
-                    ],
-                    properties: {
-                        car: makeWebAuthn.schemas.definitions.CredentialAssertionResponse,
-                        session_data: session_data_schema
-                    },
-                    definitions: makeWebAuthn.schemas.definitions
-                }
-            }
+            schema: schemas.login.post
         }, async (request, reply) => {
             const user = users.get(request.params.username);
             if (!user) {

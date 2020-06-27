@@ -6,7 +6,8 @@ import { fileURLToPath } from 'url';
 import mod_fastify from 'fastify';
 import fastify_static from 'fastify-static';
 import { make_secret_session_data, verify_secret_session_data } from './session.mjs';
-import makeWebAuthn from '../index.js';
+import * as schemas from './schemas.mjs';
+import makeWebAuthn from '../../index.js';
 const readFile = fs.promises.readFile;
 
 const port = 3000;
@@ -21,7 +22,7 @@ class ErrorWithStatus extends Error {
     }
 }
 
-const keys_dir = join(__dirname, 'keys');
+const keys_dir = join(__dirname, '..', 'keys');
 
 const fastify = mod_fastify({
     logger: true,
@@ -32,7 +33,7 @@ const fastify = mod_fastify({
 });
 
 fastify.register(fastify_static, {
-    root: join(__dirname, 'fixtures'),
+    root: join(__dirname, '..', 'fixtures'),
     index: 'example.html'
 });
 
@@ -47,7 +48,9 @@ const webAuthn = await makeWebAuthn({
 });
 
 async function register(fastify) {
-    fastify.get('/:username', async request => {
+    fastify.get('/:username', {
+        schema: schemas.register.get
+    }, async request => {
         let user = users.get(request.params.username);
         if (!user) {
             user = {
@@ -76,7 +79,9 @@ async function register(fastify) {
         };
     });
 
-    fastify.put('/:username', async (request, reply) => {
+    fastify.put('/:username', {
+        schema: schemas.register.put
+    }, async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -102,7 +107,9 @@ async function register(fastify) {
 }
 
 async function login(fastify) {
-    fastify.get('/:username', async request => {
+    fastify.get('/:username', {
+        schema: schemas.login.get
+    }, async request => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);
@@ -115,7 +122,9 @@ async function login(fastify) {
         };
     });
 
-    fastify.post('/:username', async (request, reply) => {
+    fastify.post('/:username', {
+        schema: schemas.login.post
+    }, async (request, reply) => {
         const user = users.get(request.params.username);
         if (!user) {
             throw new ErrorWithStatus('no user', 404);

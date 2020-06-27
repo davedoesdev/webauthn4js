@@ -36,7 +36,7 @@ export async function verify_secret_session_data(
         if (type !== expected_type) {
             throw new Error('wrong type');
         }
-        if ((timestamp + challenge_timeout) <= Date.now()) {
+        if ((timestamp + challenge_timeout) <= Date.now('dummy' /* for testing */)) {
             throw new Error('session timed out');
         }
         return session_data;
