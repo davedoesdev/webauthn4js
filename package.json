@@ -16,7 +16,7 @@
     "url": "https://github.com/davedoesdev/webauthn/issues"
   },
   "main": "index.js",
-  "types": "typescript/webauthn4js.d.ts",
+  "types": "index.d.ts",
   "scripts": {
     "build": "grunt build",
     "build_go": "grunt exec:build_go",

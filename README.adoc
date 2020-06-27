@@ -10,6 +10,7 @@ been compiled to Web Assembly. It was inspired by
 https://github.com/pulsejet/go-webauthn-js[go-webauthn-js] but uses Go's
 built-in Web Assembly compiler instead of GopherJS.
 
+[[example]]
 == Example
 
 Here's an example program which uses Webauthn4JS to register and authenticate
@@ -547,6 +548,15 @@ their authenticator to sign the challenge that the server sent in the options.
 
 To complete login, we make a POST request to the server with the result from
 `navigator.credentials.get()`, base 64 encoding as necessary.
+
+== Typescript
+
+Typescript definitions can be found in link:index.d.ts[] and link:typescript/webauthn.d.ts[].
+The latter is automatically generated from the Duo Labs Go WebAuthn library using 
+https://github.com/alecthomas/jsonschema[jsonschema] and
+https://github.com/bcherny/json-schema-to-typescript[json-schema-to-typescript].
+
+A Typescript version of the <<example,example>> can be found in link:typescript/example.ts[].
 
 == Installation
 
