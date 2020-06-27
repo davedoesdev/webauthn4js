@@ -9,7 +9,6 @@ const { join } = require('path');
 const { readFile } = require('fs').promises;
 const mod_fastify = require('fastify');
 const fastify_static = require('fastify-static');
-const { SodiumPlus } = require('sodium-plus');
 const makeWebAuthn = require('..');
 const { expect } = require('chai');
 const crypto = require('crypto');

@@ -55,6 +55,6 @@ interface SchemadWebAuthn4JSFactory extends WebAuthn4JSFactory {
     schemas : any;
 }
 
-declare let make : SchemadWebAuthn4JSFactory;
+declare const make : SchemadWebAuthn4JSFactory;
 
 export default make;
