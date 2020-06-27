@@ -5,15 +5,18 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mod_fastify, {  FastifyPlugin } from 'fastify';
 import fastify_static from 'fastify-static';
-import sodium_plus from 'sodium-plus';
 import * as schemas from '../test/example/schemas';
+import {
+    ISecretSessionData,
+    make_secret_session_data,
+    verify_secret_session_data
+} from '../test/example/session';
 import makeWebAuthn from '../index.js';
 import {
     User,
     Credential,
     CredentialCreationResponse,
-    CredentialAssertionResponse,
-    SessionData
+    CredentialAssertionResponse
 } from './webauthn';
 const readFile = fs.promises.readFile;
 
@@ -55,55 +58,6 @@ const webAuthn = await makeWebAuthn({
         userVerification: 'preferred'
     }
 });
-
-const sodium = await sodium_plus.SodiumPlus.auto();
-const session_data_key = await sodium.crypto_secretbox_keygen();
-
-interface ISecretSessionData {
-    ciphertext : string,
-    nonce : string
-}
-
-async function make_secret_session_data(
-    username : string,
-    type : string,
-    session_data : SessionData) : Promise<ISecretSessionData> {
-    const nonce = await sodium.randombytes_buf(
-        sodium.CRYPTO_SECRETBOX_NONCEBYTES);
-    return {
-        ciphertext: (await sodium.crypto_secretbox(
-            JSON.stringify([ username, type, session_data, Date.now() ]),
-            nonce,
-            session_data_key)).toString('base64'),
-        nonce: nonce.toString('base64')
-    };
-}
-
-async function verify_secret_session_data(
-    expected_username : string,
-    expected_type : string,
-    secret_session_data : ISecretSessionData) : Promise<SessionData> {
-    try {
-        const [ username, type, session_data, timestamp ] = JSON.parse(
-            (await sodium.crypto_secretbox_open(
-                Buffer.from(secret_session_data.ciphertext, 'base64'),
-                Buffer.from(secret_session_data.nonce, 'base64'),
-                session_data_key)).toString());
-        if (username !== expected_username) {
-            throw new Error('wrong username');
-        }
-        if (type !== expected_type) {
-            throw new Error('wrong type');
-        }
-        if ((timestamp + challenge_timeout) <= Date.now()) {
-            throw new Error('session timed out');
-        }
-        return session_data;
-    } catch (ex) {
-        ex.statusCode = 400;
-        throw ex;
-    }
-}
 
 interface IUserRoute {
     Params: { username : string }

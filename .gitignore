@@ -2,5 +2,4 @@ node_modules
 /genschema
 /typescript/example.js
 /typescript/example.mjs
-/test/example/schemas.js
 /.nyc_output
