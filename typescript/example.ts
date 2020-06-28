@@ -5,12 +5,12 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mod_fastify, {  FastifyPlugin } from 'fastify';
 import fastify_static from 'fastify-static';
-import * as schemas from '../test/example/schemas';
+import * as schemas from '../test/example/schemas.mjs';
 import {
     ISecretSessionData,
     make_secret_session_data,
     verify_secret_session_data
-} from '../test/example/session';
+} from '../test/example/session.mjs';
 import makeWebAuthn from '../index.js';
 import {
     User,

@@ -2,6 +2,5 @@
   "includeDeclarations": "true",
   "excludeExternals": "true",
   "out": "docs",
-  "readme": "none",
-  "entryPoint": "\"index.d\""
+  "readme": "none"
 }

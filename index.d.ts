@@ -1,3 +1,7 @@
+/**
+ * @module webauthn4js
+ * @packageDocumentation
+ */
 import { TypedEmitter } from 'tiny-typed-emitter';
 import {
     Config,
@@ -37,9 +41,9 @@ interface WebAuthn4JSEvents {
  * compiled to Web Assembly, to do the heavy lifting.
  * @noInheritDoc
  */
-export interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
+interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
     /**
-     * Begin reg
+     * Generate a new set of registration data to be sent to the browser.
      */
     beginRegistration(
         user : User,
@@ -73,21 +77,20 @@ export interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
 }
 
 /**
- * Signature for a function which creates {@link WebAuthn4JS} instances from
- * a given configuration.
+ * @ignore
+ */
+type WebAuthn4JSFactoryBase = (config : Config) => WebAuthn4JS;
+
+/**
+ * Function type which creates {@link WebAuthn4JS} instances from
+ * a given {@link Config}. Also has a property _on the function itself_ which
+ * holds [JSON Schemas](https://json-schema.org/) for the types in this library.
  *
  * @param config  Configuration for the instance.
  *
  * @return  A new configured instance.
  */
-declare type WebAuthn4JSFactory = (config : Config) => WebAuthn4JS;
-
-/**
- * The same as {@link WebAuthn4JSFactory} but with an additional property
- * _on the function itself_ which holds [JSON Schemas](https://json-schema.org/) for
- * the types in this library.
- */
-interface SchemadWebAuthn4JSFactory extends WebAuthn4JSFactory {
+interface WebAuthn4JSFactory extends WebAuthn4JSFactoryBase {
     /**
      * JSON Schemas for the types in `webauthn4js`. These can be useful for validating data
      * you exchange with browsers, for example.
@@ -95,6 +98,10 @@ interface SchemadWebAuthn4JSFactory extends WebAuthn4JSFactory {
     schemas : any;
 }
 
-declare const make : SchemadWebAuthn4JSFactory;
+/**
+ * `module.exports` is a function which creates {@link WebAuthn4JS} objects from a given
+ * {@link Config}.
+ */
+declare const exports : WebAuthn4JSFactory;
 
-export default make;
+export default exports;

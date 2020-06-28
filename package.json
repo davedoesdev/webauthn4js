@@ -52,6 +52,7 @@
     "nyc": "^15.0.1",
     "sodium-plus": "^0.7.1",
     "typedoc": "^0.17.7",
+    "typedoc-plugin-external-module-name": "^4.0.3",
     "typedoc-plugin-no-inherit": "Gerrit0/typedoc-plugin-no-inherit",
     "typescript": "^3.9.5",
     "webdriverio": "^6.1.14"
