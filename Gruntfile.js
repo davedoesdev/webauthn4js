@@ -27,7 +27,8 @@ module.exports = function (grunt) {
             cover: "./node_modules/.bin/nyc -x Gruntfile.js -x wdio.conf.js -x wasm_exec.js ./node_modules/.bin/grunt test",
             cover_report: "./node_modules/.bin/nyc report -r lcov -r text -x ''",
             cover_check: './node_modules/.bin/nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100',
-            coveralls: 'cat coverage/lcov.info | coveralls'
+            coveralls: 'cat coverage/lcov.info | coveralls',
+            docs: './node_modules/.bin/typedoc index.d.ts typescript/webauthn.d.ts'
         }
     });
 
@@ -53,6 +54,8 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('coveralls', 'exec:coveralls');
+
+    grunt.registerTask('docs', 'exec:docs');
 
     grunt.registerTask('default', ['lint', 'test']);
 };
