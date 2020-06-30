@@ -1,4 +1,5 @@
 node_modules
 /genschema
 /typescript/example.mjs
+/schemas/schemas.autogen.json
 /.nyc_output

@@ -130,4 +130,4 @@ module.exports = promisify((config, cb) => {
     });
 });
 
-module.exports.schemas = require('./schemas.json');
+module.exports.schemas = require('./schemas/schemas.json');

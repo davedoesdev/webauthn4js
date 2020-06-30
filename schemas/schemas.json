@@ -55,7 +55,8 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Class representing the user's authenticator device."
     },
     "AuthenticatorAssertionResponse": {
       "required": [

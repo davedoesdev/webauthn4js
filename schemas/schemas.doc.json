@@ -1,0 +1,7 @@
+{
+  "definitions": {
+    "Authenticator": {
+      "description": "Class representing the user's authenticator device."
+    }
+  }
+}

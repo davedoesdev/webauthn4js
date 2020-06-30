@@ -33,6 +33,9 @@ export interface Credential {
   AttestationType: string;
   Authenticator: Authenticator;
 }
+/**
+ * Class representing the user's authenticator device.
+ */
 export interface Authenticator {
   AAGUID: string;
   SignCount: number;

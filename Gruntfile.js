@@ -15,8 +15,9 @@ module.exports = function (grunt) {
             build_go: [
                 'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go config.go user.go',
                 'go build genschema.go config.go user.go',
-                './genschema > schemas.json',
-                'json2ts < schemas.json > typescript/webauthn.d.ts'
+                './genschema > schemas/schemas.autogen.json',
+                './node_modules/.bin/jme schemas/schemas.autogen.json schemas/schemas.doc.json > schemas/schemas.json',
+                'json2ts < schemas/schemas.json > typescript/webauthn.d.ts'
             ].join('&&'),
             build_ts: [
                 'tsc -p typescript',

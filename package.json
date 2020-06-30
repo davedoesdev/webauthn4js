@@ -47,6 +47,7 @@
     "grunt": "^1.1.0",
     "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
+    "jme": "^1.0.4",
     "json-schema-to-typescript": "^9.1.0",
     "mocha": "^7.2.0",
     "nyc": "^15.0.1",
