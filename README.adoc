@@ -184,10 +184,10 @@ the user and the excluded (existing) credentials.
 ----
 
 Once registration has started, we need to return data to the browser so it can ask the user to
-register using their authenticator. We return the options that WebAuthn4JS generates for the
-browser's `navigator.credentials.create()` call, along with session data that WebAuthn4JS will check
-when the browser makes its PUT request to complete registration. Note we sign and encrypt this data
-to ensure it won't be tampered with.
+register using their authenticator. We return the options that WebAuthn4JS generates for the browser's
+https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create[`navigator.credentials.create()`]
+call, along with session data that WebAuthn4JS will check when the browser makes its PUT request
+to complete registration. Note we sign and encrypt this data to ensure it won't be tampered with.
 
 [source,javascript]
 ----
@@ -268,8 +268,9 @@ async function login(fastify) {
 ----
 
 Login's GET handler first checks the user exists and then calls
-link:docs.html#WebAuthn4JS[`beginLogin`], passing in the user object. We then return to the browser
-the options for `navigator.credentials.get()` and signed and encrypted session data.
+link:docs.html#WebAuthn4JS[`beginLogin`], passing in the user object. We then return to the browser the options
+for https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get[`navigator.credentials.get()`]
+and signed and encrypted session data.
 
 [source,javascript]
 ----
