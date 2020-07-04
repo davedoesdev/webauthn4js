@@ -67,6 +67,13 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Contains the raw authenticator attestation data, used to verify the authenticy of the registration ceremony and the new credential.</p>
+					</div>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -97,9 +104,14 @@
 					<div class="tsd-signature tsd-kind-icon">attestation<wbr>Object<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/6cd8adf/typescript/webauthn.d.ts#L103">typescript/webauthn.d.ts:103</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/14c1245/typescript/webauthn.d.ts#L216">typescript/webauthn.d.ts:216</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party&#39;s server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data.</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="clientdatajson" class="tsd-anchor"></a>
@@ -107,9 +119,14 @@
 					<div class="tsd-signature tsd-kind-icon">client<wbr>DataJSON<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/6cd8adf/typescript/webauthn.d.ts#L102">typescript/webauthn.d.ts:102</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/14c1245/typescript/webauthn.d.ts#L212">typescript/webauthn.d.ts:212</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.create().</p>
+						</div>
+					</div>
 				</section>
 			</section>
 		</div>
@@ -130,9 +147,6 @@
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="typescript.authenticator.html" class="tsd-kind-icon">Authenticator</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.authenticatorassertionresponse.html" class="tsd-kind-icon">Authenticator<wbr>Assertion<wbr>Response</a>
 					</li>
 				</ul>
@@ -150,9 +164,6 @@
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="typescript.authenticatorselection.html" class="tsd-kind-icon">Authenticator<wbr>Selection</a>
-					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.config.html" class="tsd-kind-icon">Config</a>
 					</li>
@@ -195,6 +206,30 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.userentity.html" class="tsd-kind-icon">User<wbr>Entity</a>
 					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#crossplatformattachment" class="tsd-kind-icon">Cross<wbr>Platform<wbr>Attachment</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#platformattachment" class="tsd-kind-icon">Platform<wbr>Attachment</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#preferdirectattestation" class="tsd-kind-icon">Prefer<wbr>Direct<wbr>Attestation</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#preferindirectattestation" class="tsd-kind-icon">Prefer<wbr>Indirect<wbr>Attestation</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#prefernoattestation" class="tsd-kind-icon">Prefer<wbr>NoAttestation</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#userverificationdiscouraged" class="tsd-kind-icon">User<wbr>Verification<wbr>Discouraged</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#userverificationpreferred" class="tsd-kind-icon">User<wbr>Verification<wbr>Preferred</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module">
+						<a href="../modules/typescript.html#userverificationrequired" class="tsd-kind-icon">User<wbr>Verification<wbr>Required</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -205,11 +240,12 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 		</div>
 	</div>

@@ -45,18 +45,21 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "Identifies the type (e.g. make and model) of the authenticator."
         },
         "SignCount": {
-          "type": "integer"
+          "type": "integer",
+          "description": "{@link finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning."
         },
         "CloneWarning": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "This is a signal that the authenticator may be cloned, i.e. at least two copies of the credential private key may exist and are being used in parallel. Relying Parties (applications) should incorporate this information into their risk scoring. Whether the Relying Party updates the stored signature counter value in this case, or not, or fails the authentication ceremony or not, is Relying Party-specific."
         }
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "Class representing the user's authenticator device."
+      "description": "Represents the user's authenticator device."
     },
     "AuthenticatorAssertionResponse": {
       "required": [
@@ -69,29 +72,34 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.get()."
         },
         "authenticatorData": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "Serialized bindings made by the authenticator, such as ID of the Relying Party that the credential is meant for, whether the user is present and the signature count."
         },
         "signature": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "The raw signature returned from the authenticator."
         },
         "userHandle": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "Contains the Relying Party's ID for the user"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Contains the raw authenticator assertion data, used to verify the authenticity of the login ceremony and the used credential."
     },
     "AuthenticatorAttestationResponse": {
       "required": [
@@ -103,32 +111,59 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.create()."
         },
         "attestationObject": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party's server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Contains the raw authenticator attestation data, used to verify the authenticy of the registration ceremony and the new credential."
     },
     "AuthenticatorSelection": {
       "properties": {
         "authenticatorAttachment": {
-          "type": "string"
+          "type": "string",
+          "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PlatformAttachment"
+            },
+            {
+              "$ref": "#/definitions/CrossPlatformAttachment"
+            }
+          ]
         },
         "requireResidentKey": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential."
         },
         "userVerification": {
-          "type": "string"
+          "type": "string",
+          "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserVerificationRequired"
+            },
+            {
+              "$ref": "#/definitions/UserVerificationPreferred"
+            },
+            {
+              "$ref": "#/definitions/UserVerificationDiscouraged"
+            }
+          ],
+          "default": "preferred"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Use this class to specify requirements regarding authenticator attributes."
     },
     "Config": {
       "required": [
@@ -137,32 +172,53 @@
       ],
       "properties": {
         "RPDisplayName": {
-          "type": "string"
+          "type": "string",
+          "description": "Friendly name for the Relying Party (application). The browser may display this to the user."
         },
         "RPID": {
-          "type": "string"
+          "type": "string",
+          "description": "A valid domain that identifies the Relying Party. A credential can only by used  with the same enity (as identified by the `RPID`) it was registered with."
         },
         "RPOrigin": {
-          "type": "string"
+          "type": "string",
+          "description": "The HTTP(S) origin that the Relying Party is using to handle requests"
         },
         "RPIcon": {
-          "type": "string"
+          "type": "string",
+          "description": "URL to an icon representing the Relying Party"
         },
         "AttestationPreference": {
-          "type": "string"
+          "type": "string",
+          "description": "Preferred attestation conveyance during credential generation",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PreferNoAttestation"
+            },
+            {
+              "$ref": "#/definitions/PreferIndirectAttestation"
+            },
+            {
+              "$ref": "#/definitions/PreferDirectAttestation"
+            }
+          ],
+          "default": "none"
         },
         "AuthenticatorSelection": {
-          "$ref": "#/definitions/AuthenticatorSelection"
+          "$ref": "#/definitions/AuthenticatorSelection",
+          "description": "Login requirements for authenticator attributes."
         },
         "Timeout": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Timeout for browser `navigator.credentials.create()` and `navigator.credentials.debug()` in the browser."
         },
         "Debug": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "@ignore"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Configuration and default values for the {@link WebAuthn4JS} instance."
     },
     "Credential": {
       "required": [
@@ -176,23 +232,28 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "A probabilistically-unique byte sequence identifying a public key credential source and its authentication assertions."
         },
         "PublicKey": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "The public key portion of a Relying Party-specific credential key pair, generated by an authenticator and returned to a Relying Party at registration time."
         },
         "AttestationType": {
-          "type": "string"
+          "type": "string",
+          "description": "The attestation format used (if any) by the authenticator when creating the credential."
         },
         "Authenticator": {
-          "$ref": "#/definitions/Authenticator"
+          "$ref": "#/definitions/Authenticator",
+          "description": "The Authenticator information for a given certificate."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Contains all needed information about a WebAuthn credential for storage."
     },
     "CredentialAssertion": {
       "required": [
@@ -200,11 +261,13 @@
       ],
       "properties": {
         "publicKey": {
-          "$ref": "#/definitions/PublicKeyCredentialRequestOptions"
+          "$ref": "#/definitions/PublicKeyCredentialRequestOptions",
+          "description": "Options for the browser to pass to `navigator.credentials.get()`."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "The payload that should be sent to the browser for beginning the login process."
     },
     "CredentialAssertionResponse": {
       "required": [
@@ -355,7 +418,8 @@
           "type": "array"
         },
         "authenticatorSelection": {
-          "$ref": "#/definitions/AuthenticatorSelection"
+          "$ref": "#/definitions/AuthenticatorSelection",
+          "description": "Registration requirements for authenticator attributes."
         },
         "timeout": {
           "type": "integer"
@@ -417,7 +481,8 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "FOOBAR"
     },
     "RelyingPartyEntity": {
       "required": [
@@ -528,6 +593,54 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "PlatformAttachment": {
+      "enum": [
+        "platform"
+      ],
+      "description": "A platform authenticator is attached using a client device-specific transport, called platform attachment, and is usually not removable from the client device. A public key credential bound to a platform authenticator is called a platform credential."
+    },
+    "CrossPlatformAttachment": {
+      "enum": [
+        "cross-platform"
+      ],
+      "description": "A roaming authenticator is attached using cross-platform transports, called cross-platform attachment. Authenticators of this class are removable from, and can \"roam\" among, client devices. A public key credential bound to a roaming authenticator is called a roaming credential."
+    },
+    "UserVerificationRequired": {
+      "enum": [
+        "required"
+      ],
+      "description": "User verification is required to create/use a credential."
+    },
+    "UserVerificationPreferred": {
+      "enum": [
+        "preferred"
+      ],
+      "description": "User verification is preferred to create/use a credential. This is the default if no user verification requirement is specified."
+    },
+    "UserVerificationDiscouraged": {
+      "enum": [
+        "discouraged"
+      ],
+      "description": "The authenticator should not verify the user for the credential."
+    },
+    "PreferNoAttestation": {
+      "description": "Indicates that the Relying Party is not interested in authenticator attestation. For example, in order to potentially avoid having to obtain user consent to relay identifying information to the Relying Party, or to save a roundtrip to an Attestation CA. This is the default if no attestation conveyance is specified.",
+      "enum": [
+        "none"
+      ]
+    },
+    "PreferIndirectAttestation": {
+      "description": "Indicates that the Relying Party prefers an attestation conveyance yielding verifiable attestation statements, but allows the client to decide how to obtain such attestation statements. The client MAY replace the authenticator-generated attestation statements with attestation statements generated by an Anonymization CA, in order to protect the user’s privacy, or to assist Relying Parties with attestation verification in a heterogeneous ecosystem.",
+      "enum": [
+        "indirect"
+      ]
+    },
+    "PreferDirectAttestation": {
+      "description": "Indicates that the Relying Party wants to receive the attestation statement as generated by the authenticator.",
+      "enum": [
+        "direct"
+      ]
     }
   }
 }

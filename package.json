@@ -22,7 +22,7 @@
     "build_go": "grunt exec:build_go",
     "build_ts": "grunt exec:build_ts",
     "test": "grunt test",
-    "docs": "grunt docs",
+    "docs": "grunt exec:build_go && grunt docs",
     "ci": "grunt lint coverage"
   },
   "directories": {
@@ -47,8 +47,8 @@
     "grunt": "^1.1.0",
     "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
-    "jme": "^1.0.4",
-    "json-schema-to-typescript": "^9.1.0",
+    "jme": "^1.0.6",
+    "@davedoesdev/json-schema-to-typescript": "^9.1.0",
     "mocha": "^7.2.0",
     "nyc": "^15.0.1",
     "sodium-plus": "^0.7.1",
