@@ -37,6 +37,54 @@ export type UserVerificationPreferred = "preferred";
  * The authenticator should not verify the user for the credential.
  */
 export type UserVerificationDiscouraged = "discouraged";
+/**
+ * Credential type for WebAuthn.
+ */
+export type PublicKeyCredentialType = "public-key";
+/**
+ * ECDSA with SHA-256
+ */
+export type AlgES256 = -7;
+/**
+ * ECDSA with SHA-384
+ */
+export type AlgES384 = -35;
+/**
+ * ECDSA with SHA-512
+ */
+export type AlgES512 = -36;
+/**
+ * RSASSA-PKCS1-v1_5 with SHA-1
+ */
+export type AlgRS1 = -65535;
+/**
+ * RSASSA-PKCS1-v1_5 with SHA-256
+ */
+export type AlgRS256 = -257;
+/**
+ * RSASSA-PKCS1-v1_5 with SHA-384
+ */
+export type AlgRS384 = -258;
+/**
+ * RSASSA-PKCS1-v1_5 with SHA-512
+ */
+export type AlgRS512 = -259;
+/**
+ * RSASSA-PSS with SHA-256
+ */
+export type AlgPS256 = -37;
+/**
+ * RSASSA-PSS with SHA-384
+ */
+export type AlgPS384 = -38;
+/**
+ * RSASSA-PSS with SHA-512
+ */
+export type AlgPS512 = -39;
+/**
+ * EdDSA
+ */
+export type AlgEdDSA = -8;
 
 /**
  * Configuration and default values for the {@link WebAuthn4JS} instance.
@@ -137,9 +185,18 @@ export interface Authenticator {
    */
   CloneWarning: boolean;
 }
+/**
+ * The payload that should be sent to the browser for beginning the registration process.
+ */
 export interface CredentialCreation {
+  /**
+   * Options for the browser to pass to `navigator.credentials.create()`.
+   */
   publicKey: PublicKeyCredentialCreationOptions;
 }
+/**
+ * Parameters for `navigator.credentials.create()`.
+ */
 export interface PublicKeyCredentialCreationOptions {
   challenge: string;
   rp: RelyingPartyEntity;
@@ -173,19 +230,66 @@ export interface UserEntity {
   displayName?: string;
   id: string;
 }
+/**
+ * The credential type and algorithm that the relying party wants the authenticator to create.
+ */
 export interface CredentialParameter {
-  type: string;
-  alg: number;
+  /**
+   * Type of the credential to use.
+   */
+  type: PublicKeyCredentialType;
+  /**
+   * Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms)
+   */
+  alg:
+    | AlgES256
+    | AlgES384
+    | AlgES512
+    | AlgRS1
+    | AlgRS256
+    | AlgRS384
+    | AlgRS512
+    | AlgPS256
+    | AlgPS384
+    | AlgPS512
+    | AlgEdDSA;
 }
+/**
+ * Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`.
+ */
 export interface CredentialDescriptor {
-  type: string;
+  /**
+   * Type of the credential to use.
+   */
+  type: PublicKeyCredentialType;
+  /**
+   * The ID of a credential to allow/disallow.
+   */
   id: string;
+  /**
+   * Contains a hint as to how the browser might communicate with the authenticator to which the credential belongs.
+   */
   transports?: string[];
 }
+/**
+ * The raw response returned to us from an authenticator when we request a credential for registration.
+ */
 export interface CredentialCreationResponse {
+  /**
+   * The credential's identifier.
+   */
   id: string;
-  type: string;
+  /**
+   * Specifies the credential type represented by this object.
+   */
+  type: PublicKeyCredentialType;
+  /**
+   * The credential's identifier. Since we base64-encode raw data, this is the same as `id`.
+   */
   rawId: string;
+  /**
+   * A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration.
+   */
   extensions?: {
     /**
      * This interface was referenced by `undefined`'s JSON-Schema definition
@@ -195,6 +299,9 @@ export interface CredentialCreationResponse {
       [k: string]: unknown;
     };
   };
+  /**
+   * The authenticator's response to the request to generate a registration attestation.
+   */
   response: AuthenticatorAttestationResponse;
 }
 /**
@@ -238,10 +345,25 @@ export interface PublicKeyCredentialRequestOptions {
     };
   };
 }
+/**
+ * The raw response returned to us from an authenticator when we request a credential for login.
+ */
 export interface CredentialAssertionResponse {
+  /**
+   * The credential's identifier.
+   */
   id: string;
-  type: string;
+  /**
+   * Specifies the credential type represented by this object.
+   */
+  type: PublicKeyCredentialType;
+  /**
+   * The credential's identifier. Since we base64-encode raw data, this is the same as `id`.
+   */
   rawId: string;
+  /**
+   * A map containing identifier -> client extension output entries produced by any extensions that may have been used during login.
+   */
   extensions?: {
     /**
      * This interface was referenced by `undefined`'s JSON-Schema definition
@@ -251,6 +373,9 @@ export interface CredentialAssertionResponse {
       [k: string]: unknown;
     };
   };
+  /**
+   * The authenticator's response to the request to generate a login assertion.
+   */
   response: AuthenticatorAssertionResponse;
 }
 /**

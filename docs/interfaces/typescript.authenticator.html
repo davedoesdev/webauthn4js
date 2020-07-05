@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>CredentialDescriptor | webauthn4js</title>
+	<title>Authenticator | webauthn4js</title>
 	<meta name="description" content="Documentation for webauthn4js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -57,10 +57,10 @@
 					<a href="../modules/typescript.html">typescript</a>
 				</li>
 				<li>
-					<a href="typescript.credentialdescriptor.html">CredentialDescriptor</a>
+					<a href="typescript.authenticator.html">Authenticator</a>
 				</li>
 			</ul>
-			<h1>Interface CredentialDescriptor</h1>
+			<h1>Interface Authenticator</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +70,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Specifies a credential for use by the browser when it calls <code>navigator.credentials.create()</code> or <code>navigator.credentials.get()</code>.</p>
+						<p>Represents the user&#39;s authenticator device.</p>
 					</div>
 				</div>
 			</section>
@@ -78,7 +78,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">CredentialDescriptor</span>
+						<span class="target">Authenticator</span>
 					</li>
 				</ul>
 			</section>
@@ -89,9 +89,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.credentialdescriptor.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.credentialdescriptor.html#transports" class="tsd-kind-icon">transports</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.credentialdescriptor.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.authenticator.html#aaguid" class="tsd-kind-icon">AAGUID</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.authenticator.html#clonewarning" class="tsd-kind-icon">Clone<wbr>Warning</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.authenticator.html#signcount" class="tsd-kind-icon">Sign<wbr>Count</a></li>
 							</ul>
 						</section>
 					</div>
@@ -100,47 +100,47 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="aaguid" class="tsd-anchor"></a>
+					<h3>AAGUID</h3>
+					<div class="tsd-signature tsd-kind-icon">AAGUID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L268">typescript/webauthn.d.ts:268</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L178">typescript/webauthn.d.ts:178</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The ID of a credential to allow/disallow.</p>
+							<p>Identifies the type (e.g. make and model) of the authenticator.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="transports" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> transports</h3>
-					<div class="tsd-signature tsd-kind-icon">transports<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<a name="clonewarning" class="tsd-anchor"></a>
+					<h3>Clone<wbr>Warning</h3>
+					<div class="tsd-signature tsd-kind-icon">Clone<wbr>Warning<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L272">typescript/webauthn.d.ts:272</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L186">typescript/webauthn.d.ts:186</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Contains a hint as to how the browser might communicate with the authenticator to which the credential belongs.</p>
+							<p>This is a signal that the authenticator may be cloned, i.e. at least two copies of the credential private key may exist and are being used in parallel. Relying Parties (applications) should incorporate this information into their risk scoring. Whether the Relying Party updates the stored signature counter value in this case, or not, or fails the authentication ceremony or not, is Relying Party-specific.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="type" class="tsd-anchor"></a>
-					<h3>type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../modules/typescript.html#publickeycredentialtype" class="tsd-signature-type">PublicKeyCredentialType</a></div>
+					<a name="signcount" class="tsd-anchor"></a>
+					<h3>Sign<wbr>Count</h3>
+					<div class="tsd-signature tsd-kind-icon">Sign<wbr>Count<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L264">typescript/webauthn.d.ts:264</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L182">typescript/webauthn.d.ts:182</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Type of the credential to use.</p>
+							<p><a href="webauthn4js.webauthn4js-1.html#finishlogin">finishLogin</a> compares the stored signature counter value with the new <code>signCount</code> value returned in the assertion’s authenticator data. If this new <code>signCount</code> value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning.</p>
 						</div>
 					</div>
 				</section>
@@ -162,9 +162,24 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.authenticator.html" class="tsd-kind-icon">Authenticator</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="typescript.authenticator.html#aaguid" class="tsd-kind-icon">AAGUID</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="typescript.authenticator.html#clonewarning" class="tsd-kind-icon">Clone<wbr>Warning</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="typescript.authenticator.html#signcount" class="tsd-kind-icon">Sign<wbr>Count</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.authenticatorassertionresponse.html" class="tsd-kind-icon">Authenticator<wbr>Assertion<wbr>Response</a>
 					</li>
@@ -192,24 +207,9 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.credentialcreationresponse.html" class="tsd-kind-icon">Credential<wbr>Creation<wbr>Response</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.credentialdescriptor.html" class="tsd-kind-icon">Credential<wbr>Descriptor</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="typescript.credentialdescriptor.html#id" class="tsd-kind-icon">id</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="typescript.credentialdescriptor.html#transports" class="tsd-kind-icon">transports</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="typescript.credentialdescriptor.html#type" class="tsd-kind-icon">type</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.credentialparameter.html" class="tsd-kind-icon">Credential<wbr>Parameter</a>
 					</li>

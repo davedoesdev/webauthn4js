@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>CredentialDescriptor | webauthn4js</title>
+	<title>AuthenticatorSelection | webauthn4js</title>
 	<meta name="description" content="Documentation for webauthn4js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -57,10 +57,10 @@
 					<a href="../modules/typescript.html">typescript</a>
 				</li>
 				<li>
-					<a href="typescript.credentialdescriptor.html">CredentialDescriptor</a>
+					<a href="typescript.authenticatorselection.html">AuthenticatorSelection</a>
 				</li>
 			</ul>
-			<h1>Interface CredentialDescriptor</h1>
+			<h1>Interface AuthenticatorSelection</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +70,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Specifies a credential for use by the browser when it calls <code>navigator.credentials.create()</code> or <code>navigator.credentials.get()</code>.</p>
+						<p>Use this class to specify requirements regarding authenticator attributes.</p>
 					</div>
 				</div>
 			</section>
@@ -78,7 +78,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">CredentialDescriptor</span>
+						<span class="target">AuthenticatorSelection</span>
 					</li>
 				</ul>
 			</section>
@@ -89,9 +89,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.credentialdescriptor.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.credentialdescriptor.html#transports" class="tsd-kind-icon">transports</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.credentialdescriptor.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.authenticatorselection.html#authenticatorattachment" class="tsd-kind-icon">authenticator<wbr>Attachment</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.authenticatorselection.html#requireresidentkey" class="tsd-kind-icon">require<wbr>Resident<wbr>Key</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="typescript.authenticatorselection.html#userverification" class="tsd-kind-icon">user<wbr>Verification</a></li>
 							</ul>
 						</section>
 					</div>
@@ -100,47 +100,47 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="authenticatorattachment" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> authenticator<wbr>Attachment</h3>
+					<div class="tsd-signature tsd-kind-icon">authenticator<wbr>Attachment<span class="tsd-signature-symbol">:</span> <a href="../modules/typescript.html#platformattachment" class="tsd-signature-type">PlatformAttachment</a><span class="tsd-signature-symbol"> | </span><a href="../modules/typescript.html#crossplatformattachment" class="tsd-signature-type">CrossPlatformAttachment</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L268">typescript/webauthn.d.ts:268</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L133">typescript/webauthn.d.ts:133</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The ID of a credential to allow/disallow.</p>
+							<p>If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="transports" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> transports</h3>
-					<div class="tsd-signature tsd-kind-icon">transports<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<a name="requireresidentkey" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> require<wbr>Resident<wbr>Key</h3>
+					<div class="tsd-signature tsd-kind-icon">require<wbr>Resident<wbr>Key<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L272">typescript/webauthn.d.ts:272</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L137">typescript/webauthn.d.ts:137</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Contains a hint as to how the browser might communicate with the authenticator to which the credential belongs.</p>
+							<p>Describes the Relying Party&#39;s requirements regarding resident credentials. If present and set to <code>true</code>, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="type" class="tsd-anchor"></a>
-					<h3>type</h3>
-					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <a href="../modules/typescript.html#publickeycredentialtype" class="tsd-signature-type">PublicKeyCredentialType</a></div>
+					<a name="userverification" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> user<wbr>Verification</h3>
+					<div class="tsd-signature tsd-kind-icon">user<wbr>Verification<span class="tsd-signature-symbol">:</span> <a href="../modules/typescript.html#userverificationrequired" class="tsd-signature-type">UserVerificationRequired</a><span class="tsd-signature-symbol"> | </span><a href="../modules/typescript.html#userverificationpreferred" class="tsd-signature-type">UserVerificationPreferred</a><span class="tsd-signature-symbol"> | </span><a href="../modules/typescript.html#userverificationdiscouraged" class="tsd-signature-type">UserVerificationDiscouraged</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L264">typescript/webauthn.d.ts:264</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/f92c4dc/typescript/webauthn.d.ts#L141">typescript/webauthn.d.ts:141</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>Type of the credential to use.</p>
+							<p>Describes the Relying Party&#39;s requirements regarding user verification for the <code>navigator.credentials.create()</code> or <code>navigator.credentials.get()</code> operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.</p>
 						</div>
 					</div>
 				</section>
@@ -171,9 +171,24 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.authenticatorattestationresponse.html" class="tsd-kind-icon">Authenticator<wbr>Attestation<wbr>Response</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-parent-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.authenticatorselection.html" class="tsd-kind-icon">Authenticator<wbr>Selection</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="typescript.authenticatorselection.html#authenticatorattachment" class="tsd-kind-icon">authenticator<wbr>Attachment</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="typescript.authenticatorselection.html#requireresidentkey" class="tsd-kind-icon">require<wbr>Resident<wbr>Key</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="typescript.authenticatorselection.html#userverification" class="tsd-kind-icon">user<wbr>Verification</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.config.html" class="tsd-kind-icon">Config</a>
 					</li>
@@ -192,24 +207,9 @@
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.credentialcreationresponse.html" class="tsd-kind-icon">Credential<wbr>Creation<wbr>Response</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.credentialdescriptor.html" class="tsd-kind-icon">Credential<wbr>Descriptor</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="typescript.credentialdescriptor.html#id" class="tsd-kind-icon">id</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="typescript.credentialdescriptor.html#transports" class="tsd-kind-icon">transports</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="typescript.credentialdescriptor.html#type" class="tsd-kind-icon">type</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="typescript.credentialparameter.html" class="tsd-kind-icon">Credential<wbr>Parameter</a>
 					</li>

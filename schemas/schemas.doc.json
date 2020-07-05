@@ -142,7 +142,136 @@
         }
       }
     },
+    "CredentialAssertionResponse": {
+      "description": "The raw response returned to us from an authenticator when we request a credential for login.",
+      "properties": {
+        "id": {
+          "description": "The credential's identifier."
+        },
+        "type": {
+          "description": "Specifies the credential type represented by this object.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PublicKeyCredentialType"
+            }
+          ]
+        },
+        "rawId": {
+          "description": "The credential's identifier. Since we base64-encode raw data, this is the same as `id`."
+        },
+        "response": {
+          "description": "The authenticator's response to the request to generate a login assertion."
+        },
+        "extensions": {
+          "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during login."
+        }
+      }
+    },
+    "CredentialCreation": {
+      "description": "The payload that should be sent to the browser for beginning the registration process.",
+      "properties": {
+        "publicKey": {
+          "description": "Options for the browser to pass to `navigator.credentials.create()`."
+        }
+      }
+    },
+    "CredentialCreationResponse": {
+      "description": "The raw response returned to us from an authenticator when we request a credential for registration.",
+      "properties": {
+        "id": {
+          "description": "The credential's identifier."
+        },
+        "type": {
+          "description": "Specifies the credential type represented by this object.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PublicKeyCredentialType"
+            }
+          ]
+        },
+        "rawId": {
+          "description": "The credential's identifier. Since we base64-encode raw data, this is the same as `id`."
+        },
+        "response": {
+          "description": "The authenticator's response to the request to generate a registration attestation."
+        },
+        "extensions": {
+          "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration."
+        }
+      }
+    },
+    "CredentialDescriptor": {
+      "description": "Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`.",
+      "properties": {
+        "type": {
+          "description": "Type of the credential to use.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PublicKeyCredentialType"
+            }
+          ]
+        },
+        "id": {
+          "description": "The ID of a credential to allow/disallow."
+        },
+        "transports": {
+          "description": "Contains a hint as to how the browser might communicate with the authenticator to which the credential belongs."
+        }
+      }
+    },
+    "CredentialParameter": {
+      "description": "The credential type and algorithm that the relying party wants the authenticator to create.",
+      "properties": {
+        "type": {
+          "description": "Type of the credential to use.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PublicKeyCredentialType"
+            }
+          ]
+        },
+        "alg": {
+          "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).",
+          "oneOf":[
+            {
+              "$ref": "#/definitions/AlgES256"
+            },
+            {
+              "$ref": "#/definitions/AlgES384"
+            },
+            {
+              "$ref": "#/definitions/AlgES512"
+            },
+            {
+              "$ref": "#/definitions/AlgRS1"
+            },
+            {
+              "$ref": "#/definitions/AlgRS256"
+            },
+            {
+              "$ref": "#/definitions/AlgRS384"
+            },
+            {
+              "$ref": "#/definitions/AlgRS512"
+            },
+            {
+              "$ref": "#/definitions/AlgPS256"
+            },
+            {
+              "$ref": "#/definitions/AlgPS384"
+            },
+            {
+              "$ref": "#/definitions/AlgPS512"
+            },
+            {
+              "$ref": "#/definitions/AlgEdDSA"
+            }
+          ]
+        }
+      }
+    },
     "PublicKeyCredentialCreationOptions": {
+      "description": "Parameters for `navigator.credentials.create()`.",
       "properties": {
         "authenticatorSelection": {
           "description": "Registration requirements for authenticator attributes."
@@ -183,6 +312,54 @@
     "PreferDirectAttestation": {
       "description": "Indicates that the Relying Party wants to receive the attestation statement as generated by the authenticator.",
       "enum": ["direct"]
+    },
+    "PublicKeyCredentialType": {
+      "description": "Credential type for WebAuthn.",
+      "enum": ["public-key"]
+    },
+    "AlgES256": {
+      "description": "ECDSA with SHA-256",
+      "enum": [-7]
+    },
+    "AlgES384": {
+      "description": "ECDSA with SHA-384",
+      "enum": [-35]
+    },
+    "AlgES512": {
+      "description": "ECDSA with SHA-512",
+      "enum": [-36]
+    },
+    "AlgRS1": {
+      "description": "RSASSA-PKCS1-v1_5 with SHA-1",
+      "enum": [-65535]
+    },
+    "AlgRS256": {
+      "description": "RSASSA-PKCS1-v1_5 with SHA-256",
+      "enum": [-257]
+    },
+    "AlgRS384": {
+      "description": "RSASSA-PKCS1-v1_5 with SHA-384",
+      "enum": [-258]
+    },
+    "AlgRS512": {
+      "description": "RSASSA-PKCS1-v1_5 with SHA-512",
+      "enum": [-259]
+    },
+    "AlgPS256": {
+      "description": "RSASSA-PSS with SHA-256",
+      "enum": [-37]
+    },
+    "AlgPS384": {
+      "description": "RSASSA-PSS with SHA-384",
+      "enum": [-38]
+    },
+    "AlgPS512": {
+      "description": "RSASSA-PSS with SHA-512",
+      "enum": [-39]
+    },
+    "AlgEdDSA": {
+      "description": "EdDSA",
+      "enum": [-8]
     }
   }
 }
