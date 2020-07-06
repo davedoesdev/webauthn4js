@@ -140,11 +140,29 @@ export interface AuthenticatorSelection {
    */
   userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
 }
+/**
+ * Represents an application (Relying Party) user.
+ */
 export interface User {
+  /**
+   * User ID according to the Relying Party.
+   */
   id: string;
+  /**
+   * User Name according to the Relying Party.
+   */
   name: string;
+  /**
+   * Display Name of the user.
+   */
   displayName: string;
+  /**
+   * User's icon url.
+   */
   iconURL: string;
+  /**
+   * Credentials owned by the user.
+   */
   credentials: Credential[];
 }
 /**
@@ -243,15 +261,42 @@ export interface PublicKeyCredentialCreationOptions {
    */
   attestation?: PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation;
 }
+/**
+ * Used to supply additional Relying Party attributes when creating a new credential.
+ */
 export interface RelyingPartyEntity {
+  /**
+   * A human-palatable identifier for the Relying Party, intended only for display.
+   */
   name: string;
+  /**
+   * A URL which resolves to an image associated with the Relying Party, for example its logo.
+   */
   icon?: string;
+  /**
+   * A unique identifier for the Relying Party.
+   */
   id: string;
 }
+/**
+ * Supplies additional user account attributes when creating a new credential.
+ */
 export interface UserEntity {
+  /**
+   * A human-palatable identifier for the user account, intended only for display to aid the user in determining the difference between user accounts with similar `displayName`s.
+   */
   name: string;
+  /**
+   * A URL which resolves to an image associated with the user account.
+   */
   icon?: string;
+  /**
+   * A human-palatable name for the user account, intended only for display.
+   */
   displayName?: string;
+  /**
+   * The user handle of the user account.
+   */
   id: string;
 }
 /**
@@ -441,9 +486,24 @@ export interface AuthenticatorAssertionResponse {
    */
   userHandle?: string;
 }
+/**
+ * Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony.
+ */
 export interface SessionData {
+  /**
+   * Challenge that was sent to the browser.
+   */
   challenge: string;
+  /**
+   * ID of the user being registered or logged in.
+   */
   user_id: string;
+  /**
+   * Credentials allowed in this login or registration ceremony.
+   */
   allowed_credentials?: string[];
-  userVerification: string;
+  /**
+   * Required user verification in this login or registration ceremony.
+   */
+  userVerification: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
 }

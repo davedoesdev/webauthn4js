@@ -393,6 +393,43 @@
         }
       }
     },
+    "User": {
+      "description": "Represents an application (Relying Party) user.",
+      "properties": {
+        "id": {
+          "description": "User ID according to the Relying Party."
+        },
+        "name": {
+          "description": "User Name according to the Relying Party."
+        },
+        "displayName": {
+          "description": "Display Name of the user."
+        },
+        "iconURL": {
+          "description": "User's icon url."
+        },
+        "credentials": {
+          "description": "Credentials owned by the user."
+        }
+      }
+    },
+    "UserEntity": {
+      "description": "Supplies additional user account attributes when creating a new credential.",
+      "properties": {
+        "name": {
+          "description": "A human-palatable identifier for the user account, intended only for display to aid the user in determining the difference between user accounts with similar `displayName`s."
+        },
+        "icon": {
+          "description": "A URL which resolves to an image associated with the user account."
+        },
+        "displayName": {
+          "description": "A human-palatable name for the user account, intended only for display."
+        },
+        "id": {
+          "description": "The user handle of the user account."
+        }
+      }
+    },
     "PlatformAttachment": {
       "enum": ["platform"],
       "description": "A platform authenticator is attached using a client device-specific transport, called platform attachment, and is usually not removable from the client device. A public key credential bound to a platform authenticator is called a platform credential."

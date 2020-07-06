@@ -606,17 +606,21 @@
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "A human-palatable identifier for the Relying Party, intended only for display."
         },
         "icon": {
-          "type": "string"
+          "type": "string",
+          "description": "A URL which resolves to an image associated with the Relying Party, for example its logo."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "A unique identifier for the Relying Party."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Used to supply additional Relying Party attributes when creating a new credential."
     },
     "SessionData": {
       "required": [
@@ -626,13 +630,15 @@
       ],
       "properties": {
         "challenge": {
-          "type": "string"
+          "type": "string",
+          "description": "Challenge that was sent to the browser."
         },
         "user_id": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "ID of the user being registered or logged in."
         },
         "allowed_credentials": {
           "items": {
@@ -641,14 +647,29 @@
               "binaryEncoding": "base64"
             }
           },
-          "type": "array"
+          "type": "array",
+          "description": "Credentials allowed in this login or registration ceremony."
         },
         "userVerification": {
-          "type": "string"
+          "type": "string",
+          "description": "Required user verification in this login or registration ceremony.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserVerificationRequired"
+            },
+            {
+              "$ref": "#/definitions/UserVerificationPreferred"
+            },
+            {
+              "$ref": "#/definitions/UserVerificationDiscouraged"
+            }
+          ],
+          "default": "preferred"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony."
     },
     "User": {
       "required": [
@@ -663,26 +684,32 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "User ID according to the Relying Party."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "User Name according to the Relying Party."
         },
         "displayName": {
-          "type": "string"
+          "type": "string",
+          "description": "Display Name of the user."
         },
         "iconURL": {
-          "type": "string"
+          "type": "string",
+          "description": "User's icon url."
         },
         "credentials": {
           "items": {
             "$ref": "#/definitions/Credential"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Credentials owned by the user."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Represents an application (Relying Party) user."
     },
     "UserEntity": {
       "required": [
@@ -691,23 +718,28 @@
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "A human-palatable identifier for the user account, intended only for display to aid the user in determining the difference between user accounts with similar `displayName`s."
         },
         "icon": {
-          "type": "string"
+          "type": "string",
+          "description": "A URL which resolves to an image associated with the user account."
         },
         "displayName": {
-          "type": "string"
+          "type": "string",
+          "description": "A human-palatable name for the user account, intended only for display."
         },
         "id": {
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "The user handle of the user account."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Supplies additional user account attributes when creating a new credential."
     },
     "PlatformAttachment": {
       "enum": [
