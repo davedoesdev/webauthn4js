@@ -426,7 +426,7 @@
         },
         "alg": {
           "type": "integer",
-          "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms)",
+          "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).",
           "oneOf": [
             {
               "$ref": "#/definitions/AlgES256"
@@ -466,7 +466,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "The credential type and algorithm that the relying party wants the authenticator to create."
+      "description": "The credential type and algorithm that the Relying Party wants the authenticator to create."
     },
     "PublicKeyCredentialCreationOptions": {
       "required": [
@@ -479,32 +479,38 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "A challenge intended to be used for generating the newly created credential’s attestation."
         },
         "rp": {
-          "$ref": "#/definitions/RelyingPartyEntity"
+          "$ref": "#/definitions/RelyingPartyEntity",
+          "description": "Data about the Relying Party responsible for the request (i.e. your application)"
         },
         "user": {
-          "$ref": "#/definitions/UserEntity"
+          "$ref": "#/definitions/UserEntity",
+          "description": "Data about the user account for which the Relying Party is requesting attestation."
         },
         "pubKeyCredParams": {
           "items": {
             "$ref": "#/definitions/CredentialParameter"
           },
-          "type": "array"
+          "type": "array",
+          "description": " Information about the desired properties of the credential to be created. The sequence is ordered from most preferred to least preferred. The browser makes a best-effort to create the most preferred credential that it can."
         },
         "authenticatorSelection": {
           "$ref": "#/definitions/AuthenticatorSelection",
           "description": "Registration requirements for authenticator attributes."
         },
         "timeout": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Specifies a time, in milliseconds, that the caller is willing to wait for the call to complete. This is treated as a hint, and may be overridden by the browser."
         },
         "excludeCredentials": {
           "items": {
             "$ref": "#/definitions/CredentialDescriptor"
           },
-          "type": "array"
+          "type": "array",
+          "description": "This member is intended for use by Relying Parties that wish to limit the creation of multiple credentials for the same account on a single authenticator. The browser is requested to return an error if the new credential would be created on an authenticator that also contains one of the credentials enumerated in this parameter."
         },
         "extensions": {
           "patternProperties": {
@@ -512,10 +518,24 @@
               "additionalProperties": true
             }
           },
-          "type": "object"
+          "type": "object",
+          "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA \"WebAuthn Extension Identifier\" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions."
         },
         "attestation": {
-          "type": "string"
+          "type": "string",
+          "description": "This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/PreferNoAttestation"
+            },
+            {
+              "$ref": "#/definitions/PreferIndirectAttestation"
+            },
+            {
+              "$ref": "#/definitions/PreferDirectAttestation"
+            }
+          ],
+          "default": "none"
         }
       },
       "additionalProperties": false,
@@ -531,22 +551,39 @@
           "type": "string",
           "media": {
             "binaryEncoding": "base64"
-          }
+          },
+          "description": "A challenge that the selected authenticator signs, along with other data, when producing a login assertion."
         },
         "timeout": {
-          "type": "integer"
+          "type": "integer",
+          "description": "Specifies a time, in milliseconds, that the caller is willing to wait for the call to complete. This is treated as a hint, and may be overridden by the browser."
         },
         "rpId": {
-          "type": "string"
+          "type": "string",
+          "description": "Specifies the Relying Party identifier claimed by the application. If omitted, its value will be the application's origin's effective domain."
         },
         "allowCredentials": {
           "items": {
             "$ref": "#/definitions/CredentialDescriptor"
           },
-          "type": "array"
+          "type": "array",
+          "description": "A list of public key credentials acceptable to the caller, in descending order of preference (the first item in the list is the most preferred credential, and so on down the list)."
         },
         "userVerification": {
-          "type": "string"
+          "type": "string",
+          "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/UserVerificationRequired"
+            },
+            {
+              "$ref": "#/definitions/UserVerificationPreferred"
+            },
+            {
+              "$ref": "#/definitions/UserVerificationDiscouraged"
+            }
+          ],
+          "default": "preferred"
         },
         "extensions": {
           "patternProperties": {
@@ -554,12 +591,13 @@
               "additionalProperties": true
             }
           },
-          "type": "object"
+          "type": "object",
+          "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension."
         }
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "FOOBAR"
+      "description": "Parameters for `navigator.credentials.get()`."
     },
     "RelyingPartyEntity": {
       "required": [

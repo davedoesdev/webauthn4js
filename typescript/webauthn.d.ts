@@ -198,16 +198,37 @@ export interface CredentialCreation {
  * Parameters for `navigator.credentials.create()`.
  */
 export interface PublicKeyCredentialCreationOptions {
+  /**
+   * A challenge intended to be used for generating the newly created credential’s attestation.
+   */
   challenge: string;
+  /**
+   * Data about the Relying Party responsible for the request (i.e. your application)
+   */
   rp: RelyingPartyEntity;
+  /**
+   * Data about the user account for which the Relying Party is requesting attestation.
+   */
   user: UserEntity;
+  /**
+   *  Information about the desired properties of the credential to be created. The sequence is ordered from most preferred to least preferred. The browser makes a best-effort to create the most preferred credential that it can.
+   */
   pubKeyCredParams?: CredentialParameter[];
   /**
    * Registration requirements for authenticator attributes.
    */
   authenticatorSelection?: AuthenticatorSelection;
+  /**
+   * Specifies a time, in milliseconds, that the caller is willing to wait for the call to complete. This is treated as a hint, and may be overridden by the browser.
+   */
   timeout?: number;
+  /**
+   * This member is intended for use by Relying Parties that wish to limit the creation of multiple credentials for the same account on a single authenticator. The browser is requested to return an error if the new credential would be created on an authenticator that also contains one of the credentials enumerated in this parameter.
+   */
   excludeCredentials?: CredentialDescriptor[];
+  /**
+   * Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA "WebAuthn Extension Identifier" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions.
+   */
   extensions?: {
     /**
      * This interface was referenced by `undefined`'s JSON-Schema definition
@@ -217,7 +238,10 @@ export interface PublicKeyCredentialCreationOptions {
       [k: string]: unknown;
     };
   };
-  attestation?: string;
+  /**
+   * This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.
+   */
+  attestation?: PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation;
 }
 export interface RelyingPartyEntity {
   name: string;
@@ -231,7 +255,7 @@ export interface UserEntity {
   id: string;
 }
 /**
- * The credential type and algorithm that the relying party wants the authenticator to create.
+ * The credential type and algorithm that the Relying Party wants the authenticator to create.
  */
 export interface CredentialParameter {
   /**
@@ -239,7 +263,7 @@ export interface CredentialParameter {
    */
   type: PublicKeyCredentialType;
   /**
-   * Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms)
+   * Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).
    */
   alg:
     | AlgES256
@@ -327,14 +351,32 @@ export interface CredentialAssertion {
   publicKey: PublicKeyCredentialRequestOptions;
 }
 /**
- * FOOBAR
+ * Parameters for `navigator.credentials.get()`.
  */
 export interface PublicKeyCredentialRequestOptions {
+  /**
+   * A challenge that the selected authenticator signs, along with other data, when producing a login assertion.
+   */
   challenge: string;
+  /**
+   * Specifies a time, in milliseconds, that the caller is willing to wait for the call to complete. This is treated as a hint, and may be overridden by the browser.
+   */
   timeout?: number;
+  /**
+   * Specifies the Relying Party identifier claimed by the application. If omitted, its value will be the application's origin's effective domain.
+   */
   rpId?: string;
+  /**
+   * A list of public key credentials acceptable to the caller, in descending order of preference (the first item in the list is the most preferred credential, and so on down the list).
+   */
   allowCredentials?: CredentialDescriptor[];
-  userVerification?: string;
+  /**
+   * Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.
+   */
+  userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
+  /**
+   * Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension.
+   */
   extensions?: {
     /**
      * This interface was referenced by `undefined`'s JSON-Schema definition
