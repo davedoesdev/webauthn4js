@@ -22,8 +22,8 @@
     "build_go": "grunt exec:build_go",
     "build_ts": "grunt exec:build_ts",
     "test": "grunt test",
-    "docs": "grunt exec:build_go && grunt docs",
-    "ci": "grunt lint coverage"
+    "test:ci": "grunt lint coverage",
+    "docs": "grunt exec:build_go && grunt docs"
   },
   "directories": {
     "test": "test"
