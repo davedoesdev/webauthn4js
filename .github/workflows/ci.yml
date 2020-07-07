@@ -7,12 +7,7 @@ env:
 
 jobs:
     test:
-        strategy:
-            matrix:
-                node-version: [14]
-                os: [ubuntu-latest]
-
-        runs-on: ${{ matrix.os }}
+        runs-on: ubuntu-latest
 
         steps:
             - name: Checkout
@@ -21,7 +16,7 @@ jobs:
             - name: Use Node.js
               uses: actions/setup-node@v2.1.0
               with:
-                node-version: ${{ matrix.node-version }}
+                node-version: 14
 
             - name: Install
               run: npm ci
@@ -30,3 +25,8 @@ jobs:
               uses: GabrielBB/xvfb-action@v1.2
               with:
                 run: npm run test:ci
+
+            - name: Coveralls
+              uses: coverallsapp/github-action@v1.1.1
+              with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
