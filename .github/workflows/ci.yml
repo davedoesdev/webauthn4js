@@ -27,4 +27,5 @@ jobs:
               run: npm ci
 
             - name: Run tests
+              uses: GabrielBB/xvfb-action@1.2
               run: npm run test:ci
