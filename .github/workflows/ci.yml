@@ -7,23 +7,24 @@ env:
 
 jobs:
     test:
-        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [14]
+                os: [ubuntu-latest]
 
-    strategy:
-        matrix:
-            node-version: [14.x]
+        runs-on: ${{ matrix.os }}
 
-    steps:
-        - name: Checkout
-          uses: actions/checkout@v2
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
 
-        - name: Use Node.js
-          uses: actions/setup-node@v2-beta
-          with:
-            node-version: ${{ matrix.node-version }}
+            - name: Use Node.js
+              uses: actions/setup-node@v2.1.0
+              with:
+                node-version: ${{ matrix.node-version }}
 
-        - name: Install
-          run: npm install
+            - name: Install
+              run: npm ci
 
-        - name: Run tests
-          run: npm run test:ci
+            - name: Run tests
+              run: npm run test:ci
