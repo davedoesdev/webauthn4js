@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>WebAuthn4JSFactory | webauthn4js</title>
+	<title>AuthenticatorAttestationResponse | webauthn4js</title>
 	<meta name="description" content="Documentation for webauthn4js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -57,10 +57,10 @@
 					<a href="../modules/webauthn4js.html">webauthn4js</a>
 				</li>
 				<li>
-					<a href="webauthn4js.webauthn4jsfactory.html">WebAuthn4JSFactory</a>
+					<a href="webauthn4js.authenticatorattestationresponse.html">AuthenticatorAttestationResponse</a>
 				</li>
 			</ul>
-			<h1>Interface WebAuthn4JSFactory</h1>
+			<h1>Interface AuthenticatorAttestationResponse</h1>
 		</div>
 	</div>
 </header>
@@ -70,9 +70,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Function type which creates <a href="webauthn4js.webauthn4js-1.html">WebAuthn4JS</a> instances from
-							a given <a href="webauthn4js.config.html">Config</a>. Also has a property <em>on the function itself</em> which
-						holds <a href="https://json-schema.org/">JSON Schemas</a> for the types in this library.</p>
+						<p>Contains the raw authenticator attestation data, used to verify the authenticy of the registration ceremony and the new credential.</p>
 					</div>
 				</div>
 			</section>
@@ -80,47 +78,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="webauthn4js.config.html" class="tsd-signature-type">Config</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="webauthn4js.webauthn4js-1.html" class="tsd-signature-type">WebAuthn4JS</a>
-						<ul class="tsd-hierarchy">
-							<li>
-								<span class="target">WebAuthn4JSFactory</span>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3 class="tsd-before-signature">Callable</h3>
-				<ul class="tsd-signatures tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
-					<li class="tsd-signature tsd-kind-icon">__call<span class="tsd-signature-symbol">(</span>config<span class="tsd-signature-symbol">: </span><a href="webauthn4js.config.html" class="tsd-signature-type">Config</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="webauthn4js.webauthn4js-1.html" class="tsd-signature-type">WebAuthn4JS</a></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/1f37b22/index.d.ts#L156">index.d.ts:156</a></li>
-							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>Function type which creates <a href="webauthn4js.webauthn4js-1.html">WebAuthn4JS</a> instances from
-									a given <a href="webauthn4js.config.html">Config</a>. Also has a property <em>on the function itself</em> which
-								holds <a href="https://json-schema.org/">JSON Schemas</a> for the types in this library.</p>
-							</div>
-						</div>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5>config: <a href="webauthn4js.config.html" class="tsd-signature-type">Config</a></h5>
-								<div class="tsd-comment tsd-typography">
-									<div class="lead">
-										<p>Configuration for the instance.</p>
-									</div>
-								</div>
-							</li>
-						</ul>
-						<h4 class="tsd-returns-title">Returns <a href="webauthn4js.webauthn4js-1.html" class="tsd-signature-type">WebAuthn4JS</a></h4>
-						<p>A new configured instance.</p>
+						<span class="target">AuthenticatorAttestationResponse</span>
 					</li>
 				</ul>
 			</section>
@@ -128,30 +86,45 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section tsd-is-not-exported">
+						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="webauthn4js.webauthn4jsfactory.html#schemas" class="tsd-kind-icon">schemas</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="webauthn4js.authenticatorattestationresponse.html#attestationobject" class="tsd-kind-icon">attestation<wbr>Object</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="webauthn4js.authenticatorattestationresponse.html#clientdatajson" class="tsd-kind-icon">client<wbr>DataJSON</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-not-exported">
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
-					<a name="schemas" class="tsd-anchor"></a>
-					<h3>schemas</h3>
-					<div class="tsd-signature tsd-kind-icon">schemas<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="attestationobject" class="tsd-anchor"></a>
+					<h3>attestation<wbr>Object</h3>
+					<div class="tsd-signature tsd-kind-icon">attestation<wbr>Object<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/1f37b22/index.d.ts#L172">index.d.ts:172</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/1f37b22/typescript/webauthn.d.ts#L382">typescript/webauthn.d.ts:382</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>JSON Schemas for the types in <code>webauthn4js</code>. These can be useful for validating data
-							you exchange with browsers, for example.</p>
+							<p>This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party&#39;s server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="clientdatajson" class="tsd-anchor"></a>
+					<h3>client<wbr>DataJSON</h3>
+					<div class="tsd-signature tsd-kind-icon">client<wbr>DataJSON<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/1f37b22/typescript/webauthn.d.ts#L378">typescript/webauthn.d.ts:378</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.create().</p>
 						</div>
 					</div>
 				</section>
@@ -172,11 +145,14 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
-						<a href="webauthn4js.webauthn4jsfactory.html" class="tsd-kind-icon">Web<wbr>Authn4JSFactory</a>
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
+						<a href="webauthn4js.authenticatorattestationresponse.html" class="tsd-kind-icon">Authenticator<wbr>Attestation<wbr>Response</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
-								<a href="webauthn4js.webauthn4jsfactory.html#schemas" class="tsd-kind-icon">schemas</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="webauthn4js.authenticatorattestationresponse.html#attestationobject" class="tsd-kind-icon">attestation<wbr>Object</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="webauthn4js.authenticatorattestationresponse.html#clientdatajson" class="tsd-kind-icon">client<wbr>DataJSON</a>
 							</li>
 						</ul>
 					</li>
