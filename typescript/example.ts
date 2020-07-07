@@ -21,7 +21,6 @@ import {
 } from './webauthn';
 const readFile = fs.promises.readFile;
 
-const challenge_timeout = 60000;
 const port = 3000;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
