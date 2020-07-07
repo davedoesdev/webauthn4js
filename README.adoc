@@ -1,4 +1,4 @@
-= WebAuthn4JS {nbsp}{nbsp}{nbsp} image:https://github.com/davedoesdev/webauthn4js/workflows/ci/badge.svg[CI status,link=https://github.com/davedoesdev/webauthn4js/actions] image:https://gitlab.com/davedoesdev/webauthn4js/badges/master/coverage.svg[coverage report,link="https://gitlab.com/davedoesdev/webauthn4js/builds/artifacts/master/download?job=ci"] image:https://img.shields.io/npm/v/webauthn4js.svg[NPM version,link=https://www.npmjs.com/package/webauthn4js]
+= WebAuthn4JS {nbsp}{nbsp}{nbsp} image:https://github.com/davedoesdev/webauthn4js/workflows/ci/badge.svg[CI status,link=https://github.com/davedoesdev/webauthn4js/actions] image:https://coveralls.io/repos/github/davedoesdev/centro/badge.svg[Coverage Status,link="https://coveralls.io/github/davedoesdev/webauthn4js"] image:https://img.shields.io/npm/v/webauthn4js.svg[NPM version,link=https://www.npmjs.com/package/webauthn4js]
 :prewrap!:
 
 This library handles https://w3c.github.io/webauthn/[Web Authentication] for
