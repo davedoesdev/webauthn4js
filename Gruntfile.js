@@ -17,7 +17,7 @@ module.exports = function (grunt) {
                 'go build genschema.go config.go user.go',
                 './genschema > schemas/schemas.autogen.json',
                 'jme schemas/schemas.autogen.json schemas/schemas.doc.json > schemas/schemas.json',
-                'json2ts --no-resolve < schemas/schemas.json > typescript/webauthn.d.ts'
+                "json2ts --no-resolve --bannerComment '/** @module webauthn4js */' < schemas/schemas.json > typescript/webauthn.d.ts"
             ].join('&&'),
             build_ts: [
                 'tsc -p typescript',

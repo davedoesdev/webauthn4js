@@ -10,6 +10,8 @@ been compiled to Web Assembly. It was inspired by
 https://github.com/pulsejet/go-webauthn-js[go-webauthn-js] but uses Go's
 built-in Web Assembly compiler instead of GopherJS.
 
+API documentation is available http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/index.html[here].
+
 [[example]]
 == Example
 
@@ -119,9 +121,9 @@ const webAuthn = await makeWebAuthn({
 });
 ----
 
-Now we make our link:docs.html#WebAuthn4JS[`WebAuthn4JS`] object which will
-handle registration and login. Note this example assumes it's running on
-`localhost`.
+Now we make our
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html[`WebAuthn4JS`]
+object which will handle registration and login. Note this example assumes it's running on `localhost`.
 
 [source,javascript]
 ----
@@ -170,8 +172,9 @@ We specify here that the browser shouldn't use any credential that the user has 
             });
 ----
 
-Now we begin registration, calling link:docs.html#WebAuthn4JS[`beginRegistration`] and passing in
-the user and the excluded (existing) credentials.
+Now we begin registration, calling
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#beginregistration[`beginRegistration`] 
+and passing in the user and the excluded (existing) credentials.
 
 [source,javascript]
 ----
@@ -223,9 +226,11 @@ First we verify the session data to ensure it hasn't been tampered with.
         }
 ----
 
-Then we complete the registration process, calling link:docs.html#WebAuthn4JS[`finishRegistration`] 
-and receiving a link:docs.html#WebAuthn4JS[`Credential`] object. Note the credential isn't yet
-associated with a user.
+Then we complete the registration process, calling
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#finishregistration[`finishRegistration`] 
+and receiving a 
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.credential.html[`Credential`]
+object. Note the credential isn't yet associated with a user.
 
 [source,javascript]
 ----
@@ -268,7 +273,8 @@ async function login(fastify) {
 ----
 
 Login's GET handler first checks the user exists and then calls
-link:docs.html#WebAuthn4JS[`beginLogin`], passing in the user object. We then return to the browser the options
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#beginlogin[`beginLogin`],
+passing in the user object. We then return to the browser the options
 for https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get[`navigator.credentials.get()`]
 and signed and encrypted session data.
 
@@ -301,8 +307,9 @@ browser.
         }
 ----
 
-It then completes the login process by calling link:docs.html#WebAuthn4JS[`finishLogin`], passing in
-the user object, session data and authentication request it received from the browser (i.e. the
+It then completes the login process by calling
+http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#finishlogin[`finishLogin`],
+passing in the user object, session data and authentication request it received from the browser (i.e. the
 result of `navigator.credentials.get()`).
 
 [source,javascript]
