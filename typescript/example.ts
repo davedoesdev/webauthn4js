@@ -16,7 +16,8 @@ import {
     User,
     Credential,
     CredentialCreationResponse,
-    CredentialAssertionResponse
+    CredentialAssertionResponse,
+    CredentialDescriptor
 } from './webauthn';
 const readFile = fs.promises.readFile;
 
@@ -78,7 +79,7 @@ const register : FastifyPlugin = async function (fastify) {
             };
             users.set(request.params.username, user);
         }
-        const excludeCredentials = user.credentials.map(c => ({
+        const excludeCredentials = user.credentials.map((c) : CredentialDescriptor => ({
             type: 'public-key',
             id: c.ID
         }));
