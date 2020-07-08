@@ -1,4 +1,4 @@
-Please see the [project home page](https://gitlab.com/davedoesdev/webauthn4js)
+Please see the [project home page](https://github.com/davedoesdev/webauthn4js)
 for the README.
 
 It's written in [AsciiDoc](http://www.methods.co.nz/asciidoc/) but npmjs.com
