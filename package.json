@@ -1,7 +1,7 @@
 {
   "name": "webauthn4js",
   "description": "Node.js bindings to Duo Labs WebAuthn Go/Wasm library",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "homepage": "https://gitlab.com/davedoesdev/webauthn4js",
   "author": {
     "name": "David Halls",

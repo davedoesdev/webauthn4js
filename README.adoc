@@ -40,6 +40,8 @@ link:test/example/example.mjs[]. Run it using:
 node --harmony-top-level-await test/example/example.mjs
 ----
 
+==== Setup
+
 [source,javascript]
 .example.mjs
 ----
@@ -124,6 +126,8 @@ const webAuthn = await makeWebAuthn({
 Now we make our
 http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html[`WebAuthn4JS`]
 object which will handle registration and login. Note this example assumes it's running on `localhost`.
+
+==== Registration
 
 [source,javascript]
 ----
@@ -252,6 +256,8 @@ If the credential is in use by any user already, this is an error.
 ----
 
 Finally for registration, we associate the credential with the requested user.
+
+==== Login
 
 [source,javascript]
 ----
