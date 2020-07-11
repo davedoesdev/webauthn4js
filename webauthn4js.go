@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"bytes"
+	"fmt"
 
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/duo-labs/webauthn/protocol"
@@ -66,6 +67,12 @@ func cbok(cb js.Value, args ...interface{}) interface{} {
 	return js.Null()
 }
 
+func recovery(cb js.Value) {
+	if r:= recover(); r != nil {
+		cberr(cb, errors.New(fmt.Sprintf("panic: %v", r)));
+	}
+}
+
 func initialize(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[1]
 	var config Config
@@ -83,6 +90,7 @@ func initialize(this js.Value, arguments []js.Value) interface{} {
 
 func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[len(arguments) - 1]
+	defer recovery(cb)
 
 	if webAuthn == nil {
 		return cberr(cb, errors.New("WebAuthn not initialiazed"))
@@ -140,6 +148,7 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 
 func finishRegistration(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[3]
+	defer recovery(cb)
 
 	if webAuthn == nil {
 		return cberr(cb, errors.New("WebAuthn not initialiazed"))
@@ -178,6 +187,7 @@ func finishRegistration(this js.Value, arguments []js.Value) interface{} {
 
 func beginLogin(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[len(arguments) - 1]
+	defer recovery(cb)
 
 	if webAuthn == nil {
 		return cberr(cb, errors.New("WebAuthn not initialiazed"))
@@ -235,6 +245,7 @@ func beginLogin(this js.Value, arguments []js.Value) interface{} {
 
 func finishLogin(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[3]
+	defer recovery(cb)
 
 	if webAuthn == nil {
 		return cberr(cb, errors.New("WebAuthn not initialiazed"))

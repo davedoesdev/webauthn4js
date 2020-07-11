@@ -316,6 +316,12 @@ async function login(username, opts) {
             }
             ({ session_data } = await get_response.json());
         }
+        if (opts.modify_sig) {
+            const sigview = new Uint8Array(signature);
+            for (let i = 0; i < sigview.length; ++i) {
+                sigview[i] ^= 1;
+            }
+        }
         const post_request = {
             method: 'POST',
             headers: {
@@ -653,6 +659,20 @@ describe('login', function () {
             ex = e;
         }
         expect(ex.message).to.equal('Login GET failed with 500 {"statusCode":500,"error":"Internal Server Error","message":"Found no credentials for user"}');
+    });
+
+    it('should recover from panic', async function () {
+        //https://github.com/duo-labs/webauthn/pull/75
+        //when this is fixed, this will stop throwing so we'll need another
+        //way of forcing a panic
+        let ex;
+        try {
+            await login(username, { modify_sig: true });
+        } catch (e) {
+            ex = e;
+        }
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"panic: runtime error: invalid memory address or nil pointer dereference"}');
+        await login(username);
     });
 });
 
