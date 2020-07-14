@@ -1,8 +1,8 @@
 {
   "name": "webauthn4js",
   "description": "Node.js bindings to Duo Labs WebAuthn Go/Wasm library",
-  "version": "0.0.5",
-  "homepage": "https://gitlab.com/davedoesdev/webauthn4js",
+  "version": "0.0.6",
+  "homepage": "https://github.com/davedoesdev/webauthn4js",
   "author": {
     "name": "David Halls",
     "email": "dave@davedoesdev.com",
@@ -10,10 +10,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/davedoesdev/webauthn.git"
+    "url": "https://github.com/davedoesdev/webauthn4js.git"
   },
   "bugs": {
-    "url": "https://github.com/davedoesdev/webauthn/issues"
+    "url": "https://github.com/davedoesdev/webauthn4js/issues"
   },
   "main": "index.js",
   "types": "index.d.ts",
@@ -29,7 +29,8 @@
     "test": "test"
   },
   "keywords": [
-    "webauthn"
+    "webauthn",
+    "fido2"
   ],
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.1.0",
