@@ -3,7 +3,7 @@
 import * as fs from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import mod_fastify, {  FastifyPlugin } from 'fastify';
+import mod_fastify, {  FastifyPluginAsync } from 'fastify';
 import fastify_static from 'fastify-static';
 import * as schemas from '../test/example/schemas.mjs';
 import {
@@ -63,7 +63,7 @@ interface IUserRoute {
     Params: { username : string }
 }
 
-const register : FastifyPlugin = async function (fastify) {
+const register : FastifyPluginAsync = async function (fastify) {
     fastify.get<IUserRoute>('/:username', {
         schema: schemas.register.get
     }, async request => {
@@ -129,7 +129,7 @@ const register : FastifyPlugin = async function (fastify) {
     });
 }
 
-const login : FastifyPlugin = async function (fastify) {
+const login : FastifyPluginAsync = async function (fastify) {
     fastify.get<IUserRoute>('/:username', {
         schema: schemas.login.get
     }, async request => {

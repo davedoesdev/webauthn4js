@@ -661,17 +661,13 @@ describe('login', function () {
         expect(ex.message).to.equal('Login GET failed with 500 {"statusCode":500,"error":"Internal Server Error","message":"Found no credentials for user"}');
     });
 
-    it('should recover from panic', async function () {
-        //https://github.com/duo-labs/webauthn/pull/75
-        //when this is fixed, this will stop throwing so we'll need another
-        //way of forcing a panic
-        let ex;
+    it('should fail to verify bad signature', async function () {
         try {
             await login(username, { modify_sig: true });
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"panic: runtime error: invalid memory address or nil pointer dereference"}');
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"Error validating the assertion signature: Signature invalid or not provided\\n"}');
         await login(username);
     });
 });
