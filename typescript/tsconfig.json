@@ -5,7 +5,8 @@
     "lib": ["es2017"],
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "strict": true
+    "strict": true,
+    "skipLibCheck": true
   },
   "files": [
     "example.ts"

@@ -662,6 +662,7 @@ describe('login', function () {
     });
 
     it('should fail to verify bad signature', async function () {
+        let ex;
         try {
             await login(username, { modify_sig: true });
         } catch (e) {
