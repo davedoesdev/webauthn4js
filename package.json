@@ -1,7 +1,7 @@
 {
   "name": "webauthn4js",
   "description": "Node.js bindings to Duo Labs WebAuthn Go/Wasm library",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "homepage": "https://github.com/davedoesdev/webauthn4js",
   "author": {
     "name": "David Halls",
@@ -33,31 +33,31 @@
     "fido2"
   ],
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^3.9.0",
-    "@typescript-eslint/parser": "^3.9.0",
-    "@wdio/cli": "^6.4.0",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "@wdio/cli": "^6.4.6",
     "@wdio/firefox-profile-service": "^6.4.0",
-    "@wdio/local-runner": "^6.4.0",
+    "@wdio/local-runner": "^6.4.6",
     "@wdio/mocha-framework": "^6.4.0",
     "@wdio/selenium-standalone-service": "6.4.0",
     "@wdio/spec-reporter": "^6.4.0",
     "chai": "^4.2.0",
-    "eslint": "^7.6.0",
-    "fastify": "^3.2.0",
+    "eslint": "^7.8.1",
+    "fastify": "^3.3.0",
     "fastify-static": "^3.2.0",
-    "grunt": "^1.2.1",
+    "grunt": "^1.3.0",
     "grunt-eslint": "^23.0.0",
     "grunt-exec": "^3.0.0",
     "jme": "^1.0.6",
     "@davedoesdev/json-schema-to-typescript": "^9.1.1",
-    "mocha": "^8.1.1",
+    "mocha": "^8.1.3",
     "nyc": "^15.1.0",
     "sodium-plus": "^0.9.0",
-    "typedoc": "^0.18.0",
+    "typedoc": "^0.19.1",
     "typedoc-plugin-external-module-name": "^4.0.3",
     "typedoc-plugin-no-inherit": "Gerrit0/typedoc-plugin-no-inherit",
-    "typescript": "^3.9.7",
-    "webdriverio": "^6.4.0"
+    "typescript": "^4.0.2",
+    "webdriverio": "^6.4.6"
   },
   "engines": {
     "node": ">= 12"
