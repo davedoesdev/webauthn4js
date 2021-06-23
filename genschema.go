@@ -9,7 +9,7 @@ import (
 
 	"github.com/duo-labs/webauthn/webauthn"
 	"github.com/duo-labs/webauthn/protocol"
-	"github.com/davedoesdev/jsonschema"
+	"github.com/alecthomas/jsonschema"
 )
 
 type WebAuthn4JS struct {
