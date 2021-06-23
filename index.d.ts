@@ -153,7 +153,7 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
 /**
  * @ignore
  */
-type WebAuthn4JSFactoryBase = (config : Config) => WebAuthn4JS;
+type WebAuthn4JSFactoryBase = (config : Config) => Promise<WebAuthn4JS>;
 
 /**
  * Function type which creates {@link WebAuthn4JS} instances from
@@ -179,3 +179,4 @@ interface WebAuthn4JSFactory extends WebAuthn4JSFactoryBase {
 declare const exports : WebAuthn4JSFactory;
 
 export default exports;
+export { WebAuthn4JS };

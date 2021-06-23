@@ -595,7 +595,6 @@ module.exports = (process, module) => {
 	}
 
 	if (
-		typeof module !== "undefined" &&
 		global.require &&
 		global.require.main === module &&
 		global.process &&
