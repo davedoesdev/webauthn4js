@@ -151,38 +151,24 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
 }
 
 /**
- * @ignore
- */
-type WebAuthn4JSFactoryBase = (config : Config) => Promise<WebAuthn4JS>;
-
-/**
- * Function type which creates {@link WebAuthn4JS} instances from
- * a given {@link Config}. Also has a property _on the function itself_ which
- * holds [JSON Schemas](https://json-schema.org/) for the types in this library.
+ * Creates {@link WebAuthn4JS} instances from a given {@link Config}.
+ * Also has a property {@link schemas} _on the function itself_ which holds
+ * [JSON Schemas](https://json-schema.org/) for the types in this library.
  *
  * @param config  Configuration for the instance.
  *
  * @returns  A new configured instance.
  */
-interface WebAuthn4JSFactory extends WebAuthn4JSFactoryBase {
-    /**
-     * JSON Schemas for the types in `webauthn4js`. These can be useful for validating data
-     * you exchange with browsers, for example.
-     */
-    schemas : any;
-}
+export default function makeWebAuthn(config : Config) : Promise<WebAuthn4JS>;
 
 /**
- * `module.exports` is a function which creates {@link WebAuthn4JS} objects from a given
- * {@link Config}.
+ * JSON Schemas for the types in `webauthn4js`. These can be useful for validating data
+ * you exchange with browsers, for example.
  */
-declare const exports : WebAuthn4JSFactory;
+export const schemas : any;
 
-export default exports;
 export {
     WebAuthn4JSEvents,
-    WebAuthn4JS,
-    WebAuthn4JSFactoryBase,
-    WebAuthn4JSFactory
+    WebAuthn4JS
 };
 export * from './typescript/webauthn';
