@@ -29,7 +29,7 @@ module.exports = function (grunt) {
             cover_report: "./node_modules/.bin/nyc report -r lcov -r text -x ''",
             cover_check: './node_modules/.bin/nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100',
             coveralls: 'cat coverage/lcov.info | coveralls',
-            docs: './node_modules/.bin/typedoc index.d.ts typescript/webauthn.d.ts'
+            docs: './node_modules/.bin/typedoc index.d.ts'
         }
     });
 

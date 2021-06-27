@@ -23,7 +23,7 @@ type WebAuthn4JS struct {
 }
 
 func main() {
-	jsonschema.Version = "" // json-schema-to-typescript doesn't like $schema and $ref together
+	//jsonschema.Version = "" // json-schema-to-typescript doesn't like $schema and $ref together
 	typ := reflect.TypeOf((*WebAuthn4JS)(nil)).Elem()
 	reflector := jsonschema.Reflector{
 		DoNotReference: false,

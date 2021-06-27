@@ -104,7 +104,7 @@ export interface Config {
   /**
    * Preferred attestation conveyance during credential generation
    */
-  AttestationPreference?: PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation;
+  AttestationPreference?: (PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation) & string;
   /**
    * Login requirements for authenticator attributes.
    */
@@ -125,7 +125,7 @@ export interface AuthenticatorSelection {
   /**
    * If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.
    */
-  authenticatorAttachment?: PlatformAttachment | CrossPlatformAttachment;
+  authenticatorAttachment?: (PlatformAttachment | CrossPlatformAttachment) & string;
   /**
    * Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential.
    */
@@ -133,7 +133,7 @@ export interface AuthenticatorSelection {
   /**
    * Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.
    */
-  userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
+  userVerification?: (UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged) & string;
 }
 /**
  * Represents an application (Relying Party) user.
@@ -254,7 +254,7 @@ export interface PublicKeyCredentialCreationOptions {
   /**
    * This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.
    */
-  attestation?: PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation;
+  attestation?: (PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation) & string;
 }
 /**
  * Used to supply additional Relying Party attributes when creating a new credential.
@@ -301,22 +301,24 @@ export interface CredentialParameter {
   /**
    * Type of the credential to use.
    */
-  type: PublicKeyCredentialType;
+  type: PublicKeyCredentialType & string;
   /**
    * Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).
    */
-  alg:
-    | AlgES256
-    | AlgES384
-    | AlgES512
-    | AlgRS1
-    | AlgRS256
-    | AlgRS384
-    | AlgRS512
-    | AlgPS256
-    | AlgPS384
-    | AlgPS512
-    | AlgEdDSA;
+  alg: number &
+    (
+      | AlgES256
+      | AlgES384
+      | AlgES512
+      | AlgRS1
+      | AlgRS256
+      | AlgRS384
+      | AlgRS512
+      | AlgPS256
+      | AlgPS384
+      | AlgPS512
+      | AlgEdDSA
+    );
 }
 /**
  * Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`.
@@ -325,7 +327,7 @@ export interface CredentialDescriptor {
   /**
    * Type of the credential to use.
    */
-  type: PublicKeyCredentialType;
+  type: PublicKeyCredentialType & string;
   /**
    * The ID of a credential to allow/disallow.
    */
@@ -346,7 +348,7 @@ export interface CredentialCreationResponse {
   /**
    * Specifies the credential type represented by this object.
    */
-  type: PublicKeyCredentialType;
+  type: PublicKeyCredentialType & string;
   /**
    * The credential's identifier. Since we base64-encode raw data, this is the same as `id`.
    */
@@ -413,7 +415,7 @@ export interface PublicKeyCredentialRequestOptions {
   /**
    * Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.
    */
-  userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
+  userVerification?: (UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged) & string;
   /**
    * Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension.
    */
@@ -438,7 +440,7 @@ export interface CredentialAssertionResponse {
   /**
    * Specifies the credential type represented by this object.
    */
-  type: PublicKeyCredentialType;
+  type: PublicKeyCredentialType & string;
   /**
    * The credential's identifier. Since we base64-encode raw data, this is the same as `id`.
    */
@@ -500,5 +502,5 @@ export interface SessionData {
   /**
    * Required user verification in this login or registration ceremony.
    */
-  userVerification: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
+  userVerification: (UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged) & string;
 }

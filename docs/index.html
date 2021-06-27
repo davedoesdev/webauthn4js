@@ -7,6 +7,7 @@
 	<meta name="description" content="Documentation for webauthn4js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -38,8 +39,6 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -49,11 +48,6 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<ul class="tsd-breadcrumb">
-				<li>
-					<a href="index.html">Globals</a>
-				</li>
-			</ul>
 			<h1>webauthn4js</h1>
 		</div>
 	</div>
@@ -66,11 +60,384 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Modules</h3>
+							<h3>Interfaces</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-module"><a href="modules/webauthn4js.html" class="tsd-kind-icon">webauthn4js</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/authenticator.html" class="tsd-kind-icon">Authenticator</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/authenticatorassertionresponse.html" class="tsd-kind-icon">Authenticator<wbr>Assertion<wbr>Response</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/authenticatorattestationresponse.html" class="tsd-kind-icon">Authenticator<wbr>Attestation<wbr>Response</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/authenticatorselection.html" class="tsd-kind-icon">Authenticator<wbr>Selection</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/config.html" class="tsd-kind-icon">Config</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credential.html" class="tsd-kind-icon">Credential</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credentialassertion.html" class="tsd-kind-icon">Credential<wbr>Assertion</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credentialassertionresponse.html" class="tsd-kind-icon">Credential<wbr>Assertion<wbr>Response</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credentialcreation.html" class="tsd-kind-icon">Credential<wbr>Creation</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credentialcreationresponse.html" class="tsd-kind-icon">Credential<wbr>Creation<wbr>Response</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credentialdescriptor.html" class="tsd-kind-icon">Credential<wbr>Descriptor</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/credentialparameter.html" class="tsd-kind-icon">Credential<wbr>Parameter</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/publickeycredentialcreationoptions.html" class="tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Creation<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/publickeycredentialrequestoptions.html" class="tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Request<wbr>Options</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/relyingpartyentity.html" class="tsd-kind-icon">Relying<wbr>Party<wbr>Entity</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/sessiondata.html" class="tsd-kind-icon">Session<wbr>Data</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/user.html" class="tsd-kind-icon">User</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/userentity.html" class="tsd-kind-icon">User<wbr>Entity</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/webauthn4js.html" class="tsd-kind-icon">Web<wbr>Authn4JS</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/webauthn4jsevents.html" class="tsd-kind-icon">Web<wbr>Authn4JSEvents</a></li>
+								<li class="tsd-kind-interface"><a href="interfaces/webauthn4jsfactory.html" class="tsd-kind-icon">Web<wbr>Authn4JSFactory</a></li>
 							</ul>
 						</section>
+						<section class="tsd-index-section ">
+							<h3>Type aliases</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-type-alias"><a href="index.html#alges256" class="tsd-kind-icon">AlgES256</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#alges384" class="tsd-kind-icon">AlgES384</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#alges512" class="tsd-kind-icon">AlgES512</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algeddsa" class="tsd-kind-icon">Alg<wbr>EdDSA</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algps256" class="tsd-kind-icon">AlgPS256</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algps384" class="tsd-kind-icon">AlgPS384</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algps512" class="tsd-kind-icon">AlgPS512</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algrs1" class="tsd-kind-icon">AlgRS1</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algrs256" class="tsd-kind-icon">AlgRS256</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algrs384" class="tsd-kind-icon">AlgRS384</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#algrs512" class="tsd-kind-icon">AlgRS512</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#crossplatformattachment" class="tsd-kind-icon">Cross<wbr>Platform<wbr>Attachment</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#platformattachment" class="tsd-kind-icon">Platform<wbr>Attachment</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#preferdirectattestation" class="tsd-kind-icon">Prefer<wbr>Direct<wbr>Attestation</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#preferindirectattestation" class="tsd-kind-icon">Prefer<wbr>Indirect<wbr>Attestation</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#prefernoattestation" class="tsd-kind-icon">Prefer<wbr>NoAttestation</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#publickeycredentialtype" class="tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Type</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#userverificationdiscouraged" class="tsd-kind-icon">User<wbr>Verification<wbr>Discouraged</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#userverificationpreferred" class="tsd-kind-icon">User<wbr>Verification<wbr>Preferred</a></li>
+								<li class="tsd-kind-type-alias"><a href="index.html#userverificationrequired" class="tsd-kind-icon">User<wbr>Verification<wbr>Required</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Variables</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-variable"><a href="index.html#default" class="tsd-kind-icon">default</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Type aliases</h2>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="alges256" class="tsd-anchor"></a>
+					<h3>AlgES256</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgES256<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-7</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L42">typescript/webauthn.d.ts:42</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>ECDSA with SHA-256</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="alges384" class="tsd-anchor"></a>
+					<h3>AlgES384</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgES384<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-35</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L46">typescript/webauthn.d.ts:46</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>ECDSA with SHA-384</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="alges512" class="tsd-anchor"></a>
+					<h3>AlgES512</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgES512<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-36</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L50">typescript/webauthn.d.ts:50</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>ECDSA with SHA-512</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algeddsa" class="tsd-anchor"></a>
+					<h3>Alg<wbr>EdDSA</h3>
+					<div class="tsd-signature tsd-kind-icon">Alg<wbr>EdDSA<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-8</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L82">typescript/webauthn.d.ts:82</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>EdDSA</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algps256" class="tsd-anchor"></a>
+					<h3>AlgPS256</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgPS256<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-37</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L70">typescript/webauthn.d.ts:70</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PSS with SHA-256</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algps384" class="tsd-anchor"></a>
+					<h3>AlgPS384</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgPS384<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-38</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L74">typescript/webauthn.d.ts:74</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PSS with SHA-384</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algps512" class="tsd-anchor"></a>
+					<h3>AlgPS512</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgPS512<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-39</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L78">typescript/webauthn.d.ts:78</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PSS with SHA-512</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algrs1" class="tsd-anchor"></a>
+					<h3>AlgRS1</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgRS1<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-65535</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L54">typescript/webauthn.d.ts:54</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PKCS1-v1_5 with SHA-1</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algrs256" class="tsd-anchor"></a>
+					<h3>AlgRS256</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgRS256<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-257</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L58">typescript/webauthn.d.ts:58</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PKCS1-v1_5 with SHA-256</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algrs384" class="tsd-anchor"></a>
+					<h3>AlgRS384</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgRS384<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-258</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L62">typescript/webauthn.d.ts:62</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PKCS1-v1_5 with SHA-384</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="algrs512" class="tsd-anchor"></a>
+					<h3>AlgRS512</h3>
+					<div class="tsd-signature tsd-kind-icon">AlgRS512<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">-259</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L66">typescript/webauthn.d.ts:66</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>RSASSA-PKCS1-v1_5 with SHA-512</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="crossplatformattachment" class="tsd-anchor"></a>
+					<h3>Cross<wbr>Platform<wbr>Attachment</h3>
+					<div class="tsd-signature tsd-kind-icon">Cross<wbr>Platform<wbr>Attachment<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;cross-platform&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L22">typescript/webauthn.d.ts:22</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A roaming authenticator is attached using cross-platform transports, called cross-platform attachment. Authenticators of this class are removable from, and can &quot;roam&quot; among, client devices. A public key credential bound to a roaming authenticator is called a roaming credential.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="platformattachment" class="tsd-anchor"></a>
+					<h3>Platform<wbr>Attachment</h3>
+					<div class="tsd-signature tsd-kind-icon">Platform<wbr>Attachment<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;platform&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L18">typescript/webauthn.d.ts:18</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>A platform authenticator is attached using a client device-specific transport, called platform attachment, and is usually not removable from the client device. A public key credential bound to a platform authenticator is called a platform credential.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="preferdirectattestation" class="tsd-anchor"></a>
+					<h3>Prefer<wbr>Direct<wbr>Attestation</h3>
+					<div class="tsd-signature tsd-kind-icon">Prefer<wbr>Direct<wbr>Attestation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;direct&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L14">typescript/webauthn.d.ts:14</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Indicates that the Relying Party wants to receive the attestation statement as generated by the authenticator.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="preferindirectattestation" class="tsd-anchor"></a>
+					<h3>Prefer<wbr>Indirect<wbr>Attestation</h3>
+					<div class="tsd-signature tsd-kind-icon">Prefer<wbr>Indirect<wbr>Attestation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;indirect&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L10">typescript/webauthn.d.ts:10</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Indicates that the Relying Party prefers an attestation conveyance yielding verifiable attestation statements, but allows the client to decide how to obtain such attestation statements. The client MAY replace the authenticator-generated attestation statements with attestation statements generated by an Anonymization CA, in order to protect the user’s privacy, or to assist Relying Parties with attestation verification in a heterogeneous ecosystem.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="prefernoattestation" class="tsd-anchor"></a>
+					<h3>Prefer<wbr>NoAttestation</h3>
+					<div class="tsd-signature tsd-kind-icon">Prefer<wbr>NoAttestation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;none&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L6">typescript/webauthn.d.ts:6</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Indicates that the Relying Party is not interested in authenticator attestation. For example, in order to potentially avoid having to obtain user consent to relay identifying information to the Relying Party, or to save a roundtrip to an Attestation CA. This is the default if no attestation conveyance is specified.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="publickeycredentialtype" class="tsd-anchor"></a>
+					<h3>Public<wbr>Key<wbr>Credential<wbr>Type</h3>
+					<div class="tsd-signature tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;public-key&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L38">typescript/webauthn.d.ts:38</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Credential type for WebAuthn.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="userverificationdiscouraged" class="tsd-anchor"></a>
+					<h3>User<wbr>Verification<wbr>Discouraged</h3>
+					<div class="tsd-signature tsd-kind-icon">User<wbr>Verification<wbr>Discouraged<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;discouraged&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L34">typescript/webauthn.d.ts:34</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>The authenticator should not verify the user for the credential.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="userverificationpreferred" class="tsd-anchor"></a>
+					<h3>User<wbr>Verification<wbr>Preferred</h3>
+					<div class="tsd-signature tsd-kind-icon">User<wbr>Verification<wbr>Preferred<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;preferred&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L30">typescript/webauthn.d.ts:30</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>User verification is preferred to create/use a credential. This is the default if no user verification requirement is specified.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias">
+					<a name="userverificationrequired" class="tsd-anchor"></a>
+					<h3>User<wbr>Verification<wbr>Required</h3>
+					<div class="tsd-signature tsd-kind-icon">User<wbr>Verification<wbr>Required<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;required&quot;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L26">typescript/webauthn.d.ts:26</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>User verification is required to create/use a credential.</p>
+						</div>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Variables</h2>
+				<section class="tsd-panel tsd-member tsd-kind-variable">
+					<a name="default" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> default</h3>
+					<div class="tsd-signature tsd-kind-icon">default<span class="tsd-signature-symbol">:</span> <a href="interfaces/webauthn4jsfactory.html" class="tsd-signature-type" data-tsd-kind="Interface">WebAuthn4JSFactory</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/index.d.ts#L179">index.d.ts:179</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p><code>module.exports</code> is a function which creates <a href="interfaces/webauthn4js.html">WebAuthn4JS</a> objects from a given
+							<a href="interfaces/config.html">Config</a>.</p>
+						</div>
 					</div>
 				</section>
 			</section>
@@ -78,16 +445,139 @@
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals current ">
-						<a href="index.html"><em>Globals</em></a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="modules/webauthn4js.html">webauthn4js</a>
+					<li class="current ">
+						<a href="index.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/authenticator.html" class="tsd-kind-icon">Authenticator</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/authenticatorassertionresponse.html" class="tsd-kind-icon">Authenticator<wbr>Assertion<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/authenticatorattestationresponse.html" class="tsd-kind-icon">Authenticator<wbr>Attestation<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/authenticatorselection.html" class="tsd-kind-icon">Authenticator<wbr>Selection</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/config.html" class="tsd-kind-icon">Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credential.html" class="tsd-kind-icon">Credential</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credentialassertion.html" class="tsd-kind-icon">Credential<wbr>Assertion</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credentialassertionresponse.html" class="tsd-kind-icon">Credential<wbr>Assertion<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credentialcreation.html" class="tsd-kind-icon">Credential<wbr>Creation</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credentialcreationresponse.html" class="tsd-kind-icon">Credential<wbr>Creation<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credentialdescriptor.html" class="tsd-kind-icon">Credential<wbr>Descriptor</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/credentialparameter.html" class="tsd-kind-icon">Credential<wbr>Parameter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/publickeycredentialcreationoptions.html" class="tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Creation<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/publickeycredentialrequestoptions.html" class="tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Request<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/relyingpartyentity.html" class="tsd-kind-icon">Relying<wbr>Party<wbr>Entity</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/sessiondata.html" class="tsd-kind-icon">Session<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/user.html" class="tsd-kind-icon">User</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/userentity.html" class="tsd-kind-icon">User<wbr>Entity</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/webauthn4js.html" class="tsd-kind-icon">Web<wbr>Authn4JS</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/webauthn4jsevents.html" class="tsd-kind-icon">Web<wbr>Authn4JSEvents</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/webauthn4jsfactory.html" class="tsd-kind-icon">Web<wbr>Authn4JSFactory</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#alges256" class="tsd-kind-icon">AlgES256</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#alges384" class="tsd-kind-icon">AlgES384</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#alges512" class="tsd-kind-icon">AlgES512</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algeddsa" class="tsd-kind-icon">Alg<wbr>EdDSA</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algps256" class="tsd-kind-icon">AlgPS256</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algps384" class="tsd-kind-icon">AlgPS384</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algps512" class="tsd-kind-icon">AlgPS512</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algrs1" class="tsd-kind-icon">AlgRS1</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algrs256" class="tsd-kind-icon">AlgRS256</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algrs384" class="tsd-kind-icon">AlgRS384</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#algrs512" class="tsd-kind-icon">AlgRS512</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#crossplatformattachment" class="tsd-kind-icon">Cross<wbr>Platform<wbr>Attachment</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#platformattachment" class="tsd-kind-icon">Platform<wbr>Attachment</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#preferdirectattestation" class="tsd-kind-icon">Prefer<wbr>Direct<wbr>Attestation</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#preferindirectattestation" class="tsd-kind-icon">Prefer<wbr>Indirect<wbr>Attestation</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#prefernoattestation" class="tsd-kind-icon">Prefer<wbr>NoAttestation</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#publickeycredentialtype" class="tsd-kind-icon">Public<wbr>Key<wbr>Credential<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#userverificationdiscouraged" class="tsd-kind-icon">User<wbr>Verification<wbr>Discouraged</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#userverificationpreferred" class="tsd-kind-icon">User<wbr>Verification<wbr>Preferred</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="index.html#userverificationrequired" class="tsd-kind-icon">User<wbr>Verification<wbr>Required</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="index.html#default" class="tsd-kind-icon">default</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -98,11 +588,8 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
-				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 		</div>
 	</div>

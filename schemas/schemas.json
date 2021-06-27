@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "required": [
     "Config",
     "User",
@@ -10,24 +11,31 @@
   ],
   "properties": {
     "Config": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/Config"
     },
     "User": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/User"
     },
     "CredentialCreation": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/CredentialCreation"
     },
     "CredentialCreationResponse": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/CredentialCreationResponse"
     },
     "CredentialAssertion": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/CredentialAssertion"
     },
     "CredentialAssertionResponse": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/CredentialAssertionResponse"
     },
     "SessionData": {
+      "$schema": "http://json-schema.org/draft-04/schema#",
       "$ref": "#/definitions/SessionData"
     }
   },
@@ -204,6 +212,7 @@
           "default": "none"
         },
         "AuthenticatorSelection": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/AuthenticatorSelection",
           "description": "Login requirements for authenticator attributes."
         },
@@ -247,6 +256,7 @@
           "description": "The attestation format used (if any) by the authenticator when creating the credential."
         },
         "Authenticator": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/Authenticator",
           "description": "The Authenticator information for a given certificate."
         }
@@ -261,6 +271,7 @@
       ],
       "properties": {
         "publicKey": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/PublicKeyCredentialRequestOptions",
           "description": "Options for the browser to pass to `navigator.credentials.get()`."
         }
@@ -307,6 +318,7 @@
           "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during login."
         },
         "response": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/AuthenticatorAssertionResponse",
           "description": "The authenticator's response to the request to generate a login assertion."
         }
@@ -321,6 +333,7 @@
       ],
       "properties": {
         "publicKey": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/PublicKeyCredentialCreationOptions",
           "description": "Options for the browser to pass to `navigator.credentials.create()`."
         }
@@ -367,6 +380,7 @@
           "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration."
         },
         "response": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/AuthenticatorAttestationResponse",
           "description": "The authenticator's response to the request to generate a registration attestation."
         }
@@ -483,15 +497,18 @@
           "description": "A challenge intended to be used for generating the newly created credential’s attestation."
         },
         "rp": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/RelyingPartyEntity",
           "description": "Data about the Relying Party responsible for the request (i.e. your application)"
         },
         "user": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/UserEntity",
           "description": "Data about the user account for which the Relying Party is requesting attestation."
         },
         "pubKeyCredParams": {
           "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/CredentialParameter"
           },
           "type": "array",
@@ -507,6 +524,7 @@
         },
         "excludeCredentials": {
           "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/CredentialDescriptor"
           },
           "type": "array",
@@ -701,6 +719,7 @@
         },
         "credentials": {
           "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/Credential"
           },
           "type": "array",

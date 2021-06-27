@@ -3,10 +3,11 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>RelyingPartyEntity | webauthn4js</title>
+	<title>SessionData | webauthn4js</title>
 	<meta name="description" content="Documentation for webauthn4js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
+	<script async src="../assets/js/search.js" id="search-script"></script>
 </head>
 <body>
 <header>
@@ -38,8 +39,6 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
-							<input type="checkbox" id="tsd-filter-only-exported" />
-							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -51,16 +50,13 @@
 		<div class="container">
 			<ul class="tsd-breadcrumb">
 				<li>
-					<a href="../index.html">Globals</a>
+					<a href="../index.html">webauthn4js</a>
 				</li>
 				<li>
-					<a href="../modules/webauthn4js.html">webauthn4js</a>
-				</li>
-				<li>
-					<a href="webauthn4js.relyingpartyentity.html">RelyingPartyEntity</a>
+					<a href="sessiondata.html">SessionData</a>
 				</li>
 			</ul>
-			<h1>Interface RelyingPartyEntity</h1>
+			<h1>Interface SessionData</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +66,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Used to supply additional Relying Party attributes when creating a new credential.</p>
+						<p>Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony.</p>
 					</div>
 				</div>
 			</section>
@@ -78,7 +74,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">RelyingPartyEntity</span>
+						<span class="target">SessionData</span>
 					</li>
 				</ul>
 			</section>
@@ -89,9 +85,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="webauthn4js.relyingpartyentity.html#icon" class="tsd-kind-icon">icon</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="webauthn4js.relyingpartyentity.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="webauthn4js.relyingpartyentity.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sessiondata.html#allowed_credentials" class="tsd-kind-icon">allowed_<wbr>credentials</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sessiondata.html#challenge" class="tsd-kind-icon">challenge</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sessiondata.html#userverification" class="tsd-kind-icon">user<wbr>Verification</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sessiondata.html#user_id" class="tsd-kind-icon">user_<wbr>id</a></li>
 							</ul>
 						</section>
 					</div>
@@ -100,47 +97,62 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="icon" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> icon</h3>
-					<div class="tsd-signature tsd-kind-icon">icon<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="allowed_credentials" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> allowed_<wbr>credentials</h3>
+					<div class="tsd-signature tsd-kind-icon">allowed_<wbr>credentials<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/821f473/typescript/webauthn.d.ts#L270">typescript/webauthn.d.ts:270</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L501">typescript/webauthn.d.ts:501</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>A URL which resolves to an image associated with the Relying Party, for example its logo.</p>
+							<p>Credentials allowed in this login or registration ceremony.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="challenge" class="tsd-anchor"></a>
+					<h3>challenge</h3>
+					<div class="tsd-signature tsd-kind-icon">challenge<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/821f473/typescript/webauthn.d.ts#L274">typescript/webauthn.d.ts:274</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L493">typescript/webauthn.d.ts:493</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>A unique identifier for the Relying Party.</p>
+							<p>Challenge that was sent to the browser.</p>
 						</div>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="userverification" class="tsd-anchor"></a>
+					<h3>user<wbr>Verification</h3>
+					<div class="tsd-signature tsd-kind-icon">user<wbr>Verification<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;required&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;preferred&quot;</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">&quot;discouraged&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/821f473/typescript/webauthn.d.ts#L266">typescript/webauthn.d.ts:266</a></li>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L505">typescript/webauthn.d.ts:505</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>A human-palatable identifier for the Relying Party, intended only for display.</p>
+							<p>Required user verification in this login or registration ceremony.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="user_id" class="tsd-anchor"></a>
+					<h3>user_<wbr>id</h3>
+					<div class="tsd-signature tsd-kind-icon">user_<wbr>id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/davedoesdev/webauthn4js/blob/542e647/typescript/webauthn.d.ts#L497">typescript/webauthn.d.ts:497</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>ID of the user being registered or logged in.</p>
 						</div>
 					</div>
 				</section>
@@ -149,11 +161,8 @@
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
-					<li class="globals  ">
-						<a href="../index.html"><em>Globals</em></a>
-					</li>
-					<li class="current tsd-kind-module">
-						<a href="../modules/webauthn4js.html">webauthn4js</a>
+					<li class=" ">
+						<a href="../index.html">Exports</a>
 					</li>
 				</ul>
 			</nav>
@@ -161,17 +170,20 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="webauthn4js.relyingpartyentity.html" class="tsd-kind-icon">Relying<wbr>Party<wbr>Entity</a>
+					<li class="current tsd-kind-interface">
+						<a href="sessiondata.html" class="tsd-kind-icon">Session<wbr>Data</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="webauthn4js.relyingpartyentity.html#icon" class="tsd-kind-icon">icon</a>
+								<a href="sessiondata.html#allowed_credentials" class="tsd-kind-icon">allowed_<wbr>credentials</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="webauthn4js.relyingpartyentity.html#id" class="tsd-kind-icon">id</a>
+								<a href="sessiondata.html#challenge" class="tsd-kind-icon">challenge</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="webauthn4js.relyingpartyentity.html#name" class="tsd-kind-icon">name</a>
+								<a href="sessiondata.html#userverification" class="tsd-kind-icon">user<wbr>Verification</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="sessiondata.html#user_id" class="tsd-kind-icon">user_<wbr>id</a>
 							</li>
 						</ul>
 					</li>
@@ -187,12 +199,8 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
-				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
 			</ul>
 		</div>
 	</div>

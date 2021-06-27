@@ -179,4 +179,10 @@ interface WebAuthn4JSFactory extends WebAuthn4JSFactoryBase {
 declare const exports : WebAuthn4JSFactory;
 
 export default exports;
-export { WebAuthn4JS };
+export {
+    WebAuthn4JSEvents,
+    WebAuthn4JS,
+    WebAuthn4JSFactoryBase,
+    WebAuthn4JSFactory
+};
+export * from './typescript/webauthn';
