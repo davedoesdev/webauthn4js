@@ -9,7 +9,7 @@ to Web Assembly. It was inspired by
 Go’s built-in Web Assembly compiler instead of GopherJS.
 
 API documentation is available
-[here](https://rawgit-now.netlify.app/davedoesdev/webauthn4js/master/docs/index.html).
+[here](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/index.html).
 
 # Example
 

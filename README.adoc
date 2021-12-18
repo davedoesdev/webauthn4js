@@ -10,7 +10,7 @@ been compiled to Web Assembly. It was inspired by
 https://github.com/pulsejet/go-webauthn-js[go-webauthn-js] but uses Go's
 built-in Web Assembly compiler instead of GopherJS.
 
-API documentation is available https://rawgit-now.netlify.app/davedoesdev/webauthn4js/master/docs/index.html[here].
+API documentation is available http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/index.html[here].
 
 [[example]]
 == Example
