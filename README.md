@@ -35,7 +35,7 @@ I’ll describe the example bit-by-bit below. You can also find it in
 [test/example/example.mjs](test/example/example.mjs). Run it using:
 
 ``` bash
-node --harmony-top-level-await test/example/example.mjs
+node test/example/example.mjs
 ```
 
 ### Setup
@@ -101,9 +101,8 @@ fastify.register(fastify_static, {
 });
 ```
 
-Here we configure Fastify to serve over HTTPS the
-[index.html](#Web%20page) users will use to interact with their
-authenticators.
+Here we configure Fastify to serve over HTTPS the [Web
+page](#index.html) users will use to interact with their authenticators.
 
 ``` javascript
 const webAuthn = await makeWebAuthn({
@@ -118,7 +117,7 @@ const webAuthn = await makeWebAuthn({
 ```
 
 Now we make our
-[`WebAuthn4JS`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html)
+[`WebAuthn4JS`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/WebAuthn4JS.html)
 object which will handle registration and login. Note this example
 assumes it’s running on `localhost`.
 
@@ -171,7 +170,7 @@ use any credential that the user has already registerd.
 ```
 
 Now we begin registration, calling
-[`beginRegistration`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#beginregistration)
+[`beginRegistration`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/WebAuthn4JS.html#beginRegistration)
 and passing in the user and the excluded (existing) credentials.
 
 ``` javascript
@@ -224,9 +223,9 @@ First we verify the session data to ensure it hasn’t been tampered with.
 ```
 
 Then we complete the registration process, calling
-[`finishRegistration`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#finishregistration)
+[`finishRegistration`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/WebAuthn4JS.html#finishRegistration)
 and receiving a
-[`Credential`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.credential.html)
+[`Credential`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/Credential.html)
 object. Note the credential isn’t yet associated with a user.
 
 ``` javascript
@@ -270,7 +269,7 @@ async function login(fastify) {
 ```
 
 Login’s GET handler first checks the user exists and then calls
-[`beginLogin`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#beginlogin),
+[`beginLogin`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/WebAuthn4JS.html#beginLogin),
 passing in the user object. We then return to the browser the options
 for
 [`navigator.credentials.get()`](https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get)
@@ -303,7 +302,7 @@ data it received from the browser.
 ```
 
 It then completes the login process by calling
-[`finishLogin`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/webauthn4js.webauthn4js-1.html#finishlogin),
+[`finishLogin`](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/docs/interfaces/WebAuthn4JS.html#finishLogin),
 passing in the user object, session data and authentication request it
 received from the browser (i.e. the result of
 `navigator.credentials.get()`).
@@ -596,7 +595,7 @@ grunt test
 grunt coverage
 ```
 
-[Istanbul](http://gotwarlost.github.io/istanbul/) results are available
+[c8](https://github.com/bcoe/c8) results are available
 [here](http://rawgit.davedoesdev.com/davedoesdev/webauthn4js/master/coverage/lcov-report/index.html).
 
 Coveralls page is
