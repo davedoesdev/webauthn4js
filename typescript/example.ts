@@ -115,7 +115,7 @@ const register : FastifyPluginAsync = async function (fastify) {
         try {
             credential = await webAuthn.finishRegistration(
                 user, session_data, request.body.ccr);
-        } catch (ex) {
+        } catch (ex : any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             ex.statusCode = 400;
             throw ex;
         }
@@ -165,7 +165,7 @@ const login : FastifyPluginAsync = async function (fastify) {
         try {
             credential = await webAuthn.finishLogin(
                 user, session_data, request.body.car);
-        } catch (ex) {
+        } catch (ex : any) { // eslint-disable-line @typescript-eslint/no-explicit-any
             ex.statusCode = 400;
             throw ex;
         }

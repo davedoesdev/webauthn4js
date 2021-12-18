@@ -1,5 +1,7 @@
 /*eslint-env node */
 
+const c8 = "npx c8 -x Gruntfile.js -x wdio.conf.js -x wasm_exec.js -x 'test/**'";
+
 module.exports = function (grunt) {
     grunt.initConfig({
         eslint: {
@@ -16,20 +18,22 @@ module.exports = function (grunt) {
                 'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go config.go user.go',
                 'go build genschema.go config.go user.go',
                 './genschema > schemas/schemas.autogen.json',
-                'jme schemas/schemas.autogen.json schemas/schemas.doc.json > schemas/schemas.json',
-                "json2ts --no-resolve --bannerComment '/** @module webauthn4js */' < schemas/schemas.json > typescript/webauthn.d.ts"
+                'npx jme schemas/schemas.autogen.json schemas/schemas.doc.json > schemas/schemas.json',
+                "npx json2ts --no-resolve --bannerComment '/** @module webauthn4js */' < schemas/schemas.json > typescript/webauthn.d.ts"
             ].join('&&'),
             build_ts: [
-                'tsc -p typescript',
+                'npx tsc -p typescript',
                 // https://github.com/microsoft/TypeScript/issues/18442
                 'mv typescript/example.js typescript/example.mjs'
             ].join('&&'),
-            test: './node_modules/.bin/wdio',
-            cover: "./node_modules/.bin/nyc -x Gruntfile.js -x wdio.conf.js -x wasm_exec.js ./node_modules/.bin/grunt test",
-            cover_report: "./node_modules/.bin/nyc report -r lcov -r text -x ''",
-            cover_check: './node_modules/.bin/nyc check-coverage --statements 100 --branches 100 --functions 100 --lines 100',
-            coveralls: 'cat coverage/lcov.info | coveralls',
-            docs: './node_modules/.bin/typedoc index.d.ts'
+            test: 'npx wdio',
+            cover: `${c8} npx grunt test`,
+            cover_report: `${c8} report -r lcov -r text`,
+            cover_check: `${c8} check-coverage --statements 100 --branches 100 --functions 100 --lines 100`,
+            docs: [
+                'npx typedoc index.d.ts',
+                'asciidoc -b docbook -o - README.adoc | pandoc -f docbook -t gfm -o README.md'
+            ].join('&&')
         }
     });
 
@@ -56,7 +60,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('coveralls', 'exec:coveralls');
 
-    grunt.registerTask('docs', 'exec:docs');
+    grunt.registerTask('docs', ['exec:build_go', 'exec:docs']);
 
     grunt.registerTask('default', ['lint', 'test']);
 };
