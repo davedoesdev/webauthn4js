@@ -115,7 +115,7 @@ exports.config = {
         }]
     ],
 
-    execArgv: ['--harmony-top-level-await'],
+    execArgv: [],
 
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber

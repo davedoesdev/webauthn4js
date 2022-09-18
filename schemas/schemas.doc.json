@@ -1,5 +1,5 @@
 {
-  "definitions": {
+  "$defs": {
     "Authenticator": {
       "description": "Represents the user's authenticator device.",
       "properties": {
@@ -7,7 +7,7 @@
           "description": "Identifies the type (e.g. make and model) of the authenticator."
         },
         "SignCount": {
-          "description": "{@link finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning."
+          "description": "{@link WebAuthn4JS.finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning."
         },
         "CloneWarning": {
           "description": "This is a signal that the authenticator may be cloned, i.e. at least two copies of the credential private key may exist and are being used in parallel. Relying Parties (applications) should incorporate this information into their risk scoring. Whether the Relying Party updates the stored signature counter value in this case, or not, or fails the authentication ceremony or not, is Relying Party-specific."
@@ -49,10 +49,10 @@
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PlatformAttachment"
+              "$ref": "#/$defs/PlatformAttachment"
             },
             {
-              "$ref": "#/definitions/CrossPlatformAttachment"
+              "$ref": "#/$defs/CrossPlatformAttachment"
             }
           ]
         },
@@ -63,13 +63,13 @@
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
           "oneOf": [
             {
-              "$ref": "#/definitions/UserVerificationRequired"
+              "$ref": "#/$defs/UserVerificationRequired"
             },
             {
-              "$ref": "#/definitions/UserVerificationPreferred"
+              "$ref": "#/$defs/UserVerificationPreferred"
             },
             {
-              "$ref": "#/definitions/UserVerificationDiscouraged"
+              "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
           "default": "preferred"
@@ -95,13 +95,13 @@
           "description": "Preferred attestation conveyance during credential generation",
           "oneOf": [
             {
-              "$ref": "#/definitions/PreferNoAttestation"
+              "$ref": "#/$defs/PreferNoAttestation"
             },
             {
-              "$ref": "#/definitions/PreferIndirectAttestation"
+              "$ref": "#/$defs/PreferIndirectAttestation"
             },
             {
-              "$ref": "#/definitions/PreferDirectAttestation"
+              "$ref": "#/$defs/PreferDirectAttestation"
             }
           ],
           "default": "none"
@@ -152,7 +152,7 @@
           "description": "Specifies the credential type represented by this object.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
@@ -185,7 +185,7 @@
           "description": "Specifies the credential type represented by this object.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
@@ -207,7 +207,7 @@
           "description": "Type of the credential to use.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
@@ -226,7 +226,7 @@
           "description": "Type of the credential to use.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
@@ -234,37 +234,37 @@
           "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).",
           "oneOf":[
             {
-              "$ref": "#/definitions/AlgES256"
+              "$ref": "#/$defs/AlgES256"
             },
             {
-              "$ref": "#/definitions/AlgES384"
+              "$ref": "#/$defs/AlgES384"
             },
             {
-              "$ref": "#/definitions/AlgES512"
+              "$ref": "#/$defs/AlgES512"
             },
             {
-              "$ref": "#/definitions/AlgRS1"
+              "$ref": "#/$defs/AlgRS1"
             },
             {
-              "$ref": "#/definitions/AlgRS256"
+              "$ref": "#/$defs/AlgRS256"
             },
             {
-              "$ref": "#/definitions/AlgRS384"
+              "$ref": "#/$defs/AlgRS384"
             },
             {
-              "$ref": "#/definitions/AlgRS512"
+              "$ref": "#/$defs/AlgRS512"
             },
             {
-              "$ref": "#/definitions/AlgPS256"
+              "$ref": "#/$defs/AlgPS256"
             },
             {
-              "$ref": "#/definitions/AlgPS384"
+              "$ref": "#/$defs/AlgPS384"
             },
             {
-              "$ref": "#/definitions/AlgPS512"
+              "$ref": "#/$defs/AlgPS512"
             },
             {
-              "$ref": "#/definitions/AlgEdDSA"
+              "$ref": "#/$defs/AlgEdDSA"
             }
           ]
         }
@@ -302,13 +302,13 @@
           "description": "This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PreferNoAttestation"
+              "$ref": "#/$defs/PreferNoAttestation"
             },
             {
-              "$ref": "#/definitions/PreferIndirectAttestation"
+              "$ref": "#/$defs/PreferIndirectAttestation"
             },
             {
-              "$ref": "#/definitions/PreferDirectAttestation"
+              "$ref": "#/$defs/PreferDirectAttestation"
             }
           ],
           "default": "none"
@@ -334,13 +334,13 @@
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
           "oneOf": [
             {
-              "$ref": "#/definitions/UserVerificationRequired"
+              "$ref": "#/$defs/UserVerificationRequired"
             },
             {
-              "$ref": "#/definitions/UserVerificationPreferred"
+              "$ref": "#/$defs/UserVerificationPreferred"
             },
             {
-              "$ref": "#/definitions/UserVerificationDiscouraged"
+              "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
           "default": "preferred"
@@ -380,13 +380,13 @@
           "description": "Required user verification in this login or registration ceremony.",
           "oneOf": [
             {
-              "$ref": "#/definitions/UserVerificationRequired"
+              "$ref": "#/$defs/UserVerificationRequired"
             },
             {
-              "$ref": "#/definitions/UserVerificationPreferred"
+              "$ref": "#/$defs/UserVerificationPreferred"
             },
             {
-              "$ref": "#/definitions/UserVerificationDiscouraged"
+              "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
           "default": "preferred"

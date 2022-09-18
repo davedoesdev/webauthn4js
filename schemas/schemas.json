@@ -1,64 +1,22 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "required": [
-    "Config",
-    "User",
-    "CredentialCreation",
-    "CredentialCreationResponse",
-    "CredentialAssertion",
-    "CredentialAssertionResponse",
-    "SessionData"
-  ],
-  "properties": {
-    "Config": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/Config"
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "AuthenticationExtensions": {
+      "type": "object"
     },
-    "User": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/User"
+    "AuthenticationExtensionsClientOutputs": {
+      "type": "object"
     },
-    "CredentialCreation": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/CredentialCreation"
-    },
-    "CredentialCreationResponse": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/CredentialCreationResponse"
-    },
-    "CredentialAssertion": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/CredentialAssertion"
-    },
-    "CredentialAssertionResponse": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/CredentialAssertionResponse"
-    },
-    "SessionData": {
-      "$schema": "http://json-schema.org/draft-04/schema#",
-      "$ref": "#/definitions/SessionData"
-    }
-  },
-  "additionalProperties": false,
-  "type": "object",
-  "definitions": {
     "Authenticator": {
-      "required": [
-        "AAGUID",
-        "SignCount",
-        "CloneWarning"
-      ],
       "properties": {
         "AAGUID": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "Identifies the type (e.g. make and model) of the authenticator."
         },
         "SignCount": {
           "type": "integer",
-          "description": "{@link finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning."
+          "description": "{@link WebAuthn4JS.finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning."
         },
         "CloneWarning": {
           "type": "boolean",
@@ -67,71 +25,58 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "AAGUID",
+        "SignCount",
+        "CloneWarning"
+      ],
       "description": "Represents the user's authenticator device."
     },
     "AuthenticatorAssertionResponse": {
-      "required": [
-        "clientDataJSON",
-        "authenticatorData",
-        "signature"
-      ],
       "properties": {
         "clientDataJSON": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.get()."
         },
         "authenticatorData": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "Serialized bindings made by the authenticator, such as ID of the Relying Party that the credential is meant for, whether the user is present and the signature count."
         },
         "signature": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "The raw signature returned from the authenticator."
         },
         "userHandle": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "Contains the Relying Party's ID for the user"
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "clientDataJSON",
+        "authenticatorData",
+        "signature"
+      ],
       "description": "Contains the raw authenticator assertion data, used to verify the authenticity of the login ceremony and the used credential."
     },
     "AuthenticatorAttestationResponse": {
-      "required": [
-        "clientDataJSON",
-        "attestationObject"
-      ],
       "properties": {
         "clientDataJSON": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.create()."
         },
         "attestationObject": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party's server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "clientDataJSON",
+        "attestationObject"
+      ],
       "description": "Contains the raw authenticator attestation data, used to verify the authenticy of the registration ceremony and the new credential."
     },
     "AuthenticatorSelection": {
@@ -141,10 +86,10 @@
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PlatformAttachment"
+              "$ref": "#/$defs/PlatformAttachment"
             },
             {
-              "$ref": "#/definitions/CrossPlatformAttachment"
+              "$ref": "#/$defs/CrossPlatformAttachment"
             }
           ]
         },
@@ -152,18 +97,21 @@
           "type": "boolean",
           "description": "Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential."
         },
+        "residentKey": {
+          "type": "string"
+        },
         "userVerification": {
           "type": "string",
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
           "oneOf": [
             {
-              "$ref": "#/definitions/UserVerificationRequired"
+              "$ref": "#/$defs/UserVerificationRequired"
             },
             {
-              "$ref": "#/definitions/UserVerificationPreferred"
+              "$ref": "#/$defs/UserVerificationPreferred"
             },
             {
-              "$ref": "#/definitions/UserVerificationDiscouraged"
+              "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
           "default": "preferred"
@@ -173,11 +121,11 @@
       "type": "object",
       "description": "Use this class to specify requirements regarding authenticator attributes."
     },
+    "Challenge": {
+      "type": "string",
+      "contentEncoding": "base64"
+    },
     "Config": {
-      "required": [
-        "RPDisplayName",
-        "RPID"
-      ],
       "properties": {
         "RPDisplayName": {
           "type": "string",
@@ -200,20 +148,19 @@
           "description": "Preferred attestation conveyance during credential generation",
           "oneOf": [
             {
-              "$ref": "#/definitions/PreferNoAttestation"
+              "$ref": "#/$defs/PreferNoAttestation"
             },
             {
-              "$ref": "#/definitions/PreferIndirectAttestation"
+              "$ref": "#/$defs/PreferIndirectAttestation"
             },
             {
-              "$ref": "#/definitions/PreferDirectAttestation"
+              "$ref": "#/$defs/PreferDirectAttestation"
             }
           ],
           "default": "none"
         },
         "AuthenticatorSelection": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/AuthenticatorSelection",
+          "$ref": "#/$defs/AuthenticatorSelection",
           "description": "Login requirements for authenticator attributes."
         },
         "Timeout": {
@@ -227,28 +174,22 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "RPDisplayName",
+        "RPID"
+      ],
       "description": "Configuration and default values for the {@link WebAuthn4JS} instance."
     },
     "Credential": {
-      "required": [
-        "ID",
-        "PublicKey",
-        "AttestationType",
-        "Authenticator"
-      ],
       "properties": {
         "ID": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "A probabilistically-unique byte sequence identifying a public key credential source and its authentication assertions."
         },
         "PublicKey": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "The public key portion of a Relying Party-specific credential key pair, generated by an authenticator and returned to a Relying Party at registration time."
         },
         "AttestationType": {
@@ -256,37 +197,35 @@
           "description": "The attestation format used (if any) by the authenticator when creating the credential."
         },
         "Authenticator": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/Authenticator",
+          "$ref": "#/$defs/Authenticator",
           "description": "The Authenticator information for a given certificate."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "ID",
+        "PublicKey",
+        "AttestationType",
+        "Authenticator"
+      ],
       "description": "Contains all needed information about a WebAuthn credential for storage."
     },
     "CredentialAssertion": {
-      "required": [
-        "publicKey"
-      ],
       "properties": {
         "publicKey": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/PublicKeyCredentialRequestOptions",
+          "$ref": "#/$defs/PublicKeyCredentialRequestOptions",
           "description": "Options for the browser to pass to `navigator.credentials.get()`."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "publicKey"
+      ],
       "description": "The payload that should be sent to the browser for beginning the login process."
     },
     "CredentialAssertionResponse": {
-      "required": [
-        "id",
-        "type",
-        "rawId",
-        "response"
-      ],
       "properties": {
         "id": {
           "type": "string",
@@ -297,58 +236,50 @@
           "description": "Specifies the credential type represented by this object.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
         "rawId": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "The credential's identifier. Since we base64-encode raw data, this is the same as `id`."
         },
-        "extensions": {
-          "patternProperties": {
-            ".*": {
-              "additionalProperties": true
-            }
-          },
-          "type": "object",
-          "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during login."
+        "clientExtensionResults": {
+          "$ref": "#/$defs/AuthenticationExtensionsClientOutputs"
         },
         "response": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/AuthenticatorAssertionResponse",
+          "$ref": "#/$defs/AuthenticatorAssertionResponse",
           "description": "The authenticator's response to the request to generate a login assertion."
+        },
+        "extensions": {
+          "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during login."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "id",
+        "type",
+        "rawId",
+        "response"
+      ],
       "description": "The raw response returned to us from an authenticator when we request a credential for login."
     },
     "CredentialCreation": {
-      "required": [
-        "publicKey"
-      ],
       "properties": {
         "publicKey": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/PublicKeyCredentialCreationOptions",
+          "$ref": "#/$defs/PublicKeyCredentialCreationOptions",
           "description": "Options for the browser to pass to `navigator.credentials.create()`."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "publicKey"
+      ],
       "description": "The payload that should be sent to the browser for beginning the registration process."
     },
     "CredentialCreationResponse": {
-      "required": [
-        "id",
-        "type",
-        "rawId",
-        "response"
-      ],
       "properties": {
         "id": {
           "type": "string",
@@ -359,56 +290,49 @@
           "description": "Specifies the credential type represented by this object.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
         "rawId": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "The credential's identifier. Since we base64-encode raw data, this is the same as `id`."
         },
-        "extensions": {
-          "patternProperties": {
-            ".*": {
-              "additionalProperties": true
-            }
-          },
-          "type": "object",
-          "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration."
+        "clientExtensionResults": {
+          "$ref": "#/$defs/AuthenticationExtensionsClientOutputs"
         },
         "response": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/AuthenticatorAttestationResponse",
+          "$ref": "#/$defs/AuthenticatorAttestationResponse",
           "description": "The authenticator's response to the request to generate a registration attestation."
+        },
+        "extensions": {
+          "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "id",
+        "type",
+        "rawId",
+        "response"
+      ],
       "description": "The raw response returned to us from an authenticator when we request a credential for registration."
     },
     "CredentialDescriptor": {
-      "required": [
-        "type",
-        "id"
-      ],
       "properties": {
         "type": {
           "type": "string",
           "description": "Type of the credential to use.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
         "id": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "The ID of a credential to allow/disallow."
         },
         "transports": {
@@ -421,20 +345,20 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "type",
+        "id"
+      ],
       "description": "Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`."
     },
     "CredentialParameter": {
-      "required": [
-        "type",
-        "alg"
-      ],
       "properties": {
         "type": {
           "type": "string",
           "description": "Type of the credential to use.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PublicKeyCredentialType"
+              "$ref": "#/$defs/PublicKeyCredentialType"
             }
           ]
         },
@@ -443,79 +367,72 @@
           "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).",
           "oneOf": [
             {
-              "$ref": "#/definitions/AlgES256"
+              "$ref": "#/$defs/AlgES256"
             },
             {
-              "$ref": "#/definitions/AlgES384"
+              "$ref": "#/$defs/AlgES384"
             },
             {
-              "$ref": "#/definitions/AlgES512"
+              "$ref": "#/$defs/AlgES512"
             },
             {
-              "$ref": "#/definitions/AlgRS1"
+              "$ref": "#/$defs/AlgRS1"
             },
             {
-              "$ref": "#/definitions/AlgRS256"
+              "$ref": "#/$defs/AlgRS256"
             },
             {
-              "$ref": "#/definitions/AlgRS384"
+              "$ref": "#/$defs/AlgRS384"
             },
             {
-              "$ref": "#/definitions/AlgRS512"
+              "$ref": "#/$defs/AlgRS512"
             },
             {
-              "$ref": "#/definitions/AlgPS256"
+              "$ref": "#/$defs/AlgPS256"
             },
             {
-              "$ref": "#/definitions/AlgPS384"
+              "$ref": "#/$defs/AlgPS384"
             },
             {
-              "$ref": "#/definitions/AlgPS512"
+              "$ref": "#/$defs/AlgPS512"
             },
             {
-              "$ref": "#/definitions/AlgEdDSA"
+              "$ref": "#/$defs/AlgEdDSA"
             }
           ]
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "type",
+        "alg"
+      ],
       "description": "The credential type and algorithm that the Relying Party wants the authenticator to create."
     },
     "PublicKeyCredentialCreationOptions": {
-      "required": [
-        "challenge",
-        "rp",
-        "user"
-      ],
       "properties": {
         "challenge": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/Challenge",
           "description": "A challenge intended to be used for generating the newly created credential’s attestation."
         },
         "rp": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RelyingPartyEntity",
+          "$ref": "#/$defs/RelyingPartyEntity",
           "description": "Data about the Relying Party responsible for the request (i.e. your application)"
         },
         "user": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/UserEntity",
+          "$ref": "#/$defs/UserEntity",
           "description": "Data about the user account for which the Relying Party is requesting attestation."
         },
         "pubKeyCredParams": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/CredentialParameter"
+            "$ref": "#/$defs/CredentialParameter"
           },
           "type": "array",
           "description": " Information about the desired properties of the credential to be created. The sequence is ordered from most preferred to least preferred. The browser makes a best-effort to create the most preferred credential that it can."
         },
         "authenticatorSelection": {
-          "$ref": "#/definitions/AuthenticatorSelection",
+          "$ref": "#/$defs/AuthenticatorSelection",
           "description": "Registration requirements for authenticator attributes."
         },
         "timeout": {
@@ -524,19 +441,13 @@
         },
         "excludeCredentials": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/CredentialDescriptor"
+            "$ref": "#/$defs/CredentialDescriptor"
           },
           "type": "array",
           "description": "This member is intended for use by Relying Parties that wish to limit the creation of multiple credentials for the same account on a single authenticator. The browser is requested to return an error if the new credential would be created on an authenticator that also contains one of the credentials enumerated in this parameter."
         },
         "extensions": {
-          "patternProperties": {
-            ".*": {
-              "additionalProperties": true
-            }
-          },
-          "type": "object",
+          "$ref": "#/$defs/AuthenticationExtensions",
           "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA \"WebAuthn Extension Identifier\" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions."
         },
         "attestation": {
@@ -544,13 +455,13 @@
           "description": "This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.",
           "oneOf": [
             {
-              "$ref": "#/definitions/PreferNoAttestation"
+              "$ref": "#/$defs/PreferNoAttestation"
             },
             {
-              "$ref": "#/definitions/PreferIndirectAttestation"
+              "$ref": "#/$defs/PreferIndirectAttestation"
             },
             {
-              "$ref": "#/definitions/PreferDirectAttestation"
+              "$ref": "#/$defs/PreferDirectAttestation"
             }
           ],
           "default": "none"
@@ -558,18 +469,17 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "challenge",
+        "rp",
+        "user"
+      ],
       "description": "Parameters for `navigator.credentials.create()`."
     },
     "PublicKeyCredentialRequestOptions": {
-      "required": [
-        "challenge"
-      ],
       "properties": {
         "challenge": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "$ref": "#/$defs/Challenge",
           "description": "A challenge that the selected authenticator signs, along with other data, when producing a login assertion."
         },
         "timeout": {
@@ -582,7 +492,7 @@
         },
         "allowCredentials": {
           "items": {
-            "$ref": "#/definitions/CredentialDescriptor"
+            "$ref": "#/$defs/CredentialDescriptor"
           },
           "type": "array",
           "description": "A list of public key credentials acceptable to the caller, in descending order of preference (the first item in the list is the most preferred credential, and so on down the list)."
@@ -592,36 +502,30 @@
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
           "oneOf": [
             {
-              "$ref": "#/definitions/UserVerificationRequired"
+              "$ref": "#/$defs/UserVerificationRequired"
             },
             {
-              "$ref": "#/definitions/UserVerificationPreferred"
+              "$ref": "#/$defs/UserVerificationPreferred"
             },
             {
-              "$ref": "#/definitions/UserVerificationDiscouraged"
+              "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
           "default": "preferred"
         },
         "extensions": {
-          "patternProperties": {
-            ".*": {
-              "additionalProperties": true
-            }
-          },
-          "type": "object",
+          "$ref": "#/$defs/AuthenticationExtensions",
           "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "challenge"
+      ],
       "description": "Parameters for `navigator.credentials.get()`."
     },
     "RelyingPartyEntity": {
-      "required": [
-        "name",
-        "id"
-      ],
       "properties": {
         "name": {
           "type": "string",
@@ -638,14 +542,13 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "name",
+        "id"
+      ],
       "description": "Used to supply additional Relying Party attributes when creating a new credential."
     },
     "SessionData": {
-      "required": [
-        "challenge",
-        "user_id",
-        "userVerification"
-      ],
       "properties": {
         "challenge": {
           "type": "string",
@@ -653,17 +556,13 @@
         },
         "user_id": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "ID of the user being registered or logged in."
         },
         "allowed_credentials": {
           "items": {
             "type": "string",
-            "media": {
-              "binaryEncoding": "base64"
-            }
+            "contentEncoding": "base64"
           },
           "type": "array",
           "description": "Credentials allowed in this login or registration ceremony."
@@ -673,36 +572,39 @@
           "description": "Required user verification in this login or registration ceremony.",
           "oneOf": [
             {
-              "$ref": "#/definitions/UserVerificationRequired"
+              "$ref": "#/$defs/UserVerificationRequired"
             },
             {
-              "$ref": "#/definitions/UserVerificationPreferred"
+              "$ref": "#/$defs/UserVerificationPreferred"
             },
             {
-              "$ref": "#/definitions/UserVerificationDiscouraged"
+              "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
           "default": "preferred"
+        },
+        "extensions": {
+          "$ref": "#/$defs/AuthenticationExtensions"
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "challenge",
+        "user_id",
+        "userVerification"
+      ],
       "description": "Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony."
     },
+    "URLEncodedBase64": {
+      "type": "string",
+      "contentEncoding": "base64"
+    },
     "User": {
-      "required": [
-        "id",
-        "name",
-        "displayName",
-        "iconURL",
-        "credentials"
-      ],
       "properties": {
         "id": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "User ID according to the Relying Party."
         },
         "name": {
@@ -719,8 +621,7 @@
         },
         "credentials": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/Credential"
+            "$ref": "#/$defs/Credential"
           },
           "type": "array",
           "description": "Credentials owned by the user."
@@ -728,13 +629,16 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "id",
+        "name",
+        "displayName",
+        "iconURL",
+        "credentials"
+      ],
       "description": "Represents an application (Relying Party) user."
     },
     "UserEntity": {
-      "required": [
-        "name",
-        "id"
-      ],
       "properties": {
         "name": {
           "type": "string",
@@ -750,14 +654,16 @@
         },
         "id": {
           "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          },
+          "contentEncoding": "base64",
           "description": "The user handle of the user account."
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "name",
+        "id"
+      ],
       "description": "Supplies additional user account attributes when creating a new credential."
     },
     "PlatformAttachment": {
@@ -880,5 +786,39 @@
         -8
       ]
     }
-  }
+  },
+  "properties": {
+    "Config": {
+      "$ref": "#/$defs/Config"
+    },
+    "User": {
+      "$ref": "#/$defs/User"
+    },
+    "CredentialCreation": {
+      "$ref": "#/$defs/CredentialCreation"
+    },
+    "CredentialCreationResponse": {
+      "$ref": "#/$defs/CredentialCreationResponse"
+    },
+    "CredentialAssertion": {
+      "$ref": "#/$defs/CredentialAssertion"
+    },
+    "CredentialAssertionResponse": {
+      "$ref": "#/$defs/CredentialAssertionResponse"
+    },
+    "SessionData": {
+      "$ref": "#/$defs/SessionData"
+    }
+  },
+  "additionalProperties": false,
+  "type": "object",
+  "required": [
+    "Config",
+    "User",
+    "CredentialCreation",
+    "CredentialCreationResponse",
+    "CredentialAssertion",
+    "CredentialAssertionResponse",
+    "SessionData"
+  ]
 }

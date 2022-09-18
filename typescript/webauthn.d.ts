@@ -32,6 +32,7 @@ export type UserVerificationPreferred = "preferred";
  * The authenticator should not verify the user for the credential.
  */
 export type UserVerificationDiscouraged = "discouraged";
+export type Challenge = string;
 /**
  * Credential type for WebAuthn.
  */
@@ -80,6 +81,7 @@ export type AlgPS512 = -39;
  * EdDSA
  */
 export type AlgEdDSA = -8;
+export type URLEncodedBase64 = string;
 
 /**
  * Configuration and default values for the {@link WebAuthn4JS} instance.
@@ -130,6 +132,7 @@ export interface AuthenticatorSelection {
    * Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential.
    */
   requireResidentKey?: boolean;
+  residentKey?: string;
   /**
    * Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.
    */
@@ -190,7 +193,7 @@ export interface Authenticator {
    */
   AAGUID: string;
   /**
-   * {@link finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning.
+   * {@link WebAuthn4JS.finishLogin} compares the stored signature counter value with the new `signCount` value returned in the assertion’s authenticator data. If this new `signCount` value is less than or equal to the stored value, a cloned authenticator may exist, or the authenticator may be malfunctioning.
    */
   SignCount: number;
   /**
@@ -214,7 +217,7 @@ export interface PublicKeyCredentialCreationOptions {
   /**
    * A challenge intended to be used for generating the newly created credential’s attestation.
    */
-  challenge: string;
+  challenge: Challenge;
   /**
    * Data about the Relying Party responsible for the request (i.e. your application)
    */
@@ -242,15 +245,7 @@ export interface PublicKeyCredentialCreationOptions {
   /**
    * Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA "WebAuthn Extension Identifier" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions.
    */
-  extensions?: {
-    /**
-     * This interface was referenced by `undefined`'s JSON-Schema definition
-     * via the `patternProperty` ".*".
-     */
-    [k: string]: {
-      [k: string]: unknown;
-    };
-  };
+  extensions?: AuthenticationExtensions;
   /**
    * This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.
    */
@@ -337,6 +332,9 @@ export interface CredentialDescriptor {
    */
   transports?: string[];
 }
+export interface AuthenticationExtensions {
+  [k: string]: unknown;
+}
 /**
  * The raw response returned to us from an authenticator when we request a credential for registration.
  */
@@ -352,23 +350,21 @@ export interface CredentialCreationResponse {
   /**
    * The credential's identifier. Since we base64-encode raw data, this is the same as `id`.
    */
-  rawId: string;
-  /**
-   * A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration.
-   */
-  extensions?: {
-    /**
-     * This interface was referenced by `undefined`'s JSON-Schema definition
-     * via the `patternProperty` ".*".
-     */
-    [k: string]: {
-      [k: string]: unknown;
-    };
-  };
+  rawId: URLEncodedBase64;
+  clientExtensionResults?: AuthenticationExtensionsClientOutputs;
   /**
    * The authenticator's response to the request to generate a registration attestation.
    */
   response: AuthenticatorAttestationResponse;
+  /**
+   * A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration.
+   */
+  extensions?: {
+    [k: string]: unknown;
+  };
+}
+export interface AuthenticationExtensionsClientOutputs {
+  [k: string]: unknown;
 }
 /**
  * Contains the raw authenticator attestation data, used to verify the authenticy of the registration ceremony and the new credential.
@@ -377,11 +373,11 @@ export interface AuthenticatorAttestationResponse {
   /**
    * Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.create().
    */
-  clientDataJSON: string;
+  clientDataJSON: URLEncodedBase64;
   /**
    * This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party's server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data.
    */
-  attestationObject: string;
+  attestationObject: URLEncodedBase64;
 }
 /**
  * The payload that should be sent to the browser for beginning the login process.
@@ -399,7 +395,7 @@ export interface PublicKeyCredentialRequestOptions {
   /**
    * A challenge that the selected authenticator signs, along with other data, when producing a login assertion.
    */
-  challenge: string;
+  challenge: Challenge;
   /**
    * Specifies a time, in milliseconds, that the caller is willing to wait for the call to complete. This is treated as a hint, and may be overridden by the browser.
    */
@@ -419,15 +415,7 @@ export interface PublicKeyCredentialRequestOptions {
   /**
    * Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension.
    */
-  extensions?: {
-    /**
-     * This interface was referenced by `undefined`'s JSON-Schema definition
-     * via the `patternProperty` ".*".
-     */
-    [k: string]: {
-      [k: string]: unknown;
-    };
-  };
+  extensions?: AuthenticationExtensions;
 }
 /**
  * The raw response returned to us from an authenticator when we request a credential for login.
@@ -444,23 +432,18 @@ export interface CredentialAssertionResponse {
   /**
    * The credential's identifier. Since we base64-encode raw data, this is the same as `id`.
    */
-  rawId: string;
-  /**
-   * A map containing identifier -> client extension output entries produced by any extensions that may have been used during login.
-   */
-  extensions?: {
-    /**
-     * This interface was referenced by `undefined`'s JSON-Schema definition
-     * via the `patternProperty` ".*".
-     */
-    [k: string]: {
-      [k: string]: unknown;
-    };
-  };
+  rawId: URLEncodedBase64;
+  clientExtensionResults?: AuthenticationExtensionsClientOutputs;
   /**
    * The authenticator's response to the request to generate a login assertion.
    */
   response: AuthenticatorAssertionResponse;
+  /**
+   * A map containing identifier -> client extension output entries produced by any extensions that may have been used during login.
+   */
+  extensions?: {
+    [k: string]: unknown;
+  };
 }
 /**
  * Contains the raw authenticator assertion data, used to verify the authenticity of the login ceremony and the used credential.
@@ -469,19 +452,19 @@ export interface AuthenticatorAssertionResponse {
   /**
    * Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.get().
    */
-  clientDataJSON: string;
+  clientDataJSON: URLEncodedBase64;
   /**
    * Serialized bindings made by the authenticator, such as ID of the Relying Party that the credential is meant for, whether the user is present and the signature count.
    */
-  authenticatorData: string;
+  authenticatorData: URLEncodedBase64;
   /**
    * The raw signature returned from the authenticator.
    */
-  signature: string;
+  signature: URLEncodedBase64;
   /**
    * Contains the Relying Party's ID for the user
    */
-  userHandle?: string;
+  userHandle?: URLEncodedBase64;
 }
 /**
  * Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony.
@@ -503,4 +486,5 @@ export interface SessionData {
    * Required user verification in this login or registration ceremony.
    */
   userVerification: (UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged) & string;
+  extensions?: AuthenticationExtensions;
 }

@@ -1,9 +1,17 @@
 /*eslint-env node */
+const { homedir } = require('os');
+const { join } = require('path');
 
 const c8 = "npx c8 -x Gruntfile.js -x wdio.conf.js -x wasm_exec.js -x 'test/**'";
 
 module.exports = function (grunt) {
     grunt.initConfig({
+        env: {
+            test: {
+                TMPDIR: join(homedir(), 'tmp')
+            }
+        },
+
         eslint: {
             default: {
                 src: [ '*.js', 'test/**/*.js', '!wasm_exec.js' ]
@@ -39,6 +47,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-env');
 
     grunt.registerTask('build', [
         'exec:build_go',
@@ -50,7 +59,7 @@ module.exports = function (grunt) {
         'eslint:typescript'
     ]);
 
-    grunt.registerTask('test', 'exec:test');
+    grunt.registerTask('test', ['env:test', 'exec:test']);
 
     grunt.registerTask('coverage', [
         'exec:cover',

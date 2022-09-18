@@ -2,7 +2,7 @@
 
 import makeWebAuthn from '../../index.js';
 
-const definitions = makeWebAuthn.schemas.definitions;
+const $defs = makeWebAuthn.schemas.$defs;
 
 const session_data = {
     type: 'object',
@@ -28,10 +28,10 @@ export const register = {
                 ],
                 additionalProperties: false,
                 properties: {
-                    options: definitions.CredentialCreation,
+                    options: $defs.CredentialCreation,
                     session_data
                 },
-                definitions
+                $defs
             }
         }
     },
@@ -43,10 +43,10 @@ export const register = {
                 'session_data'
             ],
             properties: {
-                ccr: definitions.CredentialCreationResponse,
+                ccr: $defs.CredentialCreationResponse,
                 session_data
             },
-            definitions
+            $defs
         }
     }
 };
@@ -62,10 +62,10 @@ export const login = {
                 ],
                 additionalProperties: false,
                 properties: {
-                    options: definitions.CredentialAssertion,
+                    options: $defs.CredentialAssertion,
                     session_data
                 },
-                definitions
+                $defs
             }
         }
     },
@@ -77,10 +77,10 @@ export const login = {
                 'session_data'
             ],
             properties: {
-                car: definitions.CredentialAssertionResponse,
+                car: $defs.CredentialAssertionResponse,
                 session_data
             },
-            definitions
+            $defs
         }
     }
 };

@@ -8,7 +8,7 @@
 const { join } = require('path');
 const { readFile } = require('fs').promises;
 const mod_fastify = require('fastify');
-const fastify_static = require('fastify-static');
+const fastify_static = require('@fastify/static');
 const makeWebAuthn = require('..');
 const { expect } = require('chai');
 const crypto = require('crypto');
@@ -188,7 +188,7 @@ before(async function () {
         prefix: '/login/'
     });
 
-    await fastify.listen(port);
+    await fastify.listen({ port });
 
     browser.config.after.push(async function () {
         await fastify.close();

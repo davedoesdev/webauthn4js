@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mod_fastify, {  FastifyPluginAsync } from 'fastify';
-import fastify_static from 'fastify-static';
+import fastify_static from '@fastify/static';
 import * as schemas from '../test/example/schemas.mjs';
 import {
     ISecretSessionData,
