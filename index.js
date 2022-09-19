@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const events = require('events');
 const crypto = require('crypto');
-const { callbackify, promisify } = require('util');
+const { promisify } = require('util');
 
 function argify(f) {
     return promisify((...args) => {
@@ -74,16 +74,10 @@ module.exports = promisify((config, cb) => {
         cb(err);
     }
 
-    crypto.randomBytes(64, (err, uid) => {
-        if (err) {
-            return error(err);
-        }
-
+    (async () => {
         try {
-            uid = uid.toString('hex');
-
             let init_err;
-
+            const uid = (await promisify(crypto.randomBytes)(64)).toString('hex');
             const gt = {
                 crypto: require('crypto'),
                 performance: require('perf_hooks').performance,
@@ -124,7 +118,6 @@ module.exports = promisify((config, cb) => {
             };
 
             const wasm_file = path.join(__dirname, 'webauthn4js.wasm');
-
             require('./wasm_exec.js')(gt);
             const go = new gt.Go();
             go.argv = [ wasm_file, uid ];
@@ -138,23 +131,14 @@ module.exports = promisify((config, cb) => {
                 webauthn.emit('exit', n);
             };
 
-            fs.readFile(
-                wasm_file,
-                (err, data) => {
-                    if (err) {
-                        return error(err);
-                    }
-                    callbackify(WebAssembly.instantiate)(data, go.importObject, (err, result) => {
-                        if (err) {
-                            return error(err);
-                        }
-                        go.run(result.instance);
-                    });
-                });
+            const data = await fs.promises.readFile(wasm_file);
+            const result = await WebAssembly.instantiate(data, go.importObject);
+
+            go.run(result.instance);
         } catch (ex) {
             error(ex);
         }
-    });
+    })();
 });
 
 module.exports.schemas = require('./schemas/schemas.json');
