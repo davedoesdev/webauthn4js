@@ -585,7 +585,7 @@ The licence for WebAuthn4JS is link:LICENCE[here].
 
 The licence for Duo Labs Go WebAuthn library is link:LICENCE_webauthn[here].
 
-I've also modified https://github.com/golang/go/blob/go1.13.8/misc/wasm/wasm_exec.js[`wasm_exec.js`]
+I've also modified https://github.com/golang/go/blob/go1.18.1/misc/wasm/wasm_exec.js[`wasm_exec.js`]
 from Go's distribution. I've included the original link:wasm_exec.js.orig[here] and Go's
 licence link:LICENSE_wasm_exec[here]. The modified version is link:wasm_exec.js[here].
 

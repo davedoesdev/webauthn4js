@@ -2,49 +2,20 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Modified 2021 by David Halls as part of webauthn4js.
+// Modified 2022 by David Halls as part of webauthn4js.
 
-module.exports = (process, module) => {
-	// Map multiple JavaScript environments to a single common API,
-	// preferring web standards over Node.js API.
-	//
-	// Environments considered:
-	// - Browsers
-	// - Node.js
-	// - Electron
-	// - Parcel
-	// - Webpack
+"use strict";
 
-	if (typeof global !== "undefined") {
-		// global already exists
-	} else if (typeof window !== "undefined") {
-		window.global = window;
-	} else if (typeof self !== "undefined") {
-		self.global = self;
-	} else {
-		throw new Error("cannot export Go (neither global, window nor self is defined)");
-	}
-
-	if (!global.require && typeof require !== "undefined") {
-		global.require = require;
-	}
-
-	if (!global.fs && global.require) {
-		const fs = require("fs");
-		if (typeof fs === "object" && fs !== null && Object.keys(fs).length !== 0) {
-			global.fs = fs;
-		}
-	}
-
+module.exports = globalThis => {
 	const enosys = () => {
 		const err = new Error("not implemented");
 		err.code = "ENOSYS";
 		return err;
 	};
 
-	if (!global.fs) {
+	if (!globalThis.fs) {
 		let outputBuf = "";
-		global.fs = {
+		globalThis.fs = {
 			constants: { O_WRONLY: -1, O_RDWR: -1, O_CREAT: -1, O_TRUNC: -1, O_APPEND: -1, O_EXCL: -1 }, // unused
 			writeSync(fd, buf) {
 				outputBuf += decoder.decode(buf);
@@ -89,8 +60,8 @@ module.exports = (process, module) => {
 		};
 	}
 
-	if (!global.process) {
-		global.process = {
+	if (!globalThis.process) {
+		globalThis.process = {
 			getuid() { return -1; },
 			getgid() { return -1; },
 			geteuid() { return -1; },
@@ -104,47 +75,26 @@ module.exports = (process, module) => {
 		}
 	}
 
-	if (!global.crypto && global.require) {
-		const nodeCrypto = require("crypto");
-		global.crypto = {
-			getRandomValues(b) {
-				nodeCrypto.randomFillSync(b);
-			},
-		};
-	}
-	if (!global.crypto) {
-		throw new Error("global.crypto is not available, polyfill required (getRandomValues only)");
+	if (!globalThis.crypto) {
+		throw new Error("globalThis.crypto is not available, polyfill required (crypto.getRandomValues only)");
 	}
 
-	if (!global.performance) {
-		global.performance = {
-			now() {
-				const [sec, nsec] = process.hrtime();
-				return sec * 1000 + nsec / 1000000;
-			},
-		};
+	if (!globalThis.performance) {
+		throw new Error("globalThis.performance is not available, polyfill required (performance.now only)");
 	}
 
-	if (!global.TextEncoder && global.require) {
-		global.TextEncoder = require("util").TextEncoder;
-	}
-	if (!global.TextEncoder) {
-		throw new Error("global.TextEncoder is not available, polyfill required");
+	if (!globalThis.TextEncoder) {
+		throw new Error("globalThis.TextEncoder is not available, polyfill required");
 	}
 
-	if (!global.TextDecoder && global.require) {
-		global.TextDecoder = require("util").TextDecoder;
-	}
-	if (!global.TextDecoder) {
-		throw new Error("global.TextDecoder is not available, polyfill required");
+	if (!globalThis.TextDecoder) {
+		throw new Error("globalThis.TextDecoder is not available, polyfill required");
 	}
 
-	// End of polyfills for common API.
+	const encoder = new globalThis.TextEncoder("utf-8");
+	const decoder = new globalThis.TextDecoder("utf-8");
 
-	const encoder = new TextEncoder("utf-8");
-	const decoder = new TextDecoder("utf-8");
-
-	global.Go = class {
+	globalThis.Go = class {
 		constructor() {
 			this.argv = ["js"];
 			this.env = {};
@@ -256,7 +206,7 @@ module.exports = (process, module) => {
 				return decoder.decode(new DataView(this._inst.exports.mem.buffer, saddr, len));
 			}
 
-			const timeOrigin = Date.now() - performance.now();
+			const timeOrigin = Date.now() - globalThis.performance.now();
 			this.importObject = {
 				go: {
 					// Go's SP does not change as long as no Go code is running. Some operations (e.g. calls, getters and setters)
@@ -283,7 +233,7 @@ module.exports = (process, module) => {
 						const fd = getInt64(sp + 8);
 						const p = getInt64(sp + 16);
 						const n = this.mem.getInt32(sp + 24, true);
-						fs.writeSync(fd, new Uint8Array(this._inst.exports.mem.buffer, p, n));
+						globalThis.fs.writeSync(fd, new Uint8Array(this._inst.exports.mem.buffer, p, n));
 					},
 
 					// func resetMemoryDataView()
@@ -295,7 +245,7 @@ module.exports = (process, module) => {
 					// func nanotime1() int64
 					"runtime.nanotime1": (sp) => {
 						sp >>>= 0;
-						setInt64(sp + 8, (timeOrigin + performance.now()) * 1000000);
+						setInt64(sp + 8, (timeOrigin + globalThis.performance.now()) * 1000000);
 					},
 
 					// func walltime() (sec int64, nsec int32)
@@ -337,7 +287,7 @@ module.exports = (process, module) => {
 					// func getRandomData(r []byte)
 					"runtime.getRandomData": (sp) => {
 						sp >>>= 0;
-						crypto.getRandomValues(loadSlice(sp + 8));
+						globalThis.crypto.getRandomValues(loadSlice(sp + 8));
 					},
 
 					// func finalizeRef(v ref)
@@ -519,7 +469,7 @@ module.exports = (process, module) => {
 				null,
 				true,
 				false,
-				global,
+				globalThis,
 				this,
 			];
 			this._goRefCounts = new Array(this._values.length).fill(Infinity); // number of references that Go has to a JS value, indexed by reference id
@@ -528,7 +478,7 @@ module.exports = (process, module) => {
 				[null, 2],
 				[true, 3],
 				[false, 4],
-				[global, 5],
+				[globalThis, 5],
 				[this, 6],
 			]);
 			this._idPool = [];   // unused ids that have been garbage collected
@@ -569,6 +519,13 @@ module.exports = (process, module) => {
 				offset += 8;
 			});
 
+			// The linker guarantees global data starts from at least wasmMinDataAddr.
+			// Keep in sync with cmd/link/internal/ld/data.go:wasmMinDataAddr.
+			const wasmMinDataAddr = 4096 + 8192;
+			if (offset >= wasmMinDataAddr) {
+				throw new Error("total length of command line and environment variables exceeds limit");
+			}
+
 			this._inst.exports.run(argc, argv);
 			if (this.exited) {
 				this._resolveExitPromise();
@@ -595,36 +552,5 @@ module.exports = (process, module) => {
 				return event.result;
 			};
 		}
-	}
-
-	if (
-		global.require &&
-		global.require.main === module &&
-		global.process &&
-		global.process.versions &&
-		!global.process.versions.electron
-	) {
-		if (process.argv.length < 3) {
-			console.error("usage: go_js_wasm_exec [wasm binary] [arguments]");
-			process.exit(1);
-		}
-
-		const go = new Go();
-		go.argv = process.argv.slice(2);
-		go.env = Object.assign({ TMPDIR: require("os").tmpdir() }, process.env);
-		go.exit = process.exit;
-		WebAssembly.instantiate(fs.readFileSync(process.argv[2]), go.importObject).then((result) => {
-			process.on("exit", (code) => { // Node.js exits if no event handler is pending
-				if (code === 0 && !go.exited) {
-					// deadlock, make Go print error and stack traces
-					go._pendingEvent = { id: 0 };
-					go._resume();
-				}
-			});
-			return go.run(result.instance);
-		}).catch((err) => {
-			console.error(err);
-			process.exit(1);
-		});
 	}
 };

@@ -195,7 +195,7 @@ before(async function () {
         webAuthn.exit();
 
         // Check Go exit isn't called twice by our beforeExit handler and
-        // prevent an error being throw before exit due to Go complaining
+        // prevent an error being thrown before exit due to Go complaining
         // that it hasn't exited. Note async-exit-hook stops our beforeExit
         // handlers being called as they normally would.
         const handlers = process.listeners('beforeExit');
@@ -725,15 +725,6 @@ describe('init', function () {
     });
 
     it('should catch errors instantiating wasm', async function () {
-        const p = promisify(cb => {
-            const handler = evname => {
-                if (evname === 'beforeExit') {
-                    process.removeListener('newListener', handler);
-                    cb();
-                }
-            };
-            process.on('newListener', handler);
-        })();
         const Mod = require('module');
         const req = Mod.prototype.require;
         Mod.prototype.require = function (f) {
@@ -755,8 +746,5 @@ describe('init', function () {
             Mod.prototype.require = req;
         }
         expect(ex.message).to.equal('dummy');
-        // Wait for beforeExit handler to be registered so it gets cleaned up
-        // in browser.config.after
-        await p;
     });
 });

@@ -1,9 +1,11 @@
 /*eslint-env node */
+/* global WebAssembly */
 'use strict';
+const fs = require('fs');
 const path = require('path');
 const events = require('events');
 const crypto = require('crypto');
-const { promisify } = require('util');
+const { callbackify, promisify } = require('util');
 
 function argify(f) {
     return promisify((...args) => {
@@ -77,53 +79,78 @@ module.exports = promisify((config, cb) => {
             return error(err);
         }
 
-        uid = uid.toString('hex');
-
-        let init_err;
-
-        global[uid] = methods => {
-            delete global[uid];
-
-            let exit_called = false;
-            function checked_exit(n) {
-                if (!exit_called) {
-                    exit_called = true;
-                    methods.exit(n || 0);
-                }
-            }
-            webauthn.on('exit', () => exit_called = true);
-            process.on('beforeExit', () => checked_exit());
-
-            methods.init(JSON.stringify(config), err => {
-                if (err) {
-                    init_err = new Error(err);
-                    return process.nextTick(checked_exit);
-                }
-                webauthn.init(methods, checked_exit);
-                cb(null, webauthn);
-            });
-        };
-
         try {
-            require('./wasm_exec.js')({
-                argv: [
-                    process.argv[0],
-                    'go_js_wasm_exec',
-                    path.join(__dirname, 'webauthn4js.wasm'),
-                    uid
-                ],
-                exit(n) {
-                    if (init_err) {
-                        return error(init_err);
+            uid = uid.toString('hex');
+
+            let init_err;
+
+            const gt = {
+                crypto: require('crypto'),
+                performance: require('perf_hooks').performance,
+                TextEncoder,
+                TextDecoder,
+                Uint8Array,
+                Object,
+                Array,
+                [uid]: methods => {
+                    delete global[uid];
+
+                    let exit_called = false;
+                    function checked_exit(n) {
+                        if (!exit_called) {
+                            exited();
+                            methods.exit(n || 0);
+                        }
                     }
-                    if ((n !== 0) || !webauthn.methods) {
-                        error(new Error(`wasm_exec exit with code ${n}`));
+                    function before_exit() {
+                        checked_exit();
                     }
-                    webauthn.emit('exit', n);
-                },
-                hrtime: process.hrtime.bind(process),
-                on: process.on.bind(process)
-            }, require.main);
+                    function exited() {
+                        exit_called = true;
+                        process.removeListener('beforeExit', before_exit);
+                    }
+                    webauthn.on('exit', exited);
+                    process.on('beforeExit', before_exit);
+
+                    methods.init(JSON.stringify(config), err => {
+                        if (err) {
+                            init_err = new Error(err);
+                            return process.nextTick(checked_exit);
+                        }
+                        webauthn.init(methods, checked_exit);
+                        cb(null, webauthn);
+                    });
+                }
+            };
+
+            const wasm_file = path.join(__dirname, 'webauthn4js.wasm');
+
+            require('./wasm_exec.js')(gt);
+            const go = new gt.Go();
+            go.argv = [ wasm_file, uid ];
+            go.exit = n => {
+                if (init_err) {
+                    return error(init_err);
+                }
+                if ((n !== 0) || !webauthn.methods) {
+                    error(new Error(`wasm_exec exit with code ${n}`));
+                }
+                webauthn.emit('exit', n);
+            };
+
+            fs.readFile(
+                wasm_file,
+                (err, data) => {
+                    if (err) {
+                        return error(err);
+                    }
+                    callbackify(WebAssembly.instantiate)(data, go.importObject, (err, result) => {
+                        if (err) {
+                            return error(err);
+                        }
+                        go.run(result.instance);
+                    });
+                });
         } catch (ex) {
             error(ex);
         }

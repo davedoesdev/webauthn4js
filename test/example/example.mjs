@@ -4,7 +4,7 @@ import fs from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import mod_fastify from 'fastify';
-import fastify_static from 'fastify-static';
+import fastify_static from '@fastify/static';
 import { make_secret_session_data, verify_secret_session_data } from './session.mjs';
 import * as schemas from './schemas.mjs';
 import makeWebAuthn from '../../index.js';
@@ -160,6 +160,6 @@ fastify.register(login, {
     prefix: '/login/'
 });
 
-await fastify.listen(port);
+await fastify.listen({ port });
 
 console.log(`Please visit https://localhost:${port}`);
