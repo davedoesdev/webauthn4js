@@ -192,17 +192,14 @@ before(async function () {
 
     browser.config.after.push(async function () {
         await fastify.close();
-        webAuthn.exit();
 
-        // Check Go exit isn't called twice by our beforeExit handler and
-        // prevent an error being thrown before exit due to Go complaining
-        // that it hasn't exited. Note async-exit-hook stops our beforeExit
-        // handlers being called as they normally would.
-        const handlers = process.listeners('beforeExit');
-        // First handler is async-exit-hook
-        for (let i = 1; i < handlers.length; ++i) {
-            handlers[i]();
-        }
+        await promisify(cb => {
+            webAuthn.on('exit', n => {
+                expect(n).to.equal(0);
+                cb();
+            });
+            webAuthn.exit();
+        })();
     });
 
     await browser.url(`${origin}/test/test.html`);
@@ -746,5 +743,24 @@ describe('init', function () {
             Mod.prototype.require = req;
         }
         expect(ex.message).to.equal('dummy');
+    });
+
+    it('should exit on beforeExit', async function () {
+        // should be two handlers:
+        // - async-exit-hook
+        // - one for webAuthn made in before()
+        expect(process.listeners('beforeExit').length).to.equal(2);
+        const webAuthn = await makeWebAuthn(config);
+        expect(process.listeners('beforeExit').length).to.equal(3);
+        await promisify(cb => {
+            webAuthn.on('exit', n => {
+                expect(n).to.equal(0);
+                expect(process.listeners('beforeExit').length).to.equal(2);
+                cb();
+            });
+            const h = process.listeners('beforeExit')[2];
+            h();
+            h(); // check Go exit isn't called twice
+        })();
     });
 });
