@@ -2,34 +2,35 @@ name: ci
 
 on: [push, pull_request]
 
-env:
-    CI: true
-
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  test:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v2
+    strategy:
+      matrix:
+        node-version: [16, 18]
 
-            - name: Use Node.js
-              uses: actions/setup-node@v2
-              with:
-                node-version: 18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-            - name: Install
-              run: npm ci
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
 
-            - name: Make temp directory
-              run: mkdir -p ~/tmp
+      - name: Install
+        run: npm ci
 
-            - name: Run tests
-              uses: GabrielBB/xvfb-action@v1
-              with:
-                run: npx grunt lint coverage
+      - name: Make temp directory
+        run: mkdir -p ~/tmp
 
-            - name: Coveralls
-              uses: coverallsapp/github-action@master
-              with:
-                github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npx grunt lint coverage
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
