@@ -79,7 +79,11 @@ module.exports = promisify((config, cb) => {
             let init_err;
             const uid = (await promisify(crypto.randomBytes)(64)).toString('hex');
             const gt = {
-                crypto: require('crypto'),
+                crypto: {
+                    getRandomValues(b) {
+                        crypto.randomFillSync(b);
+                    }
+                },
                 performance: require('perf_hooks').performance,
                 TextEncoder,
                 TextDecoder,
