@@ -40,7 +40,11 @@ node test/example/example.mjs
 
 ### Setup
 
-**example.mjs.**
+<div class="formalpara-title">
+
+**example.mjs**
+
+</div>
 
 ``` javascript
 import fs from 'fs';
@@ -320,14 +324,12 @@ received from the browser (i.e. the result of
 
 Here we do a couple of checks on the credential used for login:
 
-  - The credential hasn’t been cloned, i.e. we received a duplicate
+-   The credential hasn’t been cloned, i.e. we received a duplicate
     login request from the same authenticator. This is actually checked
     by the underlying Go WebAuthn library.
 
-  - The credential belongs to the requested user. Again, this should
+-   The credential belongs to the requested user. Again, this should
     have already been checked in Go.
-
-<!-- end list -->
 
 ``` javascript
         user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
@@ -365,7 +367,11 @@ directory.
 It’s driven by the following HTML file, which is served when you connect
 to the server.
 
-**example.html.**
+<div class="formalpara-title">
+
+**example.html**
+
+</div>
 
 ``` html
 <!DOCTYPE html>
@@ -392,7 +398,11 @@ The code for `registerUser()` and `loginUser()` is contained in
 [test/fixtures/example.js](test/fixtures/example.js), which I’ll
 describe now.
 
-**example.js.**
+<div class="formalpara-title">
+
+**example.js**
+
+</div>
 
 ``` javascript
 // Base64 to ArrayBuffer

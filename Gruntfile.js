@@ -23,15 +23,18 @@ module.exports = function (grunt) {
 
         exec: {
             build_go: [
-                'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go config.go user.go',
-                'go build genschema.go config.go user.go',
+                'GOARCH=wasm GOOS=js go build -o webauthn4js.wasm webauthn4js.go user.go',
+                'go build genschema.go user.go',
                 './genschema > schemas/schemas.autogen.json',
-                'npx jme schemas/schemas.autogen.json schemas/schemas.doc.json > schemas/schemas.json',
-                "npx json2ts --no-resolve --bannerComment '/** @module webauthn4js */' < schemas/schemas.json > typescript/webauthn.d.ts"
+                "npx jme schemas/schemas.autogen.json schemas/schemas.doc.json > schemas/schemas.json"
             ].join('&&'),
             build_ts: [
-                'npx tsc -p typescript',
+                'node typescript/schemas-to-zod.mjs > typescript/schemas.zod.ts',
+                'npx tsc --target es2017 --moduleResolution node typescript/schemas.zod.ts',
                 // https://github.com/microsoft/TypeScript/issues/18442
+                'mv typescript/schemas.zod.js typescript/schemas.zod.mjs',
+                'node typescript/zod-to-ts.mjs > typescript/webauthn.d.ts',
+                'npx tsc -p typescript',
                 'mv typescript/example.js typescript/example.mjs'
             ].join('&&'),
             test: 'npx wdio',

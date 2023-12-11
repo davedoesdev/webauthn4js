@@ -8,8 +8,8 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/duo-labs/webauthn/webauthn"
-	"github.com/duo-labs/webauthn/protocol"
+	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/go-webauthn/webauthn/protocol"
 )
 
 func (user User) WebAuthnID() []byte {
@@ -75,13 +75,12 @@ func recovery(cb js.Value) {
 
 func initialize(this js.Value, arguments []js.Value) interface{} {
 	cb := arguments[1]
-	var config Config
+	var config webauthn.Config
 	err := json.Unmarshal([]byte(arguments[0].String()), &config)
 	if err != nil {
 		return cberr(cb, err)
 	}
-	wconfig := webauthn.Config(config)
-	webAuthn, err = webauthn.New(&wconfig)
+	webAuthn, err = webauthn.New(&config)
 	if err != nil {
 		return cberr(cb, err)
 	}

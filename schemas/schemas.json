@@ -21,6 +21,9 @@
         "CloneWarning": {
           "type": "boolean",
           "description": "This is a signal that the authenticator may be cloned, i.e. at least two copies of the credential private key may exist and are being used in parallel. Relying Parties (applications) should incorporate this information into their risk scoring. Whether the Relying Party updates the stored signature counter value in this case, or not, or fails the authentication ceremony or not, is Relying Party-specific."
+        },
+        "Attachment": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
@@ -28,7 +31,8 @@
       "required": [
         "AAGUID",
         "SignCount",
-        "CloneWarning"
+        "CloneWarning",
+        "Attachment"
       ],
       "description": "Represents the user's authenticator device."
     },
@@ -69,6 +73,12 @@
         "attestationObject": {
           "$ref": "#/$defs/URLEncodedBase64",
           "description": "This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party's server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data."
+        },
+        "transports": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -121,27 +131,21 @@
       "type": "object",
       "description": "Use this class to specify requirements regarding authenticator attributes."
     },
-    "Challenge": {
-      "type": "string",
-      "contentEncoding": "base64"
-    },
     "Config": {
       "properties": {
-        "RPDisplayName": {
-          "type": "string",
-          "description": "Friendly name for the Relying Party (application). The browser may display this to the user."
-        },
         "RPID": {
           "type": "string",
           "description": "A valid domain that identifies the Relying Party. A credential can only by used  with the same enity (as identified by the `RPID`) it was registered with."
         },
-        "RPOrigin": {
+        "RPDisplayName": {
           "type": "string",
-          "description": "The HTTP(S) origin that the Relying Party is using to handle requests"
+          "description": "Friendly name for the Relying Party (application). The browser may display this to the user."
         },
-        "RPIcon": {
-          "type": "string",
-          "description": "URL to an icon representing the Relying Party"
+        "RPOrigins": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "AttestationPreference": {
           "type": "string",
@@ -163,20 +167,43 @@
           "$ref": "#/$defs/AuthenticatorSelection",
           "description": "Login requirements for authenticator attributes."
         },
-        "Timeout": {
-          "type": "integer",
-          "description": "Timeout for browser `navigator.credentials.create()` and `navigator.credentials.debug()` in the browser."
-        },
         "Debug": {
           "type": "boolean",
           "description": "@ignore"
+        },
+        "EncodeUserIDAsString": {
+          "type": "boolean"
+        },
+        "Timeouts": {
+          "$ref": "#/$defs/TimeoutsConfig"
+        },
+        "RPIcon": {
+          "type": "string",
+          "description": "URL to an icon representing the Relying Party"
+        },
+        "RPOrigin": {
+          "type": "string",
+          "description": "The HTTP(S) origin that the Relying Party is using to handle requests"
+        },
+        "Timeout": {
+          "type": "integer",
+          "description": "Timeout for browser `navigator.credentials.create()` and `navigator.credentials.debug()` in the browser."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "RPID",
         "RPDisplayName",
-        "RPID"
+        "RPOrigins",
+        "AttestationPreference",
+        "AuthenticatorSelection",
+        "Debug",
+        "EncodeUserIDAsString",
+        "Timeouts",
+        "RPIcon",
+        "RPOrigin",
+        "Timeout"
       ],
       "description": "Configuration and default values for the {@link WebAuthn4JS} instance."
     },
@@ -196,6 +223,15 @@
           "type": "string",
           "description": "The attestation format used (if any) by the authenticator when creating the credential."
         },
+        "Transport": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "Flags": {
+          "$ref": "#/$defs/CredentialFlags"
+        },
         "Authenticator": {
           "$ref": "#/$defs/Authenticator",
           "description": "The Authenticator information for a given certificate."
@@ -207,6 +243,8 @@
         "ID",
         "PublicKey",
         "AttestationType",
+        "Transport",
+        "Flags",
         "Authenticator"
       ],
       "description": "Contains all needed information about a WebAuthn credential for storage."
@@ -246,6 +284,9 @@
         },
         "clientExtensionResults": {
           "$ref": "#/$defs/AuthenticationExtensionsClientOutputs"
+        },
+        "authenticatorAttachment": {
+          "type": "string"
         },
         "response": {
           "$ref": "#/$defs/AuthenticatorAssertionResponse",
@@ -301,9 +342,18 @@
         "clientExtensionResults": {
           "$ref": "#/$defs/AuthenticationExtensionsClientOutputs"
         },
+        "authenticatorAttachment": {
+          "type": "string"
+        },
         "response": {
           "$ref": "#/$defs/AuthenticatorAttestationResponse",
           "description": "The authenticator's response to the request to generate a registration attestation."
+        },
+        "transports": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
         "extensions": {
           "description": "A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration."
@@ -331,8 +381,7 @@
           ]
         },
         "id": {
-          "type": "string",
-          "contentEncoding": "base64",
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "The ID of a credential to allow/disallow."
         },
         "transports": {
@@ -350,6 +399,30 @@
         "id"
       ],
       "description": "Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`."
+    },
+    "CredentialFlags": {
+      "properties": {
+        "UserPresent": {
+          "type": "boolean"
+        },
+        "UserVerified": {
+          "type": "boolean"
+        },
+        "BackupEligible": {
+          "type": "boolean"
+        },
+        "BackupState": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "UserPresent",
+        "UserVerified",
+        "BackupEligible",
+        "BackupState"
+      ]
     },
     "CredentialParameter": {
       "properties": {
@@ -412,10 +485,6 @@
     },
     "PublicKeyCredentialCreationOptions": {
       "properties": {
-        "challenge": {
-          "$ref": "#/$defs/Challenge",
-          "description": "A challenge intended to be used for generating the newly created credential’s attestation."
-        },
         "rp": {
           "$ref": "#/$defs/RelyingPartyEntity",
           "description": "Data about the Relying Party responsible for the request (i.e. your application)"
@@ -424,16 +493,16 @@
           "$ref": "#/$defs/UserEntity",
           "description": "Data about the user account for which the Relying Party is requesting attestation."
         },
+        "challenge": {
+          "$ref": "#/$defs/URLEncodedBase64",
+          "description": "A challenge intended to be used for generating the newly created credential’s attestation."
+        },
         "pubKeyCredParams": {
           "items": {
             "$ref": "#/$defs/CredentialParameter"
           },
           "type": "array",
           "description": " Information about the desired properties of the credential to be created. The sequence is ordered from most preferred to least preferred. The browser makes a best-effort to create the most preferred credential that it can."
-        },
-        "authenticatorSelection": {
-          "$ref": "#/$defs/AuthenticatorSelection",
-          "description": "Registration requirements for authenticator attributes."
         },
         "timeout": {
           "type": "integer",
@@ -446,9 +515,9 @@
           "type": "array",
           "description": "This member is intended for use by Relying Parties that wish to limit the creation of multiple credentials for the same account on a single authenticator. The browser is requested to return an error if the new credential would be created on an authenticator that also contains one of the credentials enumerated in this parameter."
         },
-        "extensions": {
-          "$ref": "#/$defs/AuthenticationExtensions",
-          "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA \"WebAuthn Extension Identifier\" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions."
+        "authenticatorSelection": {
+          "$ref": "#/$defs/AuthenticatorSelection",
+          "description": "Registration requirements for authenticator attributes."
         },
         "attestation": {
           "type": "string",
@@ -465,21 +534,25 @@
             }
           ],
           "default": "none"
+        },
+        "extensions": {
+          "$ref": "#/$defs/AuthenticationExtensions",
+          "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA \"WebAuthn Extension Identifier\" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "challenge",
         "rp",
-        "user"
+        "user",
+        "challenge"
       ],
       "description": "Parameters for `navigator.credentials.create()`."
     },
     "PublicKeyCredentialRequestOptions": {
       "properties": {
         "challenge": {
-          "$ref": "#/$defs/Challenge",
+          "$ref": "#/$defs/URLEncodedBase64",
           "description": "A challenge that the selected authenticator signs, along with other data, when producing a login assertion."
         },
         "timeout": {
@@ -567,6 +640,10 @@
           "type": "array",
           "description": "Credentials allowed in this login or registration ceremony."
         },
+        "expires": {
+          "type": "string",
+          "format": "date-time"
+        },
         "userVerification": {
           "type": "string",
           "description": "Required user verification in this login or registration ceremony.",
@@ -592,9 +669,46 @@
       "required": [
         "challenge",
         "user_id",
+        "expires",
         "userVerification"
       ],
       "description": "Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony."
+    },
+    "TimeoutConfig": {
+      "properties": {
+        "Enforce": {
+          "type": "boolean"
+        },
+        "Timeout": {
+          "type": "integer"
+        },
+        "TimeoutUVD": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "Enforce",
+        "Timeout",
+        "TimeoutUVD"
+      ]
+    },
+    "TimeoutsConfig": {
+      "properties": {
+        "Login": {
+          "$ref": "#/$defs/TimeoutConfig"
+        },
+        "Registration": {
+          "$ref": "#/$defs/TimeoutConfig"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "Login",
+        "Registration"
+      ]
     },
     "URLEncodedBase64": {
       "type": "string",
@@ -653,8 +767,6 @@
           "description": "A human-palatable name for the user account, intended only for display."
         },
         "id": {
-          "type": "string",
-          "contentEncoding": "base64",
           "description": "The user handle of the user account."
         }
       },
@@ -808,6 +920,18 @@
     },
     "SessionData": {
       "$ref": "#/$defs/SessionData"
+    },
+    "Credential": {
+      "$ref": "#/$defs/Credential"
+    },
+    "CredentialDescriptor": {
+      "$ref": "#/$defs/CredentialDescriptor"
+    },
+    "PublicKeyCredentialCreationOptions": {
+      "$ref": "#/$defs/PublicKeyCredentialCreationOptions"
+    },
+    "PublicKeyCredentialRequestOptions": {
+      "$ref": "#/$defs/PublicKeyCredentialRequestOptions"
     }
   },
   "additionalProperties": false,
@@ -819,6 +943,10 @@
     "CredentialCreationResponse",
     "CredentialAssertion",
     "CredentialAssertionResponse",
-    "SessionData"
+    "SessionData",
+    "Credential",
+    "CredentialDescriptor",
+    "PublicKeyCredentialCreationOptions",
+    "PublicKeyCredentialRequestOptions"
   ]
 }

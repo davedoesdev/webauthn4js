@@ -145,4 +145,4 @@ module.exports = promisify((config, cb) => {
     })();
 });
 
-module.exports.schemas = require('./schemas/schemas.json');
+module.exports.webAuthnSchema = require('./schemas/schemas.json');

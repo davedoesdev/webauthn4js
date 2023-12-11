@@ -7,19 +7,23 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/duo-labs/webauthn/webauthn"
-	"github.com/duo-labs/webauthn/protocol"
+	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/invopop/jsonschema"
 )
 
 type WebAuthn4JS struct {
-	Config Config
+	Config webauthn.Config
 	User User
 	CredentialCreation protocol.CredentialCreation
 	CredentialCreationResponse protocol.CredentialCreationResponse
 	CredentialAssertion protocol.CredentialAssertion
 	CredentialAssertionResponse protocol.CredentialAssertionResponse
 	SessionData webauthn.SessionData
+	Credential protocol.Credential
+	CredentialDescriptor protocol.CredentialDescriptor
+	PublicKeyCredentialCreationOptions protocol.PublicKeyCredentialCreationOptions
+	PublicKeyCredentialRequestOptions protocol.PublicKeyCredentialRequestOptions
 }
 
 func main() {

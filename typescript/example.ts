@@ -50,13 +50,30 @@ fastify.register(fastify_static, {
 });
 
 const webAuthn = await makeWebAuthn({
-    RPDisplayName: 'WebAuthnJS',
     RPID: 'localhost',
-    RPOrigin: `https://localhost:${port}`,
-    RPIcon: `https://localhost:${port}/logo.png`,
+    RPDisplayName: 'WebAuthnJS',
+    RPOrigins: [`https://localhost:${port}`],
+    AttestationPreference: "none",
     AuthenticatorSelection: {
         userVerification: 'preferred'
-    }
+    },
+    Debug: false,
+    EncodeUserIDAsString: false,
+    Timeouts: {
+        Login: {
+            Enforce: true,
+            Timeout: 60 * 1000,
+            TimeoutUVD: 60 * 1000
+        },
+        Registration: {
+            Enforce: true,
+            Timeout: 60 * 1000,
+            TimeoutUVD: 60 * 1000
+        }
+    },
+    RPIcon: `https://localhost:${port}/logo.png`,
+    RPOrigin: `https://localhost:${port}`,
+    Timeout: 60 * 1000
 });
 
 interface IUserRoute {

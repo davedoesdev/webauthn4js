@@ -39,7 +39,7 @@ interface WebAuthn4JSEvents {
 
 /**
  * Implements [Web Authentication](https://w3c.github.io/webauthn/) for
- * applications. Uses the [Duo Labs Go WebAuthn library](https://github.com/duo-labs/webauthn),
+ * applications. Uses the [Go WebAuthn library](https://github.com/go-webauthn/webauthn),
  * compiled to Web Assembly, to do the heavy lifting.
  *
  * Note that WebAuthn4JS doesn't store any data itself. Users and credentials are left for
