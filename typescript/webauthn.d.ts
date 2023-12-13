@@ -1,20 +1,33 @@
+/** ECDSA with SHA-256 */
 export type AlgES256 = -7;
+/** ECDSA with SHA-384 */
 export type AlgES384 = -35;
+/** ECDSA with SHA-512 */
 export type AlgES512 = -36;
+/** EdDSA */
 export type AlgEdDSA = -8;
+/** RSASSA-PSS with SHA-256 */
 export type AlgPS256 = -37;
+/** RSASSA-PSS with SHA-384 */
 export type AlgPS384 = -38;
+/** RSASSA-PSS with SHA-512 */
 export type AlgPS512 = -39;
+/** RSASSA-PKCS1-v1_5 with SHA-1 */
 export type AlgRS1 = -65535;
+/** RSASSA-PKCS1-v1_5 with SHA-256 */
 export type AlgRS256 = -257;
+/** RSASSA-PKCS1-v1_5 with SHA-384 */
 export type AlgRS384 = -258;
+/** RSASSA-PKCS1-v1_5 with SHA-512 */
 export type AlgRS512 = -259;
+/** Contains additional parameters requesting additional processing by the client and authenticator. */
 export type AuthenticationExtensions = {
     [x: string]: any;
 };
 export type AuthenticationExtensionsClientOutputs = {
     [x: string]: any;
 };
+/** Represents the user's authenticator device. */
 export type Authenticator = {
     /** Identifies the type (e.g. make and model) of the authenticator. */
     AAGUID: string;
@@ -24,6 +37,7 @@ export type Authenticator = {
     CloneWarning: boolean;
     Attachment: string;
 };
+/** Contains the raw authenticator assertion data, used to verify the authenticity of the login ceremony and the used credential. */
 export type AuthenticatorAssertionResponse = {
     /** Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.get(). */
     clientDataJSON: URLEncodedBase64;
@@ -34,6 +48,7 @@ export type AuthenticatorAssertionResponse = {
     /** Contains the Relying Party's ID for the user */
     userHandle?: URLEncodedBase64 | undefined;
 };
+/** Contains the raw authenticator attestation data, used to verify the authenticy of the registration ceremony and the new credential. */
 export type AuthenticatorAttestationResponse = {
     /** Contains a JSON serialization of the client data passed to the authenticator by the browser in its call to navigator.credentials.create(). */
     clientDataJSON: URLEncodedBase64;
@@ -41,6 +56,7 @@ export type AuthenticatorAttestationResponse = {
     attestationObject: URLEncodedBase64;
     transports?: string[] | undefined;
 };
+/** Use this class to specify requirements regarding authenticator attributes. */
 export type AuthenticatorSelection = {
     /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
     authenticatorAttachment?: any | undefined;
@@ -50,6 +66,7 @@ export type AuthenticatorSelection = {
     /** Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement. */
     userVerification: any;
 };
+/** Configuration and default values for the {@link WebAuthn4JS} instance. */
 export type Config = {
     /** A valid domain that identifies the Relying Party. A credential can only by used  with the same enity (as identified by the `RPID`) it was registered with. */
     RPID: string;
@@ -71,6 +88,7 @@ export type Config = {
     /** Timeout for browser `navigator.credentials.create()` and `navigator.credentials.debug()` in the browser. */
     Timeout: number;
 };
+/** Contains all needed information about a WebAuthn credential for storage. */
 export type Credential = {
     /** A probabilistically-unique byte sequence identifying a public key credential source and its authentication assertions. */
     ID: string;
@@ -83,10 +101,12 @@ export type Credential = {
     /** The Authenticator information for a given certificate. */
     Authenticator: Authenticator;
 };
+/** The payload that should be sent to the browser for beginning the login process. */
 export type CredentialAssertion = {
     /** Options for the browser to pass to `navigator.credentials.get()`. */
     publicKey: PublicKeyCredentialRequestOptions;
 };
+/** The raw response returned to us from an authenticator when we request a credential for login. */
 export type CredentialAssertionResponse = {
     /** The credential's identifier. */
     id: string;
@@ -101,10 +121,12 @@ export type CredentialAssertionResponse = {
     /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during login. */
     extensions?: any | undefined;
 };
+/** The payload that should be sent to the browser for beginning the registration process. */
 export type CredentialCreation = {
     /** Options for the browser to pass to `navigator.credentials.create()`. */
     publicKey: PublicKeyCredentialCreationOptions;
 };
+/** The raw response returned to us from an authenticator when we request a credential for registration. */
 export type CredentialCreationResponse = {
     /** The credential's identifier. */
     id: string;
@@ -120,6 +142,7 @@ export type CredentialCreationResponse = {
     /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration. */
     extensions?: any | undefined;
 };
+/** Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`. */
 export type CredentialDescriptor = {
     /** Type of the credential to use. */
     type: PublicKeyCredentialType;
@@ -134,17 +157,24 @@ export type CredentialFlags = {
     BackupEligible: boolean;
     BackupState: boolean;
 };
+/** The credential type and algorithm that the Relying Party wants the authenticator to create. */
 export type CredentialParameter = {
     /** Type of the credential to use. */
     type: PublicKeyCredentialType;
     /** Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms). */
     alg: any;
 };
+/** A roaming authenticator is attached using cross-platform transports, called cross-platform attachment. Authenticators of this class are removable from, and can "roam" among, client devices. A public key credential bound to a roaming authenticator is called a roaming credential. */
 export type CrossPlatformAttachment = "cross-platform";
+/** A platform authenticator is attached using a client device-specific transport, called platform attachment, and is usually not removable from the client device. A public key credential bound to a platform authenticator is called a platform credential. */
 export type PlatformAttachment = "platform";
+/** Indicates that the Relying Party wants to receive the attestation statement as generated by the authenticator. */
 export type PreferDirectAttestation = "direct";
+/** Indicates that the Relying Party prefers an attestation conveyance yielding verifiable attestation statements, but allows the client to decide how to obtain such attestation statements. The client MAY replace the authenticator-generated attestation statements with attestation statements generated by an Anonymization CA, in order to protect the user’s privacy, or to assist Relying Parties with attestation verification in a heterogeneous ecosystem. */
 export type PreferIndirectAttestation = "indirect";
+/** Indicates that the Relying Party is not interested in authenticator attestation. For example, in order to potentially avoid having to obtain user consent to relay identifying information to the Relying Party, or to save a roundtrip to an Attestation CA. This is the default if no attestation conveyance is specified. */
 export type PreferNoAttestation = "none";
+/** Parameters for `navigator.credentials.create()`. */
 export type PublicKeyCredentialCreationOptions = {
     /** Data about the Relying Party responsible for the request (i.e. your application) */
     rp: RelyingPartyEntity;
@@ -165,6 +195,7 @@ export type PublicKeyCredentialCreationOptions = {
     /** Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA "WebAuthn Extension Identifier" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions. */
     extensions?: AuthenticationExtensions | undefined;
 };
+/** Parameters for `navigator.credentials.get()`. */
 export type PublicKeyCredentialRequestOptions = {
     /** A challenge that the selected authenticator signs, along with other data, when producing a login assertion. */
     challenge: URLEncodedBase64;
@@ -179,7 +210,9 @@ export type PublicKeyCredentialRequestOptions = {
     /** Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension. */
     extensions?: AuthenticationExtensions | undefined;
 };
+/** Credential type for WebAuthn. */
 export type PublicKeyCredentialType = "public-key";
+/** Used to supply additional Relying Party attributes when creating a new credential. */
 export type RelyingPartyEntity = {
     /** A human-palatable identifier for the Relying Party, intended only for display. */
     name: string;
@@ -188,6 +221,7 @@ export type RelyingPartyEntity = {
     /** A unique identifier for the Relying Party. */
     id: string;
 };
+/** Data that should be stored securely (anti-tamper) by the Relying Party for the duration of the registration or login ceremony. */
 export type SessionData = {
     /** Challenge that was sent to the browser. */
     challenge: string;
@@ -210,6 +244,7 @@ export type TimeoutsConfig = {
     Registration: TimeoutConfig;
 };
 export type URLEncodedBase64 = string;
+/** Represents an application (Relying Party) user. */
 export type User = {
     /** User ID according to the Relying Party. */
     id: string;
@@ -222,6 +257,7 @@ export type User = {
     /** Credentials owned by the user. */
     credentials: Credential[];
 };
+/** Supplies additional user account attributes when creating a new credential. */
 export type UserEntity = {
     /** A human-palatable identifier for the user account, intended only for display to aid the user in determining the difference between user accounts with similar `displayName`s. */
     name: string;
@@ -232,6 +268,9 @@ export type UserEntity = {
     /** The user handle of the user account. */
     id?: any;
 };
+/** The authenticator should not verify the user for the credential. */
 export type UserVerificationDiscouraged = "discouraged";
+/** User verification is preferred to create/use a credential. This is the default if no user verification requirement is specified. */
 export type UserVerificationPreferred = "preferred";
+/** User verification is required to create/use a credential. */
 export type UserVerificationRequired = "required";

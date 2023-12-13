@@ -4,6 +4,7 @@
  */
 import { TypedEmitter } from 'tiny-typed-emitter';
 import {
+    Authenticator,
     Config,
     User,
     Credential,
@@ -152,20 +153,27 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
 
 /**
  * Creates {@link WebAuthn4JS} instances from a given {@link Config}.
- * Also has a property {@link schemas} _on the function itself_ which holds
- * [JSON Schemas](https://json-schema.org/) for the types in this library.
  *
  * @param config  Configuration for the instance.
  *
  * @returns  A new configured instance.
  */
-export default function makeWebAuthn(config : Config) : Promise<WebAuthn4JS>;
+declare type _MakeWebAuthn = (config : Config) => Promise<WebAuthn4JS>;
 
+export interface MakeWebAuthn extends _MakeWebAuthn {
+    /**
+     * [JSON Schemas](https://json-schema.org/) for the types in `webauthn4js`.
+     * These can be useful for validating data you exchange with browsers, for example.
+     */
+    schemas : any;
+}
 /**
- * JSON Schemas for the types in `webauthn4js`. These can be useful for validating data
- * you exchange with browsers, for example.
+ * Creates {@link WebAuthn4JS} instances from a given {@link Config}.
+ * Also has a property {@link MakeWebAuthn.schemas} _on the function itself_ which holds
+ * [JSON Schemas](https://json-schema.org/) for the types in this library.
  */
-export const schemas : any;
+declare const makeWebAuthn : MakeWebAuthn;
+export default makeWebAuthn;
 
 export {
     WebAuthn4JSEvents,

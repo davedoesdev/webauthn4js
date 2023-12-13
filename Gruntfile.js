@@ -72,7 +72,11 @@ module.exports = function (grunt) {
 
     grunt.registerTask('coveralls', 'exec:coveralls');
 
-    grunt.registerTask('docs', ['exec:build_go', 'exec:docs']);
+    grunt.registerTask('docs', [
+        'exec:build_go',
+        'exec:build_ts',
+        'exec:docs'
+    ]);
 
     grunt.registerTask('default', ['lint', 'test']);
 };

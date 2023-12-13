@@ -2,7 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$defs": {
     "AuthenticationExtensions": {
-      "type": "object"
+      "type": "object",
+      "description": "Contains additional parameters requesting additional processing by the client and authenticator."
     },
     "AuthenticationExtensionsClientOutputs": {
       "type": "object"

@@ -1,5 +1,8 @@
 {
   "$defs": {
+    "AuthenticationExtensions": {
+      "description": "Contains additional parameters requesting additional processing by the client and authenticator."
+    },
     "Authenticator": {
       "description": "Represents the user's authenticator device.",
       "properties": {

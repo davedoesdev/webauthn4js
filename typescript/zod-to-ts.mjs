@@ -23,6 +23,11 @@ for (const type in schemas) {
     const typeAlias = createTypeAlias(node, type);
     replace(typeAlias);
     const nodeString = printNode(typeAlias);
+    const description = schemas[type].description;
+    if (description) {
+        process.stdout.write(`/** ${description} */`);
+        process.stdout.write(EOL);
+    }
     process.stdout.write("export ");
     process.stdout.write(nodeString);
     process.stdout.write(EOL);
