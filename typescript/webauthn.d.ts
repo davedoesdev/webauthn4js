@@ -1,5 +1,7 @@
 /** ECDSA with SHA-256 */
 export type AlgES256 = -7;
+/** ECDSA using secp256k1 curve and SHA-256. */
+export type AlgES256K = -47;
 /** ECDSA with SHA-384 */
 export type AlgES384 = -35;
 /** ECDSA with SHA-512 */
@@ -24,6 +26,7 @@ export type AlgRS512 = -259;
 export type AuthenticationExtensions = {
     [x: string]: any;
 };
+/** Contains the results of processing client extensions requested by the Relying Party. */
 export type AuthenticationExtensionsClientOutputs = {
     [x: string]: any;
 };
@@ -35,6 +38,7 @@ export type Authenticator = {
     SignCount: number;
     /** This is a signal that the authenticator may be cloned, i.e. at least two copies of the credential private key may exist and are being used in parallel. Relying Parties (applications) should incorporate this information into their risk scoring. Whether the Relying Party updates the stored signature counter value in this case, or not, or fails the authentication ceremony or not, is Relying Party-specific. */
     CloneWarning: boolean;
+    /** The {@link AuthenticatorSelection.authenticatorAttachment} value returned by the request. */
     Attachment: string;
 };
 /** Contains the raw authenticator assertion data, used to verify the authenticity of the login ceremony and the used credential. */
@@ -54,6 +58,7 @@ export type AuthenticatorAttestationResponse = {
     clientDataJSON: URLEncodedBase64;
     /** This attribute contains an attestation object, which is opaque to, and cryptographically protected against tampering by, the browser. The attestation object contains both authenticator data and an attestation statement. The former contains the AAGUID, a unique credential ID, and the credential public key. The contents of the attestation statement are determined by the attestation statement format used by the authenticator.  It also contains any additional information that the Relying Party's server requires to validate the attestation statement, as well as to decode and validate the authenticator data along with the JSON-serialized client data. */
     attestationObject: URLEncodedBase64;
+    /** These values are the transports that the authenticator is believed to support, or an empty sequence if the information is unavailable. */
     transports?: string[] | undefined;
 };
 /** Use this class to specify requirements regarding authenticator attributes. */
@@ -62,7 +67,7 @@ export type AuthenticatorSelection = {
     authenticatorAttachment?: any | undefined;
     /** Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential. */
     requireResidentKey?: boolean | undefined;
-    residentKey?: string | undefined;
+    residentKey?: any | undefined;
     /** Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement. */
     userVerification: any;
 };
@@ -72,20 +77,23 @@ export type Config = {
     RPID: string;
     /** Friendly name for the Relying Party (application). The browser may display this to the user. */
     RPDisplayName: string;
+    /** Configures the list of Relying Party Server Origins that are permitted. These should be fully qualified origins. */
     RPOrigins: string[];
     /** Preferred attestation conveyance during credential generation */
     AttestationPreference: any;
     /** Login requirements for authenticator attributes. */
     AuthenticatorSelection: AuthenticatorSelection;
-    /** @ignore */
+    /** Enables various debug options. */
     Debug: boolean;
+    /** Ensures the user.id value during registrations is encoded as a raw UTF8 string. This is useful when you only use printable ASCII characters for the random user.id but the browser library does not decode the URL Safe Base64 data. */
     EncodeUserIDAsString: boolean;
+    /** Configures various timeouts. */
     Timeouts: TimeoutsConfig;
-    /** URL to an icon representing the Relying Party */
+    /** @deprecated This option has been removed from newer specifications due to security considerations. */
     RPIcon: string;
-    /** The HTTP(S) origin that the Relying Party is using to handle requests */
+    /** @deprecated Use RPOrigins instead. */
     RPOrigin: string;
-    /** Timeout for browser `navigator.credentials.create()` and `navigator.credentials.debug()` in the browser. */
+    /** @deprecated Use Timeouts instead. */
     Timeout: number;
 };
 /** Contains all needed information about a WebAuthn credential for storage. */
@@ -96,7 +104,9 @@ export type Credential = {
     PublicKey: string;
     /** The attestation format used (if any) by the authenticator when creating the credential. */
     AttestationType: string;
-    Transport: string[];
+    /** The transport types the authenticator supports. */
+    Transport: any[];
+    /** The commonly stored flags. */
     Flags: CredentialFlags;
     /** The Authenticator information for a given certificate. */
     Authenticator: Authenticator;
@@ -114,12 +124,12 @@ export type CredentialAssertionResponse = {
     type: PublicKeyCredentialType;
     /** The credential's identifier. Since we base64-encode raw data, this is the same as `id`. */
     rawId: URLEncodedBase64;
+    /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during login. */
     clientExtensionResults?: AuthenticationExtensionsClientOutputs | undefined;
-    authenticatorAttachment?: string | undefined;
+    /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
+    authenticatorAttachment?: any | undefined;
     /** The authenticator's response to the request to generate a login assertion. */
     response: AuthenticatorAssertionResponse;
-    /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during login. */
-    extensions?: any | undefined;
 };
 /** The payload that should be sent to the browser for beginning the registration process. */
 export type CredentialCreation = {
@@ -134,13 +144,14 @@ export type CredentialCreationResponse = {
     type: PublicKeyCredentialType;
     /** The credential's identifier. Since we base64-encode raw data, this is the same as `id`. */
     rawId: URLEncodedBase64;
+    /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration. */
     clientExtensionResults?: AuthenticationExtensionsClientOutputs | undefined;
-    authenticatorAttachment?: string | undefined;
+    /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
+    authenticatorAttachment?: any | undefined;
     /** The authenticator's response to the request to generate a registration attestation. */
     response: AuthenticatorAttestationResponse;
+    /** @deprecated Deprecated due to upstream changes to the API. Use {@link AuthenticatorAttestationResponse.transports} instead. */
     transports?: string[] | undefined;
-    /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration. */
-    extensions?: any | undefined;
 };
 /** Specifies a credential for use by the browser when it calls `navigator.credentials.create()` or `navigator.credentials.get()`. */
 export type CredentialDescriptor = {
@@ -148,13 +159,18 @@ export type CredentialDescriptor = {
     type: PublicKeyCredentialType;
     /** The ID of a credential to allow/disallow. */
     id: URLEncodedBase64;
-    /** Contains a hint as to how the browser might communicate with the authenticator to which the credential belongs. */
-    transports?: string[] | undefined;
+    /** The authenticator transports that can be used. */
+    transports?: any[] | undefined;
 };
+/** Flags associated with a credential */
 export type CredentialFlags = {
+    /** Indicates the users presence. */
     UserPresent: boolean;
+    /** Indicates the user performed verification. */
     UserVerified: boolean;
+    /** Indicates the credential is able to be backed up and/or sync'd between devices. This should NEVER change. */
     BackupEligible: boolean;
+    /** Indicates the credential has been backed up and/or sync'd. This value can change but it's recommended that RP's keep track of this value. */
     BackupState: boolean;
 };
 /** The credential type and algorithm that the Relying Party wants the authenticator to create. */
@@ -170,6 +186,8 @@ export type CrossPlatformAttachment = "cross-platform";
 export type PlatformAttachment = "platform";
 /** Indicates that the Relying Party wants to receive the attestation statement as generated by the authenticator. */
 export type PreferDirectAttestation = "direct";
+/** Indicates that the Relying Party wants to receive an attestation statement that may include uniquely identifying information. This is intended for controlled deployments within an enterprise where the organization wishes to tie registrations to specific authenticators. User agents MUST NOT provide such an attestation unless the user agent or authenticator configuration permits it for the requested RP ID. If permitted, the user agent SHOULD signal to the authenticator (at invocation time) that enterprise attestation is requested, and convey the resulting AAGUID and attestation statement, unaltered, to the Relying Party. */
+export type PreferEnterpriseAttestation = "enterprise";
 /** Indicates that the Relying Party prefers an attestation conveyance yielding verifiable attestation statements, but allows the client to decide how to obtain such attestation statements. The client MAY replace the authenticator-generated attestation statements with attestation statements generated by an Anonymization CA, in order to protect the user’s privacy, or to assist Relying Parties with attestation verification in a heterogeneous ecosystem. */
 export type PreferIndirectAttestation = "indirect";
 /** Indicates that the Relying Party is not interested in authenticator attestation. For example, in order to potentially avoid having to obtain user consent to relay identifying information to the Relying Party, or to save a roundtrip to an Attestation CA. This is the default if no attestation conveyance is specified. */
@@ -229,20 +247,30 @@ export type SessionData = {
     user_id: string;
     /** Credentials allowed in this login or registration ceremony. */
     allowed_credentials?: string[] | undefined;
+    /** When this data expires */
     expires: string;
     /** Required user verification in this login or registration ceremony. */
     userVerification: any;
+    /** Contains additional parameters requesting additional processing by the client and authenticator. */
     extensions?: AuthenticationExtensions | undefined;
 };
+/** Represents the WebAuthn timeouts configuration for either registration or login. */
 export type TimeoutConfig = {
+    /** Enforce the timeouts at the Relying Party / Server. This means if enabled and the user takes too long that even if the browser does not enforce the timeout the Relying Party / Server will. */
     Enforce: boolean;
+    /** The timeout in nanoseconds for logins/registrations when the UserVerificationRequirement is set to anything other than discouraged. */
     Timeout: number;
+    /** The timeout in nanoseconds for logins/registrations when the UserVerificationRequirement is set to discouraged. */
     TimeoutUVD: number;
 };
+/** Represents the WebAuthn timeouts configuration. */
 export type TimeoutsConfig = {
+    /** Timeouts for login. */
     Login: TimeoutConfig;
+    /** Timeouts for registration. */
     Registration: TimeoutConfig;
 };
+/** URL-encoded base64 data. */
 export type URLEncodedBase64 = string;
 /** Represents an application (Relying Party) user. */
 export type User = {
@@ -252,7 +280,7 @@ export type User = {
     name: string;
     /** Display Name of the user. */
     displayName: string;
-    /** User's icon url. */
+    /** @deprecated This has been removed from the specification recommendation. Suggest a blank string. */
     iconURL: string;
     /** Credentials owned by the user. */
     credentials: Credential[];
@@ -261,7 +289,7 @@ export type User = {
 export type UserEntity = {
     /** A human-palatable identifier for the user account, intended only for display to aid the user in determining the difference between user accounts with similar `displayName`s. */
     name: string;
-    /** A URL which resolves to an image associated with the user account. */
+    /** @deprecated This has been removed from the specification recommendations. */
     icon?: string | undefined;
     /** A human-palatable name for the user account, intended only for display. */
     displayName?: string | undefined;
