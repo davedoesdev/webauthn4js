@@ -1,10 +1,10 @@
 {
   "$defs": {
     "AuthenticationExtensions": {
-      "description": "Contains additional parameters requesting additional processing by the client and authenticator."
+      "description": "Contains additional parameters requesting additional processing by the client and authenticator.eslint-disable-next-line @typescript-eslint/no-explicit-any"
     },
     "AuthenticationExtensionsClientOutputs": {
-      "description": "Contains the results of processing client extensions requested by the Relying Party."
+      "description": "Contains the results of processing client extensions requested by the Relying Party.eslint-disable-next-line @typescript-eslint/no-explicit-any"
     },
     "Authenticator": {
       "description": "Represents the user's authenticator device.",
@@ -59,7 +59,7 @@
       "properties": {
         "authenticatorAttachment": {
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PlatformAttachment"
             },
@@ -72,11 +72,11 @@
           "description": "Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential."
         },
         "residentKey": {
-          "type": "Specifies the extent to which the Relying Party desires to create a client-side discoverable credential. For historical reasons the naming retains the deprecated “resident” terminology."
+          "description": "Specifies the extent to which the Relying Party desires to create a client-side discoverable credential. For historical reasons the naming retains the deprecated “resident” terminology."
         },
         "userVerification": {
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/UserVerificationRequired"
             },
@@ -87,7 +87,7 @@
               "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
-          "default": "preferred"
+          "default": "#/$defs/UserVerificationPreferred"
         }
       }
     },
@@ -105,7 +105,7 @@
         },
         "AttestationPreference": {
           "description": "Preferred attestation conveyance during credential generation",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PreferNoAttestation"
             },
@@ -119,7 +119,7 @@
               "$ref": "#/$defs/PreferEnterpriseAttestation"
             }
           ],
-          "default": "none"
+          "default": "#/$defs/PreferNoAttestation"
         },
         "AuthenticatorSelection": {
           "description": "Login requirements for authenticator attributes."
@@ -159,7 +159,7 @@
         "Transport": {
           "description": "The transport types the authenticator supports.",
           "items": {
-            "oneOf": [
+            "anyOf": [
               {
                 "$ref": "#/$defs/TransportUSB"
               },
@@ -202,7 +202,7 @@
         },
         "type": {
           "description": "Specifies the credential type represented by this object.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PublicKeyCredentialType"
             }
@@ -216,7 +216,7 @@
         },
         "authenticatorAttachment": {
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PlatformAttachment"
             },
@@ -246,7 +246,7 @@
         },
         "type": {
           "description": "Specifies the credential type represented by this object.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PublicKeyCredentialType"
             }
@@ -260,7 +260,7 @@
         },
         "authenticatorAttachment": {
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PlatformAttachment"
             },
@@ -282,7 +282,7 @@
       "properties": {
         "type": {
           "description": "Type of the credential to use.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PublicKeyCredentialType"
             }
@@ -294,7 +294,7 @@
         "transports": {
           "description": "The authenticator transports that can be used.",
           "items": {
-            "oneOf": [
+            "anyOf": [
               {
                 "$ref": "#/$defs/TransportUSB"
               },
@@ -337,7 +337,7 @@
       "properties": {
         "type": {
           "description": "Type of the credential to use.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PublicKeyCredentialType"
             }
@@ -345,7 +345,7 @@
         },
         "alg": {
           "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).",
-          "oneOf":[
+          "anyOf":[
             {
               "$ref": "#/$defs/AlgES256"
             },
@@ -410,7 +410,7 @@
         },
         "attestation": {
           "description": "This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/PreferNoAttestation"
             },
@@ -421,7 +421,7 @@
               "$ref": "#/$defs/PreferDirectAttestation"
             }
           ],
-          "default": "none"
+          "default": "#/$defs/PreferNoAttestation"
         },
         "extensions": {
           "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA \"WebAuthn Extension Identifier\" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions."
@@ -445,7 +445,7 @@
         },
         "userVerification": {
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/UserVerificationRequired"
             },
@@ -456,7 +456,7 @@
               "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
-          "default": "preferred"
+          "default": "#/$defs/UserVerificationPreferred"
         },
         "extensions": {
           "description": "Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension."
@@ -494,7 +494,7 @@
         },
         "userVerification": {
           "description": "Required user verification in this login or registration ceremony.",
-          "oneOf": [
+          "anyOf": [
             {
               "$ref": "#/$defs/UserVerificationRequired"
             },
@@ -505,7 +505,7 @@
               "$ref": "#/$defs/UserVerificationDiscouraged"
             }
           ],
-          "default": "preferred"
+          "default": "#/$defs/UserVerificationPreferred"
         },
         "extensions": {
           "description": "Contains additional parameters requesting additional processing by the client and authenticator."
@@ -573,7 +573,7 @@
           "description": "A human-palatable name for the user account, intended only for display."
         },
         "id": {
-          "description": "The user handle of the user account."
+          "description": "The user handle of the user account. *//* eslint-disable-next-line @typescript-eslint/no-explicit-any"
         }
       }
     },
@@ -664,6 +664,26 @@
     "AlgES256K": {
       "description": "ECDSA using secp256k1 curve and SHA-256.",
       "const": -47
+    },
+    "TransportUSB": {
+      "description": "Indicates the respective authenticator can be contacted over removable USB",
+      "const": "usb"
+    },
+    "TransportNFC": {
+      "description": "Indicates the respective authenticator can be contacted over Near Field Communication (NFC).",
+      "const": "nfc"
+    },
+    "TransportBLE": {
+      "description": "Indicates the respective authenticator can be contacted over Bluetooth Smart (Bluetooth Low Energy / BLE).",
+      "const": "ble"
+    },
+    "TransportHybrid": {
+      "description": "Indicates the respective authenticator can be contacted using a combination of (often separate) data-transport and proximity mechanisms. This supports, for example, authentication on a desktop computer using a smartphone.",
+      "const": "hybrid"
+    },
+    "TransportInternal": {
+      "description": "Indicates the respective authenticator is contacted using a client device-specific transport, i.e., it is a platform authenticator. These authenticators are not removable from the client device.",
+      "const": "internal"
     }
   }
 }

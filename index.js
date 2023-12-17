@@ -1,5 +1,4 @@
 /*eslint-env node */
-/* global WebAssembly */
 'use strict';
 const fs = require('fs');
 const path = require('path');

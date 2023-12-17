@@ -22,9 +22,14 @@ for (const type in schemas) {
     const { node } = zodToTs(schemas[type], type);
     const typeAlias = createTypeAlias(node, type);
     replace(typeAlias);
-    const nodeString = printNode(typeAlias);
-    const description = schemas[type].description;
+    let nodeString = printNode(typeAlias);
+    let description = schemas[type].description;
     if (description) {
+        let pos = description.indexOf('eslint');
+        if (pos >= 0) {
+            nodeString = '/*' + description.substr(pos) + '*/' + nodeString;
+            description = description.substr(0, pos);
+        }
         process.stdout.write(`/** ${description} */`);
         process.stdout.write(EOL);
     }

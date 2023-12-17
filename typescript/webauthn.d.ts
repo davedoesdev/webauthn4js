@@ -23,11 +23,11 @@ export type AlgRS384 = -258;
 /** RSASSA-PKCS1-v1_5 with SHA-512 */
 export type AlgRS512 = -259;
 /** Contains additional parameters requesting additional processing by the client and authenticator. */
-export type AuthenticationExtensions = {
+export /*eslint-disable-next-line @typescript-eslint/no-explicit-any*/type AuthenticationExtensions = {
     [x: string]: any;
 };
 /** Contains the results of processing client extensions requested by the Relying Party. */
-export type AuthenticationExtensionsClientOutputs = {
+export /*eslint-disable-next-line @typescript-eslint/no-explicit-any*/type AuthenticationExtensionsClientOutputs = {
     [x: string]: any;
 };
 /** Represents the user's authenticator device. */
@@ -64,12 +64,13 @@ export type AuthenticatorAttestationResponse = {
 /** Use this class to specify requirements regarding authenticator attributes. */
 export type AuthenticatorSelection = {
     /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
-    authenticatorAttachment?: any | undefined;
+    authenticatorAttachment?: (PlatformAttachment | CrossPlatformAttachment) | undefined;
     /** Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential. */
     requireResidentKey?: boolean | undefined;
-    residentKey?: any | undefined;
+    /** Specifies the extent to which the Relying Party desires to create a client-side discoverable credential. For historical reasons the naming retains the deprecated “resident” terminology. */
+    residentKey?: string | undefined;
     /** Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement. */
-    userVerification: any;
+    userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
 };
 /** Configuration and default values for the {@link WebAuthn4JS} instance. */
 export type Config = {
@@ -80,7 +81,7 @@ export type Config = {
     /** Configures the list of Relying Party Server Origins that are permitted. These should be fully qualified origins. */
     RPOrigins: string[];
     /** Preferred attestation conveyance during credential generation */
-    AttestationPreference: any;
+    AttestationPreference?: PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation | PreferEnterpriseAttestation;
     /** Login requirements for authenticator attributes. */
     AuthenticatorSelection: AuthenticatorSelection;
     /** Enables various debug options. */
@@ -105,7 +106,7 @@ export type Credential = {
     /** The attestation format used (if any) by the authenticator when creating the credential. */
     AttestationType: string;
     /** The transport types the authenticator supports. */
-    Transport: any[];
+    Transport: (TransportUSB | TransportNFC | TransportBLE | TransportHybrid | TransportInternal)[];
     /** The commonly stored flags. */
     Flags: CredentialFlags;
     /** The Authenticator information for a given certificate. */
@@ -127,7 +128,7 @@ export type CredentialAssertionResponse = {
     /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during login. */
     clientExtensionResults?: AuthenticationExtensionsClientOutputs | undefined;
     /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
-    authenticatorAttachment?: any | undefined;
+    authenticatorAttachment?: (PlatformAttachment | CrossPlatformAttachment) | undefined;
     /** The authenticator's response to the request to generate a login assertion. */
     response: AuthenticatorAssertionResponse;
 };
@@ -147,7 +148,7 @@ export type CredentialCreationResponse = {
     /** A map containing identifier -> client extension output entries produced by any extensions that may have been used during registration. */
     clientExtensionResults?: AuthenticationExtensionsClientOutputs | undefined;
     /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
-    authenticatorAttachment?: any | undefined;
+    authenticatorAttachment?: (PlatformAttachment | CrossPlatformAttachment) | undefined;
     /** The authenticator's response to the request to generate a registration attestation. */
     response: AuthenticatorAttestationResponse;
     /** @deprecated Deprecated due to upstream changes to the API. Use {@link AuthenticatorAttestationResponse.transports} instead. */
@@ -160,7 +161,7 @@ export type CredentialDescriptor = {
     /** The ID of a credential to allow/disallow. */
     id: URLEncodedBase64;
     /** The authenticator transports that can be used. */
-    transports?: any[] | undefined;
+    transports?: (TransportUSB | TransportNFC | TransportBLE | TransportHybrid | TransportInternal)[] | undefined;
 };
 /** Flags associated with a credential */
 export type CredentialFlags = {
@@ -178,7 +179,7 @@ export type CredentialParameter = {
     /** Type of the credential to use. */
     type: PublicKeyCredentialType;
     /** Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms). */
-    alg: any;
+    alg: AlgES256 | AlgES384 | AlgES512 | AlgRS1 | AlgRS256 | AlgRS384 | AlgRS512 | AlgPS256 | AlgPS384 | AlgPS512 | AlgEdDSA;
 };
 /** A roaming authenticator is attached using cross-platform transports, called cross-platform attachment. Authenticators of this class are removable from, and can "roam" among, client devices. A public key credential bound to a roaming authenticator is called a roaming credential. */
 export type CrossPlatformAttachment = "cross-platform";
@@ -209,7 +210,7 @@ export type PublicKeyCredentialCreationOptions = {
     /** Registration requirements for authenticator attributes. */
     authenticatorSelection?: AuthenticatorSelection | undefined;
     /** This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance. */
-    attestation: any;
+    attestation?: PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation;
     /** Additional parameters requesting additional processing by the browser and authenticator. For example, the caller may request that only authenticators with certain capabilities be used to create the credential, or that particular information be returned in the attestation object. Some extensions are defined in [WebAuthn Extensions](https://www.w3.org/TR/webauthn/#extensions); consult the IANA "WebAuthn Extension Identifier" registry established by [WebAuthn-Registries](https://tools.ietf.org/html/draft-hodges-webauthn-registries) for an up-to-date list of registered WebAuthn Extensions. */
     extensions?: AuthenticationExtensions | undefined;
 };
@@ -224,7 +225,7 @@ export type PublicKeyCredentialRequestOptions = {
     /** A list of public key credentials acceptable to the caller, in descending order of preference (the first item in the list is the most preferred credential, and so on down the list). */
     allowCredentials?: CredentialDescriptor[] | undefined;
     /** Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement. */
-    userVerification: any;
+    userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
     /** Additional parameters requesting additional processing by the browser and authenticator. For example, if transaction confirmation is sought from the user, then the prompt string might be included as an extension. */
     extensions?: AuthenticationExtensions | undefined;
 };
@@ -250,7 +251,7 @@ export type SessionData = {
     /** When this data expires */
     expires: string;
     /** Required user verification in this login or registration ceremony. */
-    userVerification: any;
+    userVerification?: UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
     /** Contains additional parameters requesting additional processing by the client and authenticator. */
     extensions?: AuthenticationExtensions | undefined;
 };
@@ -270,6 +271,16 @@ export type TimeoutsConfig = {
     /** Timeouts for registration. */
     Registration: TimeoutConfig;
 };
+/** Indicates the respective authenticator can be contacted over Bluetooth Smart (Bluetooth Low Energy / BLE). */
+export type TransportBLE = "ble";
+/** Indicates the respective authenticator can be contacted using a combination of (often separate) data-transport and proximity mechanisms. This supports, for example, authentication on a desktop computer using a smartphone. */
+export type TransportHybrid = "hybrid";
+/** Indicates the respective authenticator is contacted using a client device-specific transport, i.e., it is a platform authenticator. These authenticators are not removable from the client device. */
+export type TransportInternal = "internal";
+/** Indicates the respective authenticator can be contacted over Near Field Communication (NFC). */
+export type TransportNFC = "nfc";
+/** Indicates the respective authenticator can be contacted over removable USB */
+export type TransportUSB = "usb";
 /** URL-encoded base64 data. */
 export type URLEncodedBase64 = string;
 /** Represents an application (Relying Party) user. */
@@ -293,7 +304,7 @@ export type UserEntity = {
     icon?: string | undefined;
     /** A human-palatable name for the user account, intended only for display. */
     displayName?: string | undefined;
-    /** The user handle of the user account. */
+    /** The user handle of the user account. *//* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     id?: any;
 };
 /** The authenticator should not verify the user for the credential. */
