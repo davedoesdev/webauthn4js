@@ -138,7 +138,7 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
     /**
      * Tell the Web Assembly code which is running the Duo Labs Go WebAuthn library for this
      * instance to stop.
-
+     *
      * Don't call any more methods after you call this.
      *
      * @param code  Optional code to stop the Web Assembly with. 
@@ -151,28 +151,22 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
     exit(code? : number) : void;
 }
 
-/**
- * Creates {@link WebAuthn4JS} instances from a given {@link Config}.
- *
- * @param config  Configuration for the instance.
- *
- * @returns  A new configured instance.
- */
-declare type _MakeWebAuthn = (config : Config) => Promise<WebAuthn4JS>;
-
-export interface MakeWebAuthn extends _MakeWebAuthn {
+declare const makeWebAuthn : {
     /**
      * [JSON Schemas](https://json-schema.org/) for the types in `webauthn4js`.
      * These can be useful for validating data you exchange with browsers, for example.
      */
     schemas : any;
+
+    /**
+     * Creates a {@link WebAuthn4JS} instance from a given {@link Config}.
+     *
+     * @param config  Configuration for the instance.
+     *
+     * @returns  A new configured instance.
+     */
+    (config : Config) : Promise<WebAuthn4JS>;
 }
-/**
- * Creates {@link WebAuthn4JS} instances from a given {@link Config}.
- * Also has a property {@link MakeWebAuthn.schemas} _on the function itself_ which holds
- * [JSON Schemas](https://json-schema.org/) for the types in this library.
- */
-declare const makeWebAuthn : MakeWebAuthn;
 export default makeWebAuthn;
 
 export {

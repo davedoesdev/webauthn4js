@@ -26,7 +26,8 @@
         },
         "Attachment": {
           "type": "string",
-          "description": "The {@link AuthenticatorSelection.authenticatorAttachment} value returned by the request."
+          "description": "The {@link AuthenticatorSelection.authenticatorAttachment} value returned by the request.",
+          "$ref": "#/$defs/AuthenticatorAttachment"
         }
       },
       "additionalProperties": false,
@@ -98,18 +99,12 @@
         "authenticatorAttachment": {
           "type": "string",
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PlatformAttachment"
-            },
-            {
-              "$ref": "#/$defs/CrossPlatformAttachment"
-            }
-          ]
+          "$ref": "#/$defs/AuthenticatorAttachment"
         },
         "requireResidentKey": {
           "type": "boolean",
-          "description": "Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential."
+          "description": "Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential.",
+          "default": false
         },
         "residentKey": {
           "type": "string",
@@ -118,18 +113,7 @@
         "userVerification": {
           "type": "string",
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.create()` or `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/UserVerificationRequired"
-            },
-            {
-              "$ref": "#/$defs/UserVerificationPreferred"
-            },
-            {
-              "$ref": "#/$defs/UserVerificationDiscouraged"
-            }
-          ],
-          "default": "#/$defs/UserVerificationPreferred"
+          "$ref": "#/$defs/UserVerificationRequirement"
         }
       },
       "additionalProperties": false,
@@ -156,21 +140,7 @@
         "AttestationPreference": {
           "type": "string",
           "description": "Preferred attestation conveyance during credential generation",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PreferNoAttestation"
-            },
-            {
-              "$ref": "#/$defs/PreferIndirectAttestation"
-            },
-            {
-              "$ref": "#/$defs/PreferDirectAttestation"
-            },
-            {
-              "$ref": "#/$defs/PreferEnterpriseAttestation"
-            }
-          ],
-          "default": "#/$defs/PreferNoAttestation"
+          "$ref": "#/$defs/ConveyancePreference"
         },
         "AuthenticatorSelection": {
           "$ref": "#/$defs/AuthenticatorSelection",
@@ -237,23 +207,7 @@
         "Transport": {
           "items": {
             "type": "string",
-            "anyOf": [
-              {
-                "$ref": "#/$defs/TransportUSB"
-              },
-              {
-                "$ref": "#/$defs/TransportNFC"
-              },
-              {
-                "$ref": "#/$defs/TransportBLE"
-              },
-              {
-                "$ref": "#/$defs/TransportHybrid"
-              },
-              {
-                "$ref": "#/$defs/TransportInternal"
-              }
-            ]
+            "$ref": "#/$defs/AuthenticatorTransport"
           },
           "type": "array",
           "description": "The transport types the authenticator supports."
@@ -302,11 +256,7 @@
         "type": {
           "type": "string",
           "description": "Specifies the credential type represented by this object.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PublicKeyCredentialType"
-            }
-          ]
+          "$ref": "#/$defs/PublicKeyCredentialType"
         },
         "rawId": {
           "$ref": "#/$defs/URLEncodedBase64",
@@ -319,14 +269,7 @@
         "authenticatorAttachment": {
           "type": "string",
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PlatformAttachment"
-            },
-            {
-              "$ref": "#/$defs/CrossPlatformAttachment"
-            }
-          ]
+          "$ref": "#/$defs/AuthenticatorAttachment"
         },
         "response": {
           "$ref": "#/$defs/AuthenticatorAssertionResponse",
@@ -366,11 +309,7 @@
         "type": {
           "type": "string",
           "description": "Specifies the credential type represented by this object.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PublicKeyCredentialType"
-            }
-          ]
+          "$ref": "#/$defs/PublicKeyCredentialType"
         },
         "rawId": {
           "$ref": "#/$defs/URLEncodedBase64",
@@ -383,14 +322,7 @@
         "authenticatorAttachment": {
           "type": "string",
           "description": "If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PlatformAttachment"
-            },
-            {
-              "$ref": "#/$defs/CrossPlatformAttachment"
-            }
-          ]
+          "$ref": "#/$defs/AuthenticatorAttachment"
         },
         "response": {
           "$ref": "#/$defs/AuthenticatorAttestationResponse",
@@ -419,11 +351,7 @@
         "type": {
           "type": "string",
           "description": "Type of the credential to use.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PublicKeyCredentialType"
-            }
-          ]
+          "$ref": "#/$defs/CredentialType"
         },
         "id": {
           "$ref": "#/$defs/URLEncodedBase64",
@@ -432,23 +360,7 @@
         "transports": {
           "items": {
             "type": "string",
-            "anyOf": [
-              {
-                "$ref": "#/$defs/TransportUSB"
-              },
-              {
-                "$ref": "#/$defs/TransportNFC"
-              },
-              {
-                "$ref": "#/$defs/TransportBLE"
-              },
-              {
-                "$ref": "#/$defs/TransportHybrid"
-              },
-              {
-                "$ref": "#/$defs/TransportInternal"
-              }
-            ]
+            "$ref": "#/$defs/AuthenticatorTransport"
           },
           "type": "array",
           "description": "The authenticator transports that can be used."
@@ -496,50 +408,12 @@
         "type": {
           "type": "string",
           "description": "Type of the credential to use.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PublicKeyCredentialType"
-            }
-          ]
+          "$ref": "#/$defs/CredentialType"
         },
         "alg": {
           "type": "integer",
           "description": "Algorithm to use, see the [IANA CBOR COSE Algorithms Registry](https://www.iana.org/assignments/cose/cose.xhtml#algorithms).",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/AlgES256"
-            },
-            {
-              "$ref": "#/$defs/AlgES384"
-            },
-            {
-              "$ref": "#/$defs/AlgES512"
-            },
-            {
-              "$ref": "#/$defs/AlgRS1"
-            },
-            {
-              "$ref": "#/$defs/AlgRS256"
-            },
-            {
-              "$ref": "#/$defs/AlgRS384"
-            },
-            {
-              "$ref": "#/$defs/AlgRS512"
-            },
-            {
-              "$ref": "#/$defs/AlgPS256"
-            },
-            {
-              "$ref": "#/$defs/AlgPS384"
-            },
-            {
-              "$ref": "#/$defs/AlgPS512"
-            },
-            {
-              "$ref": "#/$defs/AlgEdDSA"
-            }
-          ]
+          "$ref": "#/$defs/COSEAlgorithmIdentifier"
         }
       },
       "additionalProperties": false,
@@ -589,18 +463,7 @@
         "attestation": {
           "type": "string",
           "description": "This member is intended for use by Relying Parties that wish to express their preference for attestation conveyance.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/PreferNoAttestation"
-            },
-            {
-              "$ref": "#/$defs/PreferIndirectAttestation"
-            },
-            {
-              "$ref": "#/$defs/PreferDirectAttestation"
-            }
-          ],
-          "default": "#/$defs/PreferNoAttestation"
+          "$ref": "#/$defs/ConveyancePreference"
         },
         "extensions": {
           "$ref": "#/$defs/AuthenticationExtensions",
@@ -640,18 +503,7 @@
         "userVerification": {
           "type": "string",
           "description": "Describes the Relying Party's requirements regarding user verification for the `navigator.credentials.get()` operation. Eligible authenticators are filtered to only those capable of satisfying this requirement.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/UserVerificationRequired"
-            },
-            {
-              "$ref": "#/$defs/UserVerificationPreferred"
-            },
-            {
-              "$ref": "#/$defs/UserVerificationDiscouraged"
-            }
-          ],
-          "default": "#/$defs/UserVerificationPreferred"
+          "$ref": "#/$defs/UserVerificationRequirement"
         },
         "extensions": {
           "$ref": "#/$defs/AuthenticationExtensions",
@@ -715,18 +567,7 @@
         "userVerification": {
           "type": "string",
           "description": "Required user verification in this login or registration ceremony.",
-          "anyOf": [
-            {
-              "$ref": "#/$defs/UserVerificationRequired"
-            },
-            {
-              "$ref": "#/$defs/UserVerificationPreferred"
-            },
-            {
-              "$ref": "#/$defs/UserVerificationDiscouraged"
-            }
-          ],
-          "default": "#/$defs/UserVerificationPreferred"
+          "$ref": "#/$defs/UserVerificationRequirement"
         },
         "extensions": {
           "$ref": "#/$defs/AuthenticationExtensions",
@@ -855,6 +696,16 @@
       ],
       "description": "Supplies additional user account attributes when creating a new credential."
     },
+    "AuthenticatorAttachment": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlatformAttachment"
+        },
+        {
+          "$ref": "#/$defs/CrossPlatformAttachment"
+        }
+      ]
+    },
     "PlatformAttachment": {
       "const": "platform",
       "description": "A platform authenticator is attached using a client device-specific transport, called platform attachment, and is usually not removable from the client device. A public key credential bound to a platform authenticator is called a platform credential."
@@ -862,6 +713,20 @@
     "CrossPlatformAttachment": {
       "const": "cross-platform",
       "description": "A roaming authenticator is attached using cross-platform transports, called cross-platform attachment. Authenticators of this class are removable from, and can \"roam\" among, client devices. A public key credential bound to a roaming authenticator is called a roaming credential."
+    },
+    "UserVerificationRequirement": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UserVerificationRequired"
+        },
+        {
+          "$ref": "#/$defs/UserVerificationPreferred"
+        },
+        {
+          "$ref": "#/$defs/UserVerificationDiscouraged"
+        }
+      ],
+      "default": "#/$defs/UserVerificationPreferred"
     },
     "UserVerificationRequired": {
       "const": "required",
@@ -874,6 +739,23 @@
     "UserVerificationDiscouraged": {
       "const": "discouraged",
       "description": "The authenticator should not verify the user for the credential."
+    },
+    "ConveyancePreference": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PreferNoAttestation"
+        },
+        {
+          "$ref": "#/$defs/PreferIndirectAttestation"
+        },
+        {
+          "$ref": "#/$defs/PreferDirectAttestation"
+        },
+        {
+          "$ref": "#/$defs/PreferEnterpriseAttestation"
+        }
+      ],
+      "default": "#/$defs/PreferNoAttestation"
     },
     "PreferNoAttestation": {
       "description": "Indicates that the Relying Party is not interested in authenticator attestation. For example, in order to potentially avoid having to obtain user consent to relay identifying information to the Relying Party, or to save a roundtrip to an Attestation CA. This is the default if no attestation conveyance is specified.",
@@ -891,9 +773,52 @@
       "description": "Indicates that the Relying Party wants to receive an attestation statement that may include uniquely identifying information. This is intended for controlled deployments within an enterprise where the organization wishes to tie registrations to specific authenticators. User agents MUST NOT provide such an attestation unless the user agent or authenticator configuration permits it for the requested RP ID. If permitted, the user agent SHOULD signal to the authenticator (at invocation time) that enterprise attestation is requested, and convey the resulting AAGUID and attestation statement, unaltered, to the Relying Party.",
       "const": "enterprise"
     },
+    "CredentialType": {
+      "$ref": "#/$defs/PublicKeyCredentialType"
+    },
     "PublicKeyCredentialType": {
       "description": "Credential type for WebAuthn.",
       "const": "public-key"
+    },
+    "COSEAlgorithmIdentifier": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AlgES256"
+        },
+        {
+          "$ref": "#/$defs/AlgES384"
+        },
+        {
+          "$ref": "#/$defs/AlgES512"
+        },
+        {
+          "$ref": "#/$defs/AlgRS1"
+        },
+        {
+          "$ref": "#/$defs/AlgRS256"
+        },
+        {
+          "$ref": "#/$defs/AlgRS384"
+        },
+        {
+          "$ref": "#/$defs/AlgRS512"
+        },
+        {
+          "$ref": "#/$defs/AlgPS256"
+        },
+        {
+          "$ref": "#/$defs/AlgPS384"
+        },
+        {
+          "$ref": "#/$defs/AlgPS512"
+        },
+        {
+          "$ref": "#/$defs/AlgEdDSA"
+        },
+        {
+          "$ref": "#/$defs/AlgES256K"
+        }
+      ]
     },
     "AlgES256": {
       "description": "ECDSA with SHA-256",
@@ -942,6 +867,25 @@
     "AlgES256K": {
       "description": "ECDSA using secp256k1 curve and SHA-256.",
       "const": -47
+    },
+    "AuthenticatorTransport": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TransportUSB"
+        },
+        {
+          "$ref": "#/$defs/TransportNFC"
+        },
+        {
+          "$ref": "#/$defs/TransportBLE"
+        },
+        {
+          "$ref": "#/$defs/TransportHybrid"
+        },
+        {
+          "$ref": "#/$defs/TransportInternal"
+        }
+      ]
     },
     "TransportUSB": {
       "description": "Indicates the respective authenticator can be contacted over removable USB",
