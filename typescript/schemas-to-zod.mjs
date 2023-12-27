@@ -11,6 +11,19 @@ function reviver(k, v) {
         v.const = v.$ref;
         delete v.$ref;
     }
+    if (v.default !== undefined) {
+        if (v.description) {
+            v.description += ' ';
+        } else {
+            v.description = '';
+        }
+        let vdef = v.default;
+        const prefix = '#/$defs/';
+        if ((typeof vdef === 'string') && vdef.startsWith(prefix)) {
+            vdef = `{@link ${vdef.substr(prefix.length)}}`;
+        }
+        v.description += '@defaultValue ' + vdef; 
+    }
     return v;
 }
 

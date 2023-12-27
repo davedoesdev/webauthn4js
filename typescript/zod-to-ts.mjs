@@ -1,11 +1,12 @@
 import { EOL } from 'node:os';
 import * as schemas from './schemas.zod.mjs';
 import { createTypeAlias, printNode, zodToTs } from 'zod-to-ts';
+import { ZodDefault, ZodObject } from 'zod';
 import ts from 'typescript';
 
 const defs_prefix = '#/$defs/';
 
-function replace(node, parent) {
+function replace_refs(node, parent) {
     if ((node.kind === ts.SyntaxKind.StringLiteral) &&
         (parent.kind === ts.SyntaxKind.LiteralType) &&
         (node.text.startsWith(defs_prefix))) {
@@ -15,13 +16,13 @@ function replace(node, parent) {
         parent.typeName = node;
 
     }
-    node.forEachChild(child => replace(child, node));
+    node.forEachChild(child => replace_refs(child, node));
 }
 
 for (const type in schemas) {
     const { node } = zodToTs(schemas[type], type);
     const typeAlias = createTypeAlias(node, type);
-    replace(typeAlias);
+    replace_refs(typeAlias);
     let nodeString = printNode(typeAlias);
     let description = schemas[type].description;
     if (description) {

@@ -66,7 +66,7 @@ export type AuthenticatorAttestationResponse = {
 export type AuthenticatorSelection = {
     /** If this member is present, eligible authenticators are filtered to only authenticators attached by the specified mechanism. */
     authenticatorAttachment?: AuthenticatorAttachment | undefined;
-    /** Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential. */
+    /** Describes the Relying Party's requirements regarding resident credentials. If present and set to `true`, the authenticator MUST create a client-side-resident public key credential source when creating a public key credential. @defaultValue false */
     requireResidentKey?: boolean;
     /** Specifies the extent to which the Relying Party desires to create a client-side discoverable credential. For historical reasons the naming retains the deprecated “resident” terminology. */
     residentKey?: string | undefined;
@@ -100,6 +100,7 @@ export type Config = {
     /** @deprecated Use Timeouts instead. */
     Timeout: number;
 };
+/** @defaultValue {@link PreferNoAttestation} */
 export type ConveyancePreference = PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation | PreferEnterpriseAttestation;
 /** Contains all needed information about a WebAuthn credential for storage. */
 export type Credential = {
@@ -318,4 +319,5 @@ export type UserVerificationDiscouraged = "discouraged";
 export type UserVerificationPreferred = "preferred";
 /** User verification is required to create/use a credential. */
 export type UserVerificationRequired = "required";
+/** @defaultValue {@link UserVerificationPreferred} */
 export type UserVerificationRequirement = UserVerificationRequired | UserVerificationPreferred | UserVerificationDiscouraged;
