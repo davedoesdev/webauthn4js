@@ -24,6 +24,14 @@ function reviver(k, v) {
         }
         v.description += '@defaultValue ' + vdef; 
     }
+    if (v.contentEncoding !== undefined) {
+        if (v.description) {
+            v.description = ' ' + v.description;
+        } else {
+            v.description = '';
+        }
+        v.description = `(**${v.contentEncoding}**)` + v.description;
+    }
     return v;
 }
 
