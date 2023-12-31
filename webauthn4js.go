@@ -105,6 +105,7 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 	var ccoErr error
 
 	for _, f := range arguments[1:len(arguments) - 1] {
+		fCopy := f
 		regOpts = append(regOpts, func(cco *protocol.PublicKeyCredentialCreationOptions) {
 			ccoJSON, err :=  json.Marshal(cco)
 			if err != nil {
@@ -113,7 +114,7 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 			}
 
 			var newCCO protocol.PublicKeyCredentialCreationOptions
-			err = json.Unmarshal([]byte(f.Invoke(string(ccoJSON)).String()), &newCCO)
+			err = json.Unmarshal([]byte(fCopy.Invoke(string(ccoJSON)).String()), &newCCO)
 			if err != nil {
 				ccoErr = err
 				return
@@ -123,13 +124,13 @@ func beginRegistration(this js.Value, arguments []js.Value) interface{} {
 		})
 	}
 
-	if ccoErr != nil {
-		return cberr(cb, ccoErr)
-	}
-
 	options, sessionData, err := webAuthn.BeginRegistration(user, regOpts...)
 	if err != nil {
 		return cberr(cb, err)
+	}
+
+	if ccoErr != nil {
+		return cberr(cb, ccoErr)
 	}
 
 	optionsJSON, err := json.Marshal(options)

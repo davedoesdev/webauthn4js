@@ -48,7 +48,18 @@ class WebAuthn4JS extends events.EventEmitter {
     async _begin(method, user, ...args) {
         const [options, sessionData] = await method(
             JSON.stringify(this._user(user)),
-            ...args.map(f => cxo => JSON.stringify(f(JSON.parse(cxo)))));
+            ...args.map(f => cxo => {
+                const cxo2 = f(JSON.parse(cxo));
+                if (cxo2 && cxo2.excludeCredentials) {
+                    for (const c of cxo2.excludeCredentials) {
+                        c.id = c.id
+                                .replace(/\+/g, "-")
+                                .replace(/\//g, "_")
+                                .replace(/=/g, "");
+                    }
+                }
+                return JSON.stringify(cxo2);
+            }));
         return {
             options: JSON.parse(options),
             sessionData: JSON.parse(sessionData)
@@ -144,4 +155,14 @@ module.exports = promisify((config, cb) => {
     })();
 });
 
-module.exports.webAuthnSchema = require('./schemas/schemas.json');
+const schemas = require('./schemas/schemas.json');
+
+function reviver(k, v) {
+    if (v.$ref) {
+        Object.assign(v, schemas.$defs[v.$ref]);
+        delete v.$ref;
+    }
+    return v;
+}
+
+module.exports.schemas = JSON.parse(JSON.stringify(schemas), reviver);

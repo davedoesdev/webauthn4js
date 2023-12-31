@@ -419,14 +419,11 @@
       }
     },
     "AuthenticatorAttachment": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/PlatformAttachment"
-        },
-        {
-          "$ref": "#/$defs/CrossPlatformAttachment"
-        }
-      ]
+      "anyOf": [{
+        "$ref": "#/$defs/PlatformAttachment"
+      }, {
+        "$ref": "#/$defs/CrossPlatformAttachment"
+      }]
     },
     "PlatformAttachment": {
       "const": "platform",
@@ -437,18 +434,16 @@
       "description": "A roaming authenticator is attached using cross-platform transports, called cross-platform attachment. Authenticators of this class are removable from, and can \"roam\" among, client devices. A public key credential bound to a roaming authenticator is called a roaming credential."
     },
     "UserVerificationRequirement": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/UserVerificationRequired"
-        },
-        {
-          "$ref": "#/$defs/UserVerificationPreferred"
-        },
-        {
-          "$ref": "#/$defs/UserVerificationDiscouraged"
-        }
-      ],
-      "default": "#/$defs/UserVerificationPreferred"
+      "anyOf": [{
+        "$ref": "#/$defs/UserVerificationRequired"
+      }, {
+        "$ref": "#/$defs/UserVerificationPreferred"
+      }, {
+        "$ref": "#/$defs/UserVerificationDiscouraged"
+      }],
+      "default": {
+        "$ref": "#/$defs/UserVerificationPreferred"
+      }
     },
     "UserVerificationRequired": {
       "const": "required",
@@ -463,21 +458,18 @@
       "description": "The authenticator should not verify the user for the credential."
     },
     "ConveyancePreference": {
-        "anyOf": [
-          {
-            "$ref": "#/$defs/PreferNoAttestation"
-          },
-          {
-            "$ref": "#/$defs/PreferIndirectAttestation"
-          },
-          {
-            "$ref": "#/$defs/PreferDirectAttestation"
-          },
-          {
-            "$ref": "#/$defs/PreferEnterpriseAttestation"
-          }
-        ],
-        "default": "#/$defs/PreferNoAttestation"
+      "anyOf": [{
+        "$ref": "#/$defs/PreferNoAttestation"
+      }, {
+        "$ref": "#/$defs/PreferIndirectAttestation"
+      }, {
+        "$ref": "#/$defs/PreferDirectAttestation"
+      }, {
+        "$ref": "#/$defs/PreferEnterpriseAttestation"
+      }],
+      "default": {
+        "$ref": "#/$defs/PreferNoAttestation"
+      }
     },
     "PreferNoAttestation": {
       "description": "Indicates that the Relying Party is not interested in authenticator attestation. For example, in order to potentially avoid having to obtain user consent to relay identifying information to the Relying Party, or to save a roundtrip to an Attestation CA. This is the default if no attestation conveyance is specified.",
@@ -503,44 +495,31 @@
       "const": "public-key"
     },
     "COSEAlgorithmIdentifier": {
-      "anyOf":[
-        {
-          "$ref": "#/$defs/AlgES256"
-        },
-        {
-          "$ref": "#/$defs/AlgES384"
-        },
-        {
-          "$ref": "#/$defs/AlgES512"
-        },
-        {
-          "$ref": "#/$defs/AlgRS1"
-        },
-        {
-          "$ref": "#/$defs/AlgRS256"
-        },
-        {
-          "$ref": "#/$defs/AlgRS384"
-        },
-        {
-          "$ref": "#/$defs/AlgRS512"
-        },
-        {
-          "$ref": "#/$defs/AlgPS256"
-        },
-        {
-          "$ref": "#/$defs/AlgPS384"
-        },
-        {
-          "$ref": "#/$defs/AlgPS512"
-        },
-        {
-          "$ref": "#/$defs/AlgEdDSA"
-        },
-        {
-          "$ref": "#/$defs/AlgES256K"
-        }
-      ]
+      "anyOf":[{
+        "$ref": "#/$defs/AlgES256"
+      }, {
+        "$ref": "#/$defs/AlgES384"
+      }, {
+        "$ref": "#/$defs/AlgES512"
+      }, {
+        "$ref": "#/$defs/AlgRS1"
+      }, {
+        "$ref": "#/$defs/AlgRS256"
+      }, {
+        "$ref": "#/$defs/AlgRS384"
+      }, {
+        "$ref": "#/$defs/AlgRS512"
+      }, {
+        "$ref": "#/$defs/AlgPS256"
+      }, {
+        "$ref": "#/$defs/AlgPS384"
+      }, {
+        "$ref": "#/$defs/AlgPS512"
+      }, {
+        "$ref": "#/$defs/AlgEdDSA"
+      }, {
+        "$ref": "#/$defs/AlgES256K"
+      }]
     },
     "AlgES256": {
       "description": "ECDSA with SHA-256",
@@ -591,23 +570,17 @@
       "const": -47
     },
     "AuthenticatorTransport": {
-      "anyOf": [
-        {
-          "$ref": "#/$defs/TransportUSB"
-        },
-        {
-          "$ref": "#/$defs/TransportNFC"
-        },
-        {
-          "$ref": "#/$defs/TransportBLE"
-        },
-        {
-          "$ref": "#/$defs/TransportHybrid"
-        },
-        {
-          "$ref": "#/$defs/TransportInternal"
-        }
-      ]
+      "anyOf": [{
+        "$ref": "#/$defs/TransportUSB"
+      }, {
+        "$ref": "#/$defs/TransportNFC"
+      }, {
+        "$ref": "#/$defs/TransportBLE"
+      }, {
+        "$ref": "#/$defs/TransportHybrid"
+      }, {
+        "$ref": "#/$defs/TransportInternal"
+      }]
     },
     "TransportUSB": {
       "description": "Indicates the respective authenticator can be contacted over removable USB",

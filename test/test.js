@@ -54,7 +54,8 @@ before(async function () {
         https: {
             key: await readFile(join(keys_dir, 'server.key')),
             cert: await readFile(join(keys_dir, 'server.crt'))
-        }
+        },
+        forceCloseConnections: true
     });
 
     fastify.register(fastify_static, {
@@ -190,7 +191,7 @@ before(async function () {
 
     await fastify.listen({ port });
 
-    browser.config.after.push(async function () {
+    browser.options.after.push(async function () {
         await fastify.close();
 
         await promisify(cb => {
@@ -202,6 +203,8 @@ before(async function () {
         })();
     });
 
+    await browser.addVirtualAuthenticator('ctap2_1', 'usb');
+
     await browser.url(`${origin}/test/test.html`);
 });
 
@@ -211,7 +214,9 @@ async function executeAsync(f, ...args) {
         (async function () {
             let done = args[args.length - 1];
             window.bufferDecode = function (value) {
-                return Uint8Array.from(atob(value), c => c.charCodeAt(0));
+                return Uint8Array.from(atob(value
+                    .replace(/-/g, "+")
+                    .replace(/_/g, "/")), c => c.charCodeAt(0));
             };
             window.bufferEncode = function (value) {
                 return btoa(String.fromCharCode.apply(null, new Uint8Array(value)))
@@ -373,7 +378,7 @@ describe('register', function () {
         // ID from Go is b64 encoded
         expect(b64url(cred.ID)).to.equal(id);
         expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(0);
+        expect(cred.Authenticator.SignCount).to.equal(1);
         expect(cred.Authenticator.CloneWarning).to.be.false;
 
         cred_id = id;
@@ -387,7 +392,7 @@ describe('register', function () {
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('An attempt was made to use an object that is not, or is no longer, usable');
+        expect(ex.message).to.equal('The user attempted to register an authenticator that contains one of the credentials already registered with the relying party.');
     });
 
     it('should register second user', async function () {
@@ -409,7 +414,7 @@ describe('register', function () {
         const cred = user.credentials[0];
         expect(b64url(cred.ID)).to.equal(cred_id);
         expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(0);
+        expect(cred.Authenticator.SignCount).to.equal(1);
         expect(cred.Authenticator.CloneWarning).to.be.false;
         expect(cred.PublicKey).to.equal(cred_pubkey);
 
@@ -425,7 +430,7 @@ describe('register', function () {
         const cred2 = user2.credentials[0];
         expect(b64url(cred2.ID)).to.equal(id);
         expect(cred2.AttestationType).to.equal('none');
-        expect(cred2.Authenticator.SignCount).to.equal(0);
+        expect(cred2.Authenticator.SignCount).to.equal(1);
         expect(cred2.Authenticator.CloneWarning).to.be.false;
         expect(b64url(cred2.ID)).not.to.equal(cred_id);
         expect(cred2.PublicKey).not.to.equal(cred_pubkey);

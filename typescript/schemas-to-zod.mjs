@@ -6,6 +6,8 @@ import { jsonSchemaToZod } from "json-schema-to-zod";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+const defs_prefix = '#/$defs/';
+
 function reviver(k, v) {
     if (v.$ref) {
         v.const = v.$ref;
@@ -18,9 +20,9 @@ function reviver(k, v) {
             v.description = '';
         }
         let vdef = v.default;
-        const prefix = '#/$defs/';
-        if ((typeof vdef === 'string') && vdef.startsWith(prefix)) {
-            vdef = `{@link ${vdef.substr(prefix.length)}}`;
+        if (vdef.const && (typeof vdef.const === 'string') && vdef.const.startsWith(defs_prefix)) {
+            vdef = `{@link ${vdef.const.substr(defs_prefix.length)}}`;
+            v.default = vdef.const;
         }
         v.description += '@defaultValue ' + vdef; 
     }
