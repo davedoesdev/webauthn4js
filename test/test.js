@@ -484,7 +484,7 @@ describe('login', function () {
         const cred = user.credentials[0];
         expect(b64url(cred.ID)).to.equal(id);
         expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(1);
+        expect(cred.Authenticator.SignCount).to.equal(2);
         expect(cred.Authenticator.CloneWarning).to.be.false;
     });
 
@@ -649,7 +649,7 @@ describe('login', function () {
         const cred = user.credentials[0];
         expect(b64url(cred.ID)).to.equal(id);
         expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(4);
+        expect(cred.Authenticator.SignCount).to.equal(2);
         expect(cred.Authenticator.CloneWarning).to.be.false;
     });
 
@@ -670,7 +670,7 @@ describe('login', function () {
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"Error validating the assertion signature: Signature invalid or not provided\\n"}');
+        expect(ex.message).to.equal('Login POST failed with 400 {"statusCode":400,"error":"Bad Request","message":"Error validating the assertion signature: Signature invalid or not provided"}');
         await login(username);
     });
 });
@@ -683,7 +683,8 @@ describe('init', function () {
         } catch (e) {
             ex = e;
         }
-        expect(ex.message).to.equal('Configuration error: Missing RPDisplayName');
+        console.log("FOO", ex.message);
+        expect(ex.message).to.equal("error occurred validating the configuration: the field 'RPDisplayName' must be configured but it is empty");
         // Note: also tests exit without webauthn being made
     });
 
