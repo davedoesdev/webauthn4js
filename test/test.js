@@ -10,7 +10,7 @@ const { readFile } = require('fs').promises;
 const mod_fastify = require('fastify');
 const fastify_static = require('@fastify/static');
 const makeWebAuthn = require('..');
-const { expect } = require('chai');
+let expect;
 const crypto = require('crypto');
 const { promisify } = require('util');
 
@@ -47,6 +47,8 @@ function b64url(b64) {
 const users = new Map();
 
 before(async function () {
+    ({ expect } = await import('chai'));
+
     const keys_dir = join(__dirname, 'keys');
 
     const fastify = mod_fastify({
