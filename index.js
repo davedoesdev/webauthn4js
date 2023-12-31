@@ -53,9 +53,9 @@ class WebAuthn4JS extends events.EventEmitter {
                 if (cxo2 && cxo2.excludeCredentials) {
                     for (const c of cxo2.excludeCredentials) {
                         c.id = c.id
-                                .replace(/\+/g, "-")
-                                .replace(/\//g, "_")
-                                .replace(/=/g, "");
+                            .replace(/\+/g, "-")
+                            .replace(/\//g, "_")
+                            .replace(/=/g, "");
                     }
                 }
                 return JSON.stringify(cxo2);
