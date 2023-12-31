@@ -683,7 +683,6 @@ describe('init', function () {
         } catch (e) {
             ex = e;
         }
-        console.log("FOO", ex.message);
         expect(ex.message).to.equal("error occurred validating the configuration: the field 'RPDisplayName' must be configured but it is empty");
         // Note: also tests exit without webauthn being made
     });
