@@ -40,8 +40,7 @@ fastify.register(fastify_static, {
 const webAuthn = await makeWebAuthn({
     RPDisplayName: 'WebAuthnJS',
     RPID: 'localhost',
-    RPOrigin: `https://localhost:${port}`,
-    RPIcon: `https://localhost:${port}/logo.png`,
+    RPOrigins: [`https://localhost:${port}`],
     AuthenticatorSelection: {
         userVerification: 'preferred'
     }

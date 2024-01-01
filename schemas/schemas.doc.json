@@ -112,7 +112,12 @@
         "Timeout": {
           "description": "@deprecated Use Timeouts instead."
         }
-      }
+      },
+      "required": [
+        "RPID",
+        "RPDisplayName",
+        "RPOrigins"
+      ]
     },
     "Credential": {
       "description": "Contains all needed information about a WebAuthn credential for storage.",

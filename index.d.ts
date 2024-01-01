@@ -136,7 +136,7 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
     ) : Promise<Credential>;
 
     /**
-     * Tell the Web Assembly code which is running the Duo Labs Go WebAuthn library for this
+     * Tell the Web Assembly code which is running the Go WebAuthn library for this
      * instance to stop.
      *
      * Don't call any more methods after you call this.

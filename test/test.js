@@ -23,8 +23,7 @@ const username3 = 'foo3@bar.com';
 const config = {
     RPDisplayName: 'WebAuthnJS',
     RPID: 'localhost',
-    RPOrigin: origin,
-    RPIcon: `${origin}/test/logo.png`,
+    RPOrigins: [origin],
     AuthenticatorSelection: {
         userVerification: 'preferred'
     }

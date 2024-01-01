@@ -84,21 +84,21 @@ export type Config = {
     /** Configures the list of Relying Party Server Origins that are permitted. These should be fully qualified origins. */
     RPOrigins: string[];
     /** Preferred attestation conveyance during credential generation */
-    AttestationPreference: ConveyancePreference;
+    AttestationPreference?: ConveyancePreference | undefined;
     /** Login requirements for authenticator attributes. */
-    AuthenticatorSelection: AuthenticatorSelection;
+    AuthenticatorSelection?: AuthenticatorSelection | undefined;
     /** Enables various debug options. */
-    Debug: boolean;
+    Debug?: boolean | undefined;
     /** Ensures the user.id value during registrations is encoded as a raw UTF8 string. This is useful when you only use printable ASCII characters for the random user.id but the browser library does not decode the URL Safe Base64 data. */
-    EncodeUserIDAsString: boolean;
+    EncodeUserIDAsString?: boolean | undefined;
     /** Configures various timeouts. */
-    Timeouts: TimeoutsConfig;
+    Timeouts?: TimeoutsConfig | undefined;
     /** @deprecated This option has been removed from newer specifications due to security considerations. */
-    RPIcon: string;
+    RPIcon?: string | undefined;
     /** @deprecated Use RPOrigins instead. */
-    RPOrigin: string;
+    RPOrigin?: string | undefined;
     /** @deprecated Use Timeouts instead. */
-    Timeout: number;
+    Timeout?: number | undefined;
 };
 /** @defaultValue {@link PreferNoAttestation} */
 export type ConveyancePreference = PreferNoAttestation | PreferIndirectAttestation | PreferDirectAttestation | PreferEnterpriseAttestation;

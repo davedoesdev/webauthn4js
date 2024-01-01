@@ -1,7 +1,7 @@
 {
   "name": "webauthn4js",
-  "description": "Node.js bindings to Duo Labs WebAuthn Go/Wasm library",
-  "version": "2.0.0",
+  "description": "Node.js bindings to WebAuthn Go/Wasm library",
+  "version": "2.0.1",
   "homepage": "https://github.com/davedoesdev/webauthn4js",
   "author": {
     "name": "David Halls",
@@ -48,7 +48,7 @@
     "mocha": "^10.2.0",
     "prettier": "^3.1.1",
     "sodium-plus": "^0.9.0",
-    "typedoc": "^0.25.4",
+    "typedoc": "^0.25.5",
     "typedoc-plugin-no-inherit": "^1.4.0",
     "typescript": "^5.3.3",
     "webdriverio": "^8.27.0",

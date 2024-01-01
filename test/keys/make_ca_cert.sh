@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-cn="webauthn-perk test CA"
+cn="webauthn4js test CA"
 
 for arg in "$@"
 do

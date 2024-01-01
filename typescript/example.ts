@@ -50,16 +50,10 @@ fastify.register(fastify_static, {
 });
 
 const webAuthn = await makeWebAuthn({
-    RPID: 'localhost',
     RPDisplayName: 'WebAuthnJS',
+    RPID: 'localhost',
     RPOrigins: [`https://localhost:${port}`],
-    AttestationPreference: "none",
-    AuthenticatorSelection: {
-        userVerification: 'preferred'
-    },
-    Debug: false,
-    EncodeUserIDAsString: false,
-    Timeouts: {
+    /*Timeouts: {
         Login: {
             Enforce: true,
             Timeout: 60 * 1000,
@@ -70,10 +64,7 @@ const webAuthn = await makeWebAuthn({
             Timeout: 60 * 1000,
             TimeoutUVD: 60 * 1000
         }
-    },
-    RPIcon: `https://localhost:${port}/logo.png`,
-    RPOrigin: `https://localhost:${port}`,
-    Timeout: 60 * 1000
+    }*/
 });
 
 interface IUserRoute {
@@ -207,6 +198,6 @@ fastify.register(login, {
     prefix: '/login/'
 });
 
-await fastify.listen(port);
+await fastify.listen({ port });
 
 console.log(`Please visit https://localhost:${port}`);

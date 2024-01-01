@@ -5,7 +5,7 @@ This library handles https://w3c.github.io/webauthn/[Web Authentication] for
 Node.js applications that wish to implement a passwordless solution for users.
 
 It's implemented as bindings to the
-https://github.com/duo-labs/webauthn[Duo Labs Go WebAuthn library], which has
+https://github.com/go-webauthn/webauthn[Go WebAuthn library], which has
 been compiled to Web Assembly. It was inspired by
 https://github.com/pulsejet/go-webauthn-js[go-webauthn-js] but uses Go's
 built-in Web Assembly compiler instead of GopherJS.
@@ -24,7 +24,7 @@ to interact with the user's authenticator, such as a FIDO2 token, and then makes
 requests to the server.
 
 The example is modelled after
-https://github.com/hbolimovsky/webauthn-example[this example] of the Duo Labs
+https://github.com/hbolimovsky/webauthn-example[this example] of the Go WebAuthn
 library.
 
 === Server-side
@@ -115,8 +115,7 @@ interact with their authenticators.
 const webAuthn = await makeWebAuthn({
     RPDisplayName: 'WebAuthnJS',
     RPID: 'localhost',
-    RPOrigin: `https://localhost:${port}`,
-    RPIcon: `https://localhost:${port}/logo.png`,
+    RPOrigins: [`https://localhost:${port}`],
     AuthenticatorSelection: {
         userVerification: 'preferred'
     }
@@ -401,9 +400,11 @@ which I'll describe now.
 [source,javascript]
 .example.js
 ----
-// Base64 to ArrayBuffer
+// URLBase64 to ArrayBuffer
 function bufferDecode(value) {
-    return Uint8Array.from(atob(value), c => c.charCodeAt(0));
+    return Uint8Array.from(atob(value
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")), c => c.charCodeAt(0));
 }
 
 // ArrayBuffer to URLBase64
@@ -566,9 +567,9 @@ To complete login, we make a POST request to the server with the result from
 == Typescript
 
 Typescript definitions can be found in link:index.d.ts[] and link:typescript/webauthn.d.ts[].
-The latter is automatically generated from the Duo Labs Go WebAuthn library using 
-https://github.com/alecthomas/jsonschema[jsonschema] and
-https://github.com/bcherny/json-schema-to-typescript[json-schema-to-typescript].
+The latter is automatically generated from the Go WebAuthn library using 
+https://github.com/StefanTerdell/json-schema-to-zod[json-schema-to-zod] and
+https://github.com/sachinraja/zod-to-ts[zod-to-ts].
 
 A Typescript version of the <<example,example>> can be found in link:typescript/example.ts[].
 
@@ -583,9 +584,9 @@ npm install webauthn4js
 
 The licence for WebAuthn4JS is link:LICENCE[here].
 
-The licence for Duo Labs Go WebAuthn library is link:LICENCE_webauthn[here].
+The licence for the Go WebAuthn library is link:LICENCE_webauthn[here].
 
-I've also modified https://github.com/golang/go/blob/go1.18.1/misc/wasm/wasm_exec.js[`wasm_exec.js`]
+I've also modified https://github.com/golang/go/blob/go1.21.1/misc/wasm/wasm_exec.js[`wasm_exec.js`]
 from Go's distribution. I've included the original link:wasm_exec.js.orig[here] and Go's
 licence link:LICENSE_wasm_exec[here]. The modified version is link:wasm_exec.js[here].
 

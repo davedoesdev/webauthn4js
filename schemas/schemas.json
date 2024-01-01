@@ -176,15 +176,7 @@
       "required": [
         "RPID",
         "RPDisplayName",
-        "RPOrigins",
-        "AttestationPreference",
-        "AuthenticatorSelection",
-        "Debug",
-        "EncodeUserIDAsString",
-        "Timeouts",
-        "RPIcon",
-        "RPOrigin",
-        "Timeout"
+        "RPOrigins"
       ],
       "description": "Configuration and default values for the {@link WebAuthn4JS} instance."
     },
