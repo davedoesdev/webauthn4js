@@ -93,7 +93,7 @@ before(async function () {
             }
             const excludeCredentials = user.credentials.map(c => ({
                 type: 'public-key',
-                id: c.ID
+                id: c.id
             }));
             const { options, sessionData } = await webAuthn.beginRegistration(
                 user,
@@ -126,7 +126,7 @@ before(async function () {
                 throw ex;
             }
             for (const u of users.values()) {
-                if (u.credentials.find(c => c.ID === credential.ID)) {
+                if (u.credentials.find(c => c.id === credential.id)) {
                     throw new ErrorWithStatus('credential in use', 409);
                 }
             }
@@ -168,16 +168,16 @@ before(async function () {
                 ex.statusCode = 400;
                 throw ex;
             }
-            if (credential.Authenticator.CloneWarning) {
+            if (credential.authenticator.cloneWarning) {
                 throw new ErrorWithStatus('credential appears to be cloned', 403);
             }
-            const user_cred = user.credentials.find(c => c.ID === credential.ID);
+            const user_cred = user.credentials.find(c => c.id === credential.id);
             /* istanbul ignore if */
             if (!user_cred) {
                 // Should have been checked already in Go by webAuthn.finishLogin
                 throw new ErrorWithStatus('no credential', 500);
             }
-            user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
+            user_cred.authenticator.signCount = credential.authenticator.signCount;
             reply.code(204);
         });
     }
@@ -377,13 +377,13 @@ describe('register', function () {
         const cred = user.credentials[0];
         // id returned from credentials.create is b64url encoded
         // ID from Go is b64 encoded
-        expect(b64url(cred.ID)).to.equal(id);
-        expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(1);
-        expect(cred.Authenticator.CloneWarning).to.be.false;
+        expect(b64url(cred.id)).to.equal(id);
+        expect(cred.attestationType).to.equal('none');
+        expect(cred.authenticator.signCount).to.equal(1);
+        expect(cred.authenticator.cloneWarning).to.be.false;
 
         cred_id = id;
-        cred_pubkey = cred.PublicKey;
+        cred_pubkey = cred.publicKey;
     });
 
     it('should fail to use same credential', async function () {
@@ -413,11 +413,11 @@ describe('register', function () {
         expect(user.credentials.length).to.equal(1);
 
         const cred = user.credentials[0];
-        expect(b64url(cred.ID)).to.equal(cred_id);
-        expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(1);
-        expect(cred.Authenticator.CloneWarning).to.be.false;
-        expect(cred.PublicKey).to.equal(cred_pubkey);
+        expect(b64url(cred.id)).to.equal(cred_id);
+        expect(cred.attestationType).to.equal('none');
+        expect(cred.authenticator.signCount).to.equal(1);
+        expect(cred.authenticator.cloneWarning).to.be.false;
+        expect(cred.publicKey).to.equal(cred_pubkey);
 
         const user2 = users.get(username2);
 
@@ -429,12 +429,12 @@ describe('register', function () {
         expect(user2.credentials.length).to.equal(1);
 
         const cred2 = user2.credentials[0];
-        expect(b64url(cred2.ID)).to.equal(id);
-        expect(cred2.AttestationType).to.equal('none');
-        expect(cred2.Authenticator.SignCount).to.equal(1);
-        expect(cred2.Authenticator.CloneWarning).to.be.false;
-        expect(b64url(cred2.ID)).not.to.equal(cred_id);
-        expect(cred2.PublicKey).not.to.equal(cred_pubkey);
+        expect(b64url(cred2.id)).to.equal(id);
+        expect(cred2.attestationType).to.equal('none');
+        expect(cred2.authenticator.signCount).to.equal(1);
+        expect(cred2.authenticator.cloneWarning).to.be.false;
+        expect(b64url(cred2.id)).not.to.equal(cred_id);
+        expect(cred2.publicKey).not.to.equal(cred_pubkey);
     });
 
     it('should fail to register with duplicate attestation', async function () {
@@ -483,10 +483,10 @@ describe('login', function () {
         expect(user.credentials.length).to.equal(1);
 
         const cred = user.credentials[0];
-        expect(b64url(cred.ID)).to.equal(id);
-        expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(2);
-        expect(cred.Authenticator.CloneWarning).to.be.false;
+        expect(b64url(cred.id)).to.equal(id);
+        expect(cred.attestationType).to.equal('none');
+        expect(cred.authenticator.signCount).to.equal(2);
+        expect(cred.authenticator.cloneWarning).to.be.false;
     });
 
     it('should fail to login with duplicate assertion', async function () {
@@ -648,10 +648,10 @@ describe('login', function () {
         expect(user.credentials.length).to.equal(1);
 
         const cred = user.credentials[0];
-        expect(b64url(cred.ID)).to.equal(id);
-        expect(cred.AttestationType).to.equal('none');
-        expect(cred.Authenticator.SignCount).to.equal(2);
-        expect(cred.Authenticator.CloneWarning).to.be.false;
+        expect(b64url(cred.id)).to.equal(id);
+        expect(cred.attestationType).to.equal('none');
+        expect(cred.authenticator.signCount).to.equal(2);
+        expect(cred.authenticator.cloneWarning).to.be.false;
     });
 
     it('should fail to login third user', async function () {

@@ -88,7 +88,7 @@ const register : FastifyPluginAsync = async function (fastify) {
         }
         const excludeCredentials = user.credentials.map((c) : CredentialDescriptor => ({
             type: 'public-key',
-            id: c.ID
+            id: c.id
         }));
         const { options, sessionData } = await webAuthn.beginRegistration(
             user,
@@ -128,7 +128,7 @@ const register : FastifyPluginAsync = async function (fastify) {
             throw ex;
         }
         for (const u of users.values()) {
-            if (u.credentials.find(c => c.ID === credential.ID)) {
+            if (u.credentials.find(c => c.id === credential.id)) {
                 throw new ErrorWithStatus('credential in use', 409);
             }
         }
@@ -177,15 +177,15 @@ const login : FastifyPluginAsync = async function (fastify) {
             ex.statusCode = 400;
             throw ex;
         }
-        if (credential.Authenticator.CloneWarning) {
+        if (credential.authenticator.cloneWarning) {
             throw new ErrorWithStatus('credential appears to be cloned', 403);
         }
-        const user_cred = user.credentials.find(c => c.ID === credential.ID);
+        const user_cred = user.credentials.find(c => c.id === credential.id);
         if (!user_cred) {
             // Should have been checked already in Go by webAuthn.finishLogin
             throw new ErrorWithStatus('no credential', 500);
         }
-        user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
+        user_cred.authenticator.signCount = credential.authenticator.signCount;
         reply.code(204);
     });
 }

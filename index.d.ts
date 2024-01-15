@@ -122,11 +122,11 @@ interface WebAuthn4JS extends TypedEmitter<WebAuthn4JSEvents> {
      * @returns  Credential that was verified (against the challenge in the session data). 
      *           <p>It's also checked to belong to the user's existing credentials.
      *           <p>Note that the caller is responsible for checking the
-     *           {@link Authenticator.CloneWarning} property, indicating the credential has
+     *           {@link Authenticator.cloneWarning} property, indicating the credential has
      *           been cloned, and treating it as an error.
-     *           <p>The caller should also use the {@link Authenticator.SignCount} property to
+     *           <p>The caller should also use the {@link Authenticator.signCount} property to
      *           update the sign count it holds on record (for example in a database) for
-     *           this credential. It can use the {@link Credential.ID} property to identify
+     *           this credential. It can use the {@link Credential.id} property to identify
      *           credentials.
      */
     finishLogin(

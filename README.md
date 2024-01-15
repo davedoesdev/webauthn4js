@@ -155,7 +155,7 @@ and store this information in the `users` `Map`.
 ``` javascript
         const excludeCredentials = user.credentials.map(c => ({
             type: 'public-key',
-            id: c.ID
+            id: c.id
         }));
 ```
 
@@ -233,7 +233,7 @@ object. Note the credential isn’t yet associated with a user.
 
 ``` javascript
         for (const u of users.values()) {
-            if (u.credentials.find(c => c.ID === credential.ID)) {
+            if (u.credentials.find(c => c.id === credential.id)) {
                 throw new ErrorWithStatus('credential in use', 409);
             }
         }
@@ -311,10 +311,10 @@ received from the browser (i.e. the result of
 `navigator.credentials.get()`).
 
 ``` javascript
-        if (credential.Authenticator.CloneWarning) {
+        if (credential.authenticator.cloneWarning) {
             throw new ErrorWithStatus('credential appears to be cloned', 403);
         }
-        const user_cred = user.credentials.find(c => c.ID === credential.ID);
+        const user_cred = user.credentials.find(c => c.id === credential.id);
         if (!user_cred) {
             // Should have been checked already in Go by webAuthn.finishLogin
             throw new ErrorWithStatus('no credential', 500);
@@ -331,13 +331,13 @@ Here we do a couple of checks on the credential used for login:
     have already been checked in Go.
 
 ``` javascript
-        user_cred.Authenticator.SignCount = credential.Authenticator.SignCount;
+        user_cred.authenticator.signCount = credential.authenticator.signCount;
         reply.code(204);
     });
 }
 ```
 
-Finally for login, we have to update the `SignCount` for the credential
+Finally for login, we have to update the `signCount` for the credential
 in the user’s credentials list. This enables the Go library to check for
 duplicate requests.
 

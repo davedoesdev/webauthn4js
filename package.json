@@ -1,7 +1,7 @@
 {
   "name": "webauthn4js",
   "description": "Node.js bindings to WebAuthn Go/Wasm library",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "homepage": "https://github.com/davedoesdev/webauthn4js",
   "author": {
     "name": "David Halls",
